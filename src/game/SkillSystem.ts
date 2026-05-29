@@ -996,20 +996,33 @@ export class SkillSystem {
     targetId?: number,
     homingTurnRate = 0.18,
   ): Projectile {
+    // 베이스 스킬 ID 역매핑 (진화 스킬 → 베이스)
+    const baseIdMap: Record<string, string> = {
+      ghost_shuriken: 'kunai', twin_boomerang: 'boomerang',
+      napalm: 'molotov', eternal_guardian: 'guardian', cluster_rocket: 'rocket',
+    };
+    const lookupId = baseIdMap[skillId] ?? skillId;
+    const spriteUrl = this.data.skills.get(lookupId)?.projectile_sprite_url ?? '';
+
     let geo: THREE.BufferGeometry;
-    if (skillId === 'kunai' || skillId === 'ghost_shuriken') {
-      // 쿠나이: 납작한 4각형 + 앞뒤 뾰족 (탑다운에서 확실히 보이는 마름모꼴 ShapeGeometry)
+    let mat: THREE.MeshBasicMaterial;
+
+    if (spriteUrl) {
+      geo = new THREE.PlaneGeometry(radius * 2.2, radius * 2.2);
+      const tex = new THREE.TextureLoader().load(spriteUrl);
+      mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 });
+    } else if (skillId === 'kunai' || skillId === 'ghost_shuriken') {
       const shape = new THREE.Shape();
-      const hw = radius * 0.6;  // 좌우 폭
-      const hl = radius * 1.8;  // 앞뒤 길이
-      shape.moveTo( hl,   0);   // 앞 뾰족
-      shape.lineTo(  0,  hw);   // 윗 모서리
-      shape.lineTo(-hl,   0);   // 뒤 뾰족
-      shape.lineTo(  0, -hw);   // 아랫 모서리
+      const hw = radius * 0.6;
+      const hl = radius * 1.8;
+      shape.moveTo( hl,   0);
+      shape.lineTo(  0,  hw);
+      shape.lineTo(-hl,   0);
+      shape.lineTo(  0, -hw);
       shape.closePath();
       geo = new THREE.ShapeGeometry(shape);
+      mat = new THREE.MeshBasicMaterial({ color });
     } else if (skillId === 'boomerang') {
-      // 부메랑: 더 크고 두꺼운 L자 (r*1.9 기준)
       const shape = new THREE.Shape();
       const w = radius * 0.4;
       const l = radius * 1.9;
@@ -1021,20 +1034,20 @@ export class SkillSystem {
       shape.lineTo(-w,  w);
       shape.closePath();
       geo = new THREE.ShapeGeometry(shape);
+      mat = new THREE.MeshBasicMaterial({ color });
     } else if (skillId === 'twin_boomerang') {
-      // 트윈 부메랑은 기하학적인 납작한 링(Torus)
       geo = new THREE.TorusGeometry(radius * 0.75, radius * 0.28, 4, 12);
       geo.rotateX(Math.PI / 2);
+      mat = new THREE.MeshBasicMaterial({ color });
     } else if (skillId === 'rocket' || skillId === 'cluster_rocket' || skillId === 'cluster_mini') {
-      // 로켓은 실린더
       geo = new THREE.CylinderGeometry(radius * 0.35, radius * 0.65, radius * 2.0, 5);
       geo.rotateX(Math.PI / 2);
+      mat = new THREE.MeshBasicMaterial({ color });
     } else {
-      // 축구공 등은 청록색 구체
       geo = new THREE.SphereGeometry(radius * 0.85, 8, 8);
+      mat = new THREE.MeshBasicMaterial({ color });
     }
 
-    const mat  = new THREE.MeshBasicMaterial({ color });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(x, y, 1);
     

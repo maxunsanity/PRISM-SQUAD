@@ -238,24 +238,36 @@ export function createBossMesh(cfg: BossConfig, scene: THREE.Scene): EnemyMeshHa
   const glowCol = new THREE.Color(cfg.glow_color_hex);
   const r = cfg.radius;
 
-  /* 외부 링 */
-  const torusGeo = new THREE.TorusGeometry(r, r * 0.22, 8, 24);
-  const torusMat = new THREE.MeshBasicMaterial({ color: col });
-  const torus = new THREE.Mesh(torusGeo, torusMat);
-  group.add(torus);
+  /* 보스 본체 — 스프라이트 or 절차적 도형 */
+  let torus: THREE.Mesh;
+  let torusMat: THREE.MeshBasicMaterial;
+  let spikeGroup: THREE.Group | null = null;
 
-  /* 가시 돌기 8개 */
-  const spikeGroup = new THREE.Group();
-  const spikeGeo = new THREE.BoxGeometry(r * 0.15, r * 0.5, r * 0.15); // 공유 geo
-  const spikeMat = new THREE.MeshBasicMaterial({ color: glowCol });
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    const spike = new THREE.Mesh(spikeGeo, spikeMat);
-    spike.position.set(Math.cos(angle) * (r + r * 0.4), Math.sin(angle) * (r + r * 0.4), 0);
-    spike.rotation.z = angle;
-    spikeGroup.add(spike);
+  if (cfg.sprite_url) {
+    const tex = new THREE.TextureLoader().load(cfg.sprite_url);
+    const geo = new THREE.PlaneGeometry(r * 2.4, r * 2.4);
+    torusMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 });
+    torus = new THREE.Mesh(geo, torusMat);
+  } else {
+    /* 외부 링 */
+    const torusGeo = new THREE.TorusGeometry(r, r * 0.22, 8, 24);
+    torusMat = new THREE.MeshBasicMaterial({ color: col });
+    torus = new THREE.Mesh(torusGeo, torusMat);
+
+    /* 가시 돌기 8개 */
+    spikeGroup = new THREE.Group();
+    const spikeGeo = new THREE.BoxGeometry(r * 0.15, r * 0.5, r * 0.15);
+    const spikeMat = new THREE.MeshBasicMaterial({ color: glowCol });
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const spike = new THREE.Mesh(spikeGeo, spikeMat);
+      spike.position.set(Math.cos(angle) * (r + r * 0.4), Math.sin(angle) * (r + r * 0.4), 0);
+      spike.rotation.z = angle;
+      spikeGroup.add(spike);
+    }
+    group.add(spikeGroup);
   }
-  group.add(spikeGroup);
+  group.add(torus);
 
   /* 보스 HP 바 */
   const barW = r * 3.5;
@@ -297,10 +309,10 @@ export function createBossMesh(cfg: BossConfig, scene: THREE.Scene): EnemyMeshHa
 
     tick(dt) {
       spikeAngle += dt * 1.2;
-      spikeGroup.rotation.z = spikeAngle;
+      if (spikeGroup) spikeGroup.rotation.z = spikeAngle;
       if (flashTimer > 0) {
         flashTimer -= dt;
-        torusMat.color.set(flashTimer > 0 ? 0xffffff : cfg.color_hex);
+        if (!cfg.sprite_url) torusMat.color.set(flashTimer > 0 ? 0xffffff : cfg.color_hex);
       }
     },
 
