@@ -1,0 +1,7 @@
+drop_id,drop_type,drop_weight,effect_value,pickup_radius,geometry_type,color_hex,size_small,size_medium,size_large
+xp_small,xp,0,2,35,OctahedronGeometry,#80E5B0,3,5,8
+xp_medium,xp,0,10,35,OctahedronGeometry,#6699FF,5,7,10
+xp_large,xp,0,50,35,OctahedronGeometry,#FFD600,7,10,14
+meat,heal,0.04,30,28,CrossGeometry,#80CCFF,0,0,0
+magnet,magnet,0.06,0,28,HalfTorusGeometry,#C099FF,0,0,0
+bomb,bomb,0.015,0,28,IcosahedronGeometry,#FF6680,0,0,0

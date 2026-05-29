@@ -1,0 +1,9 @@
+vfx_id,particle_count,particle_size_min,particle_size_max,particle_life_frames,particle_speed,bloom_strength,bloom_radius,bloom_threshold,screen_shake_intensity,screen_shake_duration_frames,flash_duration_frames
+enemy_death,12,2,6,20,3.5,1.2,0.4,0.1,0,0,0
+player_hit,8,3,7,18,2.5,0.8,0.3,0.1,0.15,8,9
+boss_spawn,30,4,10,40,5.0,1.8,0.5,0.05,0.8,48,30
+boss_hit,6,2,5,12,2.0,1.0,0.3,0.1,0,0,6
+level_up,20,3,8,30,4.0,1.5,0.4,0.05,0,0,0
+bomb_use,40,4,12,35,6.0,2.0,0.6,0.05,0.5,20,18
+explosion,16,3,9,25,4.5,1.4,0.4,0.08,0.3,12,0
+red_tint_hit,0,0,0,0,0,0,0,0,0.1,5,9

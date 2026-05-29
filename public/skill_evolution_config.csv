@@ -1,0 +1,9 @@
+evolution_id,active_skill_id,passive_skill_id,result_skill_id,result_skill_name,result_description
+evo_kunai,kunai,ninjaScroll,ghost_shuriken,유령 수리검,무한 관통 수리검. 선딜레이 소멸
+evo_boomerang,boomerang,elasticShoes,twin_boomerang,쌍부메랑,양방향 동시 발사 초고속 부메랑
+evo_molotov,molotov,highFuel,napalm,네이팜,화염 반경 2배 + 지속시간 3배
+evo_guardian,guardian,exoskeleton,eternal_guardian,영구 수호자,공전 지속시간 무한 고정
+evo_rocket,rocket,highFuel,cluster_rocket,클러스터 로켓,폭발 시 소형 로켓 3발 추가 발사
+evo_soccer_ball,soccer_ball,elasticShoes,quantum_ball,양자공,초고속으로 적과 벽에 무한 튕기며 분열하는 축구공
+evo_drill_shot,drill_shot,exoskeleton,whistling_arrow,휘파람 화살,적 사이를 지그재그로 자동 유도 관통하는 레이저 화살
+evo_dimensional_blade,dimensional_blade,highFuel,void_slash,차원 참격,360도 전체 영역의 공간을 찢어 폭풍 피해를 입히는 검기

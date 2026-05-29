@@ -1,0 +1,13 @@
+talent_id,level,gold_cost
+power,1,200
+power,2,500
+power,3,1000
+hp,1,150
+hp,2,400
+hp,3,800
+speed,1,180
+speed,2,450
+speed,3,900
+exp_boost,1,200
+exp_boost,2,500
+exp_boost,3,1000

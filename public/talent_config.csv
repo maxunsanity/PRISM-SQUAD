@@ -1,0 +1,5 @@
+talent_id,talent_name,description,max_level,effect_per_level
+power,공격력 강화,모든 스킬 기본 데미지 +15%,3,0.15
+hp,체력 증가,시작 최대 HP +50,3,50
+speed,이동속도 증가,기본 이동속도 +8%,3,0.08
+exp_boost,경험치 보너스,EXP 획득량 +10%,3,0.10

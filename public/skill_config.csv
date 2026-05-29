@@ -1,0 +1,16 @@
+skill_id,skill_name,skill_type,icon,description,base_cooldown_frames,base_dmg_mult,projectile_speed,projectile_radius,max_level
+kunai,쿠나이,ACTIVE,🔪,가장 가까운 적에게 유도 수리검 사격,60,1.5,8.5,5,5
+boomerang,부메랑,ACTIVE,🪃,조이스틱 방향으로 발사 후 귀환 관통,70,1.5,5.5,7,5
+molotov,화염병,ACTIVE,🧪,랜덤 위치에 화염 장판 생성,90,0.5,0,40,5
+guardian,수호자,ACTIVE,⚙️,플레이어 주위 공전 블레이드,0,0.9,0,8,5
+rocket,로켓발사기,ACTIVE,🚀,최근접 적에게 폭발 로켓 발사,60,2.0,7.0,6,5
+drone,미사일 드론,ACTIVE,🛰️,우상단 드론이 유도 미사일 연사(공격3초/휴식7초, 레벨업 시 휴식 감소),20,1.4,8.0,5,5
+ninjaScroll,닌자 스크롤,PASSIVE,📜,EXP 획득량 증가,0,0,0,0,5
+elasticShoes,탄성 신발,PASSIVE,👟,이동속도 증가,0,0,0,0,5
+highFuel,고성능 연료,PASSIVE,⛽,폭발 및 화염 반경 증가,0,0,0,0,5
+exoskeleton,외골격 갑옷,PASSIVE,🛡️,투사체 지속시간 증가,0,0,0,0,5
+soccer_ball,축구공,ACTIVE,⚽,적과 벽에 튕기며 물리 피해,160,1.2,6.0,8,5
+drill_shot,드릴샷,ACTIVE,🌀,적을 관통하며 튕기는 드릴 발사,150,1.0,7.5,6,5
+dimensional_blade,차원 검기,ACTIVE,⚔️,전방 부채꼴 구역에 참격 방출,180,1.5,0,24,5
+debuff_aura,감쇄 오라,ACTIVE,🟣,주변 적들의 공격력과 이동속도를 감소시킴,120,0.5,0,35,5
+

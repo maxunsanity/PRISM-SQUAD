@@ -1,0 +1,2 @@
+map_id,map_width,map_height,camera_zoom,spawn_radius_min,spawn_radius_max,boundary_color_hex,boundary_opacity,grid_color_hex,grid_interval,floor_color_hex,ambient_light_color,ambient_light_intensity,dir_light_color,dir_light_intensity,boss_ambient_color,boss_ambient_transition_seconds
+default,3000,3000,60,380,480,#FF4444,0.5,#D0D0D8,60,#F0EDE8,#ffffff,0.6,#ffffff,0.8,#3D0080,2.0

@@ -1,0 +1,2 @@
+joystick_ring_diameter,joystick_knob_diameter,joystick_max_dist,joystick_z_index,joystick_ring_opacity,joystick_knob_opacity,keyboard_diagonal_normalize
+100,40,40,5,0.4,0.7,false
