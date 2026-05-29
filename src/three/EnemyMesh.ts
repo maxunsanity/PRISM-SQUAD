@@ -84,28 +84,36 @@ function _getOrCreate(cfg: EnemyConfig): TypeEntry {
 
   const r = cfg.radius;
   let geo: THREE.BufferGeometry;
+  let mat: THREE.MeshBasicMaterial;
 
-  switch (cfg.geometry_type) {
-    case 'ConeGeometry_flat':
-      geo = new THREE.ConeGeometry(r, r * 1.2, 3);
-      geo.rotateZ(-Math.PI / 2);   // geometry 자체 pre-rotate → 방향 회전과 분리
-      break;
-    case 'CylinderGeometry':
-      geo = new THREE.CylinderGeometry(r, r, r * 0.7, 6);
-      break;
-    case 'BoxGeometry':
-      geo = new THREE.BoxGeometry(r * 1.4, r * 1.4, r * 0.5);
-      break;
-    default:                        // ConeGeometry
-      geo = new THREE.ConeGeometry(r, r * 2, 3);
-      geo.rotateZ(-Math.PI / 2);
-      break;
+  if (cfg.sprite_url) {
+    // 스프라이트 모드: PlaneGeometry + 텍스처
+    geo = new THREE.PlaneGeometry(r * 2.2, r * 2.2);
+    const tex = new THREE.TextureLoader().load(cfg.sprite_url);
+    mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1, color: 0xffffff });
+  } else {
+    // 폴백: 기존 절차적 도형
+    switch (cfg.geometry_type) {
+      case 'ConeGeometry_flat':
+        geo = new THREE.ConeGeometry(r, r * 1.2, 3);
+        geo.rotateZ(-Math.PI / 2);
+        break;
+      case 'CylinderGeometry':
+        geo = new THREE.CylinderGeometry(r, r, r * 0.7, 6);
+        break;
+      case 'BoxGeometry':
+        geo = new THREE.BoxGeometry(r * 1.4, r * 1.4, r * 0.5);
+        break;
+      default:                      // ConeGeometry
+        geo = new THREE.ConeGeometry(r, r * 2, 3);
+        geo.rotateZ(-Math.PI / 2);
+        break;
+    }
+    // material.color = white → instanceColor가 실제 색상을 결정
+    mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   }
 
   const baseColor = new THREE.Color(cfg.color_hex);
-
-  // material.color = white → instanceColor가 실제 색상을 결정
-  const mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
   const mesh = new THREE.InstancedMesh(geo, mat, MAX_INSTANCES);
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);

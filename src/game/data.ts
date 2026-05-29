@@ -57,6 +57,7 @@ export interface PlayerConfig {
   color_hex: string;
   glow_intensity: number;
   hp_bar_low_threshold: number;
+  sprite_url: string;
 }
 
 export interface EnemyConfig {
@@ -74,6 +75,7 @@ export interface EnemyConfig {
   color_hex: string;
   has_glow: boolean;
   glow_color_hex: string;
+  sprite_url: string;
 }
 
 export interface BossConfig {
@@ -94,6 +96,7 @@ export interface BossConfig {
   geometry_type: string;
   color_hex: string;
   glow_color_hex: string;
+  sprite_url: string;
 }
 
 export interface WaveConfig {
@@ -140,6 +143,7 @@ export interface SkillConfig {
   projectile_speed: number;
   projectile_radius: number;
   max_level: number;
+  projectile_sprite_url: string;
 }
 
 export interface SkillLevelConfig {
@@ -294,6 +298,7 @@ export async function loadAllGameData(): Promise<GameData> {
     color_hex: p['color_hex'],
     glow_intensity: +p['glow_intensity'],
     hp_bar_low_threshold: +p['hp_bar_low_threshold'],
+    sprite_url: p['sprite_url'] ?? '',
   };
 
   const enemies = new Map<EnemyId, EnemyConfig>();
@@ -313,6 +318,7 @@ export async function loadAllGameData(): Promise<GameData> {
       color_hex: r['color_hex'],
       has_glow: r['has_glow'] === 'true',
       glow_color_hex: r['glow_color_hex'] ?? '',
+      sprite_url: r['sprite_url'] ?? '',
     });
   }
 
@@ -335,6 +341,7 @@ export async function loadAllGameData(): Promise<GameData> {
     geometry_type: br['geometry_type'],
     color_hex: br['color_hex'],
     glow_color_hex: br['glow_color_hex'],
+    sprite_url: br['sprite_url'] ?? '',
   };
 
   const waves: WaveConfig[] = waveRows.map(r => ({
@@ -383,6 +390,7 @@ export async function loadAllGameData(): Promise<GameData> {
       projectile_speed: +r['projectile_speed'],
       projectile_radius: +r['projectile_radius'],
       max_level: +r['max_level'],
+      projectile_sprite_url: r['projectile_sprite_url'] ?? '',
     });
   }
 

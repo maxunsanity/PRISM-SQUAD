@@ -34,36 +34,42 @@ export class PlayerMesh {
     const s = cfg.geometry_size;
     const col = new THREE.Color(cfg.color_hex);
 
-    /* ── 본체 (정사각형 박스) ── */
-    const bodyGeo = new THREE.BoxGeometry(s, s, s * 0.4);
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: col,
-      emissive: col,
-      emissiveIntensity: 0.6,
-      roughness: 0.3,
-      metalness: 0.1,
-    });
-    this.body = new THREE.Mesh(bodyGeo, bodyMat);
+    if (cfg.sprite_url) {
+      /* ── 스프라이트 모드 ── */
+      const tex = new THREE.TextureLoader().load(cfg.sprite_url);
+      const bodyGeo = new THREE.PlaneGeometry(s * 2.2, s * 2.2);
+      const bodyMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 });
+      this.body = new THREE.Mesh(bodyGeo, bodyMat);
+    } else {
+      /* ── 기본 절차적 모드 ── */
+      const bodyGeo = new THREE.BoxGeometry(s, s, s * 0.4);
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: col,
+        emissive: col,
+        emissiveIntensity: 0.6,
+        roughness: 0.3,
+        metalness: 0.1,
+      });
+      this.body = new THREE.Mesh(bodyGeo, bodyMat);
+
+      /* ── 눈 ── */
+      const halfZ = s * 0.21;
+      const eyeHalfSize = s * 0.08;
+      const eyeGeo = new THREE.BoxGeometry(eyeHalfSize, eyeHalfSize, 0.1);
+      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0D1018 });
+      this.eyeLeft = new THREE.Mesh(eyeGeo, eyeMat);
+      this.eyeLeft.position.set(-s * 0.25, s * 0.14, halfZ);
+      this.body.add(this.eyeLeft);
+      this.eyeRight = new THREE.Mesh(eyeGeo.clone(), eyeMat);
+      this.eyeRight.position.set( s * 0.25, s * 0.14, halfZ);
+      this.body.add(this.eyeRight);
+    }
     this.group.add(this.body);
 
     /* ── 발광 포인트라이트 ── */
     this.light = new THREE.PointLight(col, cfg.glow_intensity, s * 8);
     this.light.position.set(0, 0, 10);
     this.group.add(this.light);
-
-    /* ── 방향: body 자체 rotation으로 표현 (라인 제거됨) ── */
-
-    /* ── 추가 디테일: 눈 (자식으로 body에 밀착) ── */
-    const halfZ = s * 0.21; // body 얼굴 정면 중앙 Z
-    const eyeHalfSize = s * 0.08;
-    const eyeGeo = new THREE.BoxGeometry(eyeHalfSize, eyeHalfSize, 0.1);
-    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0D1018 });
-    this.eyeLeft = new THREE.Mesh(eyeGeo, eyeMat);
-    this.eyeLeft.position.set(-s * 0.25, s * 0.14, halfZ);
-    this.body.add(this.eyeLeft);
-    this.eyeRight = new THREE.Mesh(eyeGeo.clone(), eyeMat);
-    this.eyeRight.position.set( s * 0.25, s * 0.14, halfZ);
-    this.body.add(this.eyeRight);
 
     /* ── 하단 에지 라인 제거됨 ── */
 

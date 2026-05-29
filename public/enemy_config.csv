@@ -1,5 +1,5 @@
-enemy_id,enemy_name,hp,speed,radius,contact_dmg,contact_dmg_interval_frames,exp_drop_type,gold_drop,weight,geometry_type,color_hex,has_glow,glow_color_hex
-basic,기본 적,6,0.75,10,4,20,small,2,1.0,ConeGeometry,#FF8080,false,
-dog,사냥개,4,1.40,8,4,20,small,2,0.7,ConeGeometry_flat,#E06060,false,
-bloater,블로터,14,0.50,13,4,20,medium,4,2.5,CylinderGeometry,#FFBA66,true,#FF9500
-spitter,스피터,5,0.60,9,4,20,medium,3,0.9,BoxGeometry,#B899FF,true,#8833FF
+enemy_id,enemy_name,hp,speed,radius,contact_dmg,contact_dmg_interval_frames,exp_drop_type,gold_drop,weight,geometry_type,color_hex,has_glow,glow_color_hex,sprite_url
+basic,기본 적,6,0.75,10,4,20,small,2,1.0,ConeGeometry,#FF8080,false,,
+dog,사냥개,4,1.40,8,4,20,small,2,0.7,ConeGeometry_flat,#E06060,false,,
+bloater,블로터,14,0.50,13,4,20,medium,4,2.5,CylinderGeometry,#FFBA66,true,#FF9500,
+spitter,스피터,5,0.60,9,4,20,medium,3,0.9,BoxGeometry,#B899FF,true,#8833FF,
