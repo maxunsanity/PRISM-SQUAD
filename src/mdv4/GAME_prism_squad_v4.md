@@ -1,4 +1,11 @@
 ---
+doc_generation: mdv4
+condense_policy: forbidden
+note: "v4는 mdv3와 별도 폴더. v5 diff용 — 절대 요약·삭제 금지."
+ui_pixel_precision: "DESIGN·외부 팀. DEV는 json-render 슬롯·$state·DOM 순서·CSV SSoT만."
+---
+
+---
 identity:
   name: PRISM SQUAD
   pitch: "적을 무한히 처치하며 10분간 생존하고, 세 보스를 꺾어 스테이지를 클리어하는 탑뷰 자동 공격 서바이버"
@@ -523,3 +530,15 @@ PRISM 본편과 **CSV·문서·코드가 분리**된 라이브 이벤트 모듈.
 ### ✅ — `renderer_config.csv` (Renderer3D)
 - view_scale·hud_top_px·grid_spacing·grid_opacity·max_frame_dt·pixel_ratio_cap (`App.tsx` 주입)
 - `map_config.camera_zoom`는 기존대로 `baseCameraHalfHeight`
+
+
+---
+
+## 연동 모듈 (선택 — v4)
+
+| 문서 | 내용 |
+|------|------|
+| [`ATTACH_MODULES_v4.md`](./ATTACH_MODULES_v4.md) | 있으면 붙이는 이벤트·iframe·세일 절차 |
+| 각 이벤트 `mdv4/` | 검증된 이벤트 GAME·DEV·DESIGN·RECIPE·CSV |
+
+코어 단독 플레이 가능. 이벤트 md 없으면 해당 모듈 구현·연동 **생략**.
