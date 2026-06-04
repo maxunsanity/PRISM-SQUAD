@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const FOLDERS = [
-  { dir: 'src/mdv4', title: 'PRISM SQUAD Core', csv: 'public/*.csv (DEV §14·15)' },
+  { dir: 'src/prism_squad_v4', title: 'PRISM SQUAD Core', csv: 'public/*.csv (DEV §14·15)' },
   { dir: 'src/eventSystem/tycoonSeason/mdv4', title: 'Tycoon Season', csv: 'public/event/tycoonSeason/' },
   { dir: 'src/eventSystem/Lava Quest _game_end/mdv4', title: 'Lava Quest', csv: 'public/event/lavaQuest/' },
   { dir: 'src/eventSystem/prize-drop_end/mdv4', title: 'Prize Drop', csv: 'public/event/prizeDrop/game_data/' },

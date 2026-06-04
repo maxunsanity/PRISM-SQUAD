@@ -6,7 +6,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 
 # PRISM SQUAD — 선택 모듈 조립 (ATTACH_MODULES v4)
 
-> **코어만:** 이 문서·이벤트 md **읽지 않음**. `src/mdv4/GAME_*` · `DEV_*` · `public/*.csv` 만.  
+> **코어만:** 이 문서·이벤트 md **읽지 않음**. `src/prism_squad_v4/GAME_*` · `DEV_*` · `public/*.csv` 만.  
 > **「타이쿤 붙여줘」:** 아래 표에서 해당 행의 **v4 mdv4 경로 전부** + **호스트 연동 절** 추가 구현.
 
 ---
@@ -15,7 +15,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 
 | module_id | 유형 | v4 문서 (백화점) | 배포 CSV | 호스트 연결 | 없으면 |
 |-----------|------|------------------|----------|-------------|--------|
-| `core` | 필수 | `src/mdv4/` | `public/*.csv` | `App.tsx` · `GameCore` | — |
+| `core` | 필수 | `src/prism_squad_v4/` | `public/*.csv` | `App.tsx` · `GameCore` | — |
 | `tycoon_season` | 인게임 HUD | `src/eventSystem/tycoonSeason/mdv4/` | `public/event/tycoonSeason/` | `EventBridge` · `loadAllEventData` | `eventData=null` → HUD 없음 |
 | `lava` | iframe | `src/eventSystem/Lava Quest _game_end/mdv4/` | `public/event/lavaQuest/` | `eventMinigameHost` · `lq:start_attempt` | `showLavaQuest=false` 또는 미등록 |
 | `prize` | iframe | `src/eventSystem/prize-drop_end/mdv4/` | `public/event/prizeDrop/game_data/` | iframe · `event:grant` | `showPrizeDrop=false` |
@@ -29,7 +29,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 
 ## 2. 「스퀘어만」 구현 절차
 
-1. `src/mdv4/GAME_prism_squad_v4.md`
+1. `src/prism_squad_v4/GAME_prism_squad_v4.md`
 2. `DESIGN_prism_squad_v4.md` (+ `src/style.css` 전문 §Quick Start)
 3. `DEV_prism_squad_v4.md` (§6-bis CSV 인덱스, §14·15 CSV 전문)
 4. `RECIPE_prism_squad.md` · `RECIPE_CODE_prism_squad.md`

@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const MDV4 = path.join(ROOT, 'src/mdv4');
+const MDV4 = path.join(ROOT, 'src/prism_squad_v4');
 
 function read(p) {
   return fs.readFileSync(p, 'utf8');

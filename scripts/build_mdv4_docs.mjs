@@ -90,7 +90,7 @@ function copyMdv3ToMdv4(folderName, csvPublicDir, extraCsvDirs = []) {
 }
 
 function buildCoreMdv4() {
-  const dst = path.join(ROOT, 'src/mdv4');
+  const dst = path.join(ROOT, 'src/prism_squad_v4');
   ensureDir(dst);
 
   const coreCsvDir = path.join(ROOT, 'public');

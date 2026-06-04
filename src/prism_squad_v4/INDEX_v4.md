@@ -26,7 +26,7 @@ condense_policy: forbidden
 
 ### A. 코어 (필수)
 
-**경로:** `src/mdv4/`
+**경로:** `src/prism_squad_v4/`
 
 | 파일 | 출처·비고 |
 |------|-----------|
