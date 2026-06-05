@@ -1,16 +1,10 @@
 /**
- * 양궁 아레나 — 호스트 재화(활대) · 100킬 지급 · 수령 대기(레드닷)
+ * 양궁 아레나 — 호스트 재화 래퍼 (SSoT: MinigameCurrencyService)
  */
-import { hudStore } from './hudExternalStore';
+import { getMinigameCurrencyService } from './minigameCurrency';
+import type { MinigameCurrencySave } from './minigameCurrency/types';
 
-/** SSoT: public/event/archeryArena/aa_integration_config.csv (호스트·iframe 동기화) */
-const STORAGE_KEY = 'prism_archery_host_v1';
-const INTEGRATION_CSV = '/event/archeryArena/aa_integration_config.csv';
 const BUNDLE_CSV = '/event/archeryArena/aa_bundle_reward_config.csv';
-
-let KILLS_PER_BOW = 100;
-/** 신규·보유 0일 때 1회 지급 — 활대 1개 = 5발 도전 1회 */
-export let STARTER_BOW_STANDS = 5;
 
 let bundleGrantCache: Record<string, Array<{ kind: string; amount?: number; slotId?: string }>> | null = null;
 
@@ -26,20 +20,10 @@ function parseCsvRows(text: string): Record<string, string>[] {
   });
 }
 
-/** PRISM 기동 시 1회 — CSV와 호스트 상수 동기화 */
+/** PRISM 기동 시 1회 — 번들 CSV + aa_integration kills는 combat_tuning/archery_starter_bows 사용 */
 export async function preloadArcheryCsvConfig() {
   try {
-    const [intRes, bunRes] = await Promise.all([
-      fetch(INTEGRATION_CSV),
-      fetch(BUNDLE_CSV),
-    ]);
-    if (intRes.ok) {
-      const rows = parseCsvRows(await intRes.text());
-      const cfg: Record<string, string> = {};
-      for (const r of rows) if (r.config_key) cfg[r.config_key] = r.config_value;
-      if (cfg.kills_per_bow_host) KILLS_PER_BOW = Math.max(1, Number(cfg.kills_per_bow_host));
-      if (cfg.starter_bow_stands) STARTER_BOW_STANDS = Math.max(1, Number(cfg.starter_bow_stands));
-    }
+    const bunRes = await fetch(BUNDLE_CSV);
     if (bunRes.ok) {
       const map: typeof bundleGrantCache = {};
       for (const r of parseCsvRows(await bunRes.text())) {
@@ -54,7 +38,7 @@ export async function preloadArcheryCsvConfig() {
       }
       bundleGrantCache = map;
     }
-  } catch { /* CSV 없으면 하드코드 폴백 */ }
+  } catch { /* CSV 없으면 폴백 */ }
 }
 
 export type ArcheryHostState = {
@@ -63,99 +47,64 @@ export type ArcheryHostState = {
   claimPending: boolean;
 };
 
-const DEFAULT: ArcheryHostState = {
-  bowStands: STARTER_BOW_STANDS,
-  killsTowardBow: 0,
-  claimPending: false,
-};
-
-export function loadArcheryHost(): ArcheryHostState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...DEFAULT };
-    const d = JSON.parse(raw) as Partial<ArcheryHostState> & { starterGranted?: boolean; starterV2?: boolean };
-    let bowStands = Math.max(0, Number(d.bowStands ?? 0));
-    const claimPending = Boolean(d.claimPending);
-    if (!d.starterGranted && !claimPending && bowStands < STARTER_BOW_STANDS) {
-      bowStands = STARTER_BOW_STANDS;
-    } else if (!d.starterV2 && !claimPending && bowStands < STARTER_BOW_STANDS) {
-      bowStands = STARTER_BOW_STANDS;
-    }
-    if (bowStands !== Number(d.bowStands ?? 0)) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          bowStands,
-          killsTowardBow: Math.max(0, Number(d.killsTowardBow ?? 0)),
-          claimPending,
-          starterGranted: true,
-          starterV2: true,
-        }));
-      } catch { /* ignore */ }
-    }
-    return {
-      bowStands,
-      killsTowardBow: Math.max(0, Math.min(KILLS_PER_BOW - 1, Number(d.killsTowardBow ?? 0))),
-      claimPending,
-    };
-  } catch {
-    return { ...DEFAULT };
-  }
+function svc() {
+  return getMinigameCurrencyService();
 }
 
-/** 앱 기동 시 — 저장 없으면 기본 활대 지급 */
+export function loadArcheryHost(): ArcheryHostState {
+  const s = svc();
+  if (!s) {
+    return { bowStands: 0, killsTowardBow: 0, claimPending: false };
+  }
+  return {
+    bowStands: s.getBowStands(),
+    killsTowardBow: s.getKillsToward('archery'),
+    claimPending: s.getArcheryClaimPending(),
+  };
+}
+
 export function ensureArcheryStarterBows() {
-  if (!localStorage.getItem(STORAGE_KEY)) saveArcheryHost({ bowStands: STARTER_BOW_STANDS });
-  else loadArcheryHost();
+  svc()?.ensureStarterCurrency();
+  svc()?.syncHud();
 }
 
 export function saveArcheryHost(patch: Partial<ArcheryHostState>) {
-  const next = { ...loadArcheryHost(), ...patch };
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch { /* ignore */ }
-  syncArcheryHud(next);
+  const s = svc();
+  if (!s) return;
+  if (patch.claimPending !== undefined) s.setArcheryClaimPending(patch.claimPending);
+  s.syncHud();
 }
 
 export function syncArcheryHud(state = loadArcheryHost()) {
-  hudStore.setMany({
-    '/lobby/archeryBowStands': state.bowStands,
-    '/archery/killsTowardBow': state.killsTowardBow,
-    '/archery/claimPending': state.claimPending,
-    '/event/redDot/archery': state.claimPending,
-  });
+  void state;
+  svc()?.syncHud();
 }
 
-/** 스퀘어 적 처치 1회 — 100마리마다 활대 +1 */
+/** @deprecated MinigameCurrencyService.onEnemyKilled 가 처리 */
 export function archeryOnEnemyKill() {
-  const s = loadArcheryHost();
-  let kills = s.killsTowardBow + 1;
-  let bows = s.bowStands;
-  if (kills >= KILLS_PER_BOW) {
-    kills = 0;
-    bows += 1;
-  }
-  saveArcheryHost({ killsTowardBow: kills, bowStands: bows });
-}
-
-export function archeryConsumeBow(): boolean {
-  const s = loadArcheryHost();
-  if (s.bowStands < 1) return false;
-  saveArcheryHost({ bowStands: s.bowStands - 1 });
-  return true;
+  /* no-op — GameCore → getMinigameCurrencyService().onEnemyKilled */
 }
 
 export function archerySetClaimPending(pending: boolean) {
-  saveArcheryHost({ claimPending: pending });
+  svc()?.setArcheryClaimPending(pending);
 }
 
-export function archeryInitPayload() {
-  const s = loadArcheryHost();
+/** 양궁이 자체 소비 후 통지한 잔액(발)을 호스트가 저장 — 이식 지갑 계약 */
+export function setArcheryBowStands(balance: number) {
+  svc()?.setBowStands(balance);
+}
+
+/** 이식 가능 지갑 동기화 메시지 — balance(발) + 획득규칙 안내(호스트 제공 데이터) */
+export function archeryWalletSyncMsg() {
+  const s = svc();
+  const rows = (s?.getAcquireRows('archery') ?? [])
+    .filter(r => r.enabled)
+    .sort((a, b) => a.sort_order - b.sort_order);
   return {
-    bowStands: s.bowStands,
-    claimPending: s.claimPending,
-    killsTowardBow: s.killsTowardBow,
-    killsPerBow: KILLS_PER_BOW,
-    roundBlocked: s.claimPending,
+    type: 'host:walletSync',
+    balance: s?.getBowStands() ?? 0,
+    missionLines: rows.map(r => ({ title: `${r.row_title} ${r.kills_required}마리`, detail: r.reward_label })),
+    claimPending: s?.getArcheryClaimPending() ?? false,
   };
 }
 
@@ -170,4 +119,16 @@ const FALLBACK_BUNDLE: Record<string, Array<{ kind: string; amount?: number; slo
 export function archeryBundleToGrant(bundleId: string): Array<{ kind: string; amount?: number; slotId?: string }> {
   const map = bundleGrantCache ?? FALLBACK_BUNDLE;
   return map[String(bundleId)] ?? [{ kind: 'gold', amount: 500 }];
+}
+
+/** GameCore._loadMeta / _saveMeta 연동 */
+export function applyMinigameCurrencySave(patch: MinigameCurrencySave | undefined) {
+  svc()?.applySave(patch);
+  svc()?.migrateLegacyArchery();
+  svc()?.ensureStarterCurrency();
+  svc()?.syncHud();
+}
+
+export function minigameCurrencySavePayload(): MinigameCurrencySave | undefined {
+  return svc()?.toSavePayload();
 }

@@ -43,6 +43,8 @@ export const CSV_PATHS = {
   LAVA_QUEST_HOST: '/lava_quest_host_config.csv',
   TICKET_MULT_STEP:'/ticket_multiplier_step.csv',
   EVENT_MINIGAME_HOST: '/event_minigame_host_config.csv',
+  EVENT_MINIGAME_ACQUIRE: '/event_minigame_acquire_config.csv',
+  EVENT_MINIGAME_KILL_REWARD: '/event_minigame_kill_reward_config.csv',
   SKILL_RUNTIME:       '/skill_runtime_config.csv',
   GUARDIAN_RUNTIME:    '/guardian_runtime_config.csv',
   BOSS_PATTERN:        '/boss_pattern_config.csv',
@@ -597,6 +599,30 @@ export interface LavaQuestHostRule {
   boss_spawn_sec_override: number;
 }
 
+export type MinigameCurrencyId = 'lava' | 'prize' | 'archery';
+
+/** 미니게임 재화 획득 규칙 (event_minigame_acquire_config.csv) */
+export interface MinigameAcquireConfig {
+  minigame_id: MinigameCurrencyId;
+  target_type: 'normal' | 'boss';
+  kills_required: number;
+  reward_label: string;
+  left_icon_key: string;
+  reward_icon_key: string;
+  sort_order: number;
+  enabled: boolean;
+  row_title: string;
+}
+
+/** 적 처치 시 미니게임 재화 base (event_minigame_kill_reward_config.csv) */
+export interface MinigameKillRewardConfig {
+  enemy_id: string;
+  lava_base: number;
+  prize_base: number;
+  archery_base: number;
+  is_boss: boolean;
+}
+
 /** iframe 미니게임 호스트 (event_minigame_host_config.csv) */
 export interface EventMinigameHostConfig {
   id: string;
@@ -609,6 +635,7 @@ export interface EventMinigameHostConfig {
   ticketUnit: string;
   showFlag: string;
   persistKeys: string[];
+  durationHours: number;   // 이벤트 노출 기간(시간) — 사이드탭 남은시간 카운트다운
   enabled: boolean;
 }
 
@@ -677,6 +704,8 @@ export interface GameData {
   /** iframe 미니게임 호스트 메타 */
   eventMinigames: EventMinigameHostConfig[];
   eventMinigameOrder: string[];
+  minigameAcquire: Map<MinigameCurrencyId, MinigameAcquireConfig[]>;
+  minigameKillRewards: Map<string, MinigameKillRewardConfig>;
   meta: MetaConfig;
   shopTest: ShopTestConfig;
   shopGemPacks: ShopGemPackConfig[];
@@ -744,7 +773,7 @@ export async function loadAllGameData(): Promise<GameData> {
     vfxRows, talentRows, talentCostRows, controlRows, stageRows, luckyTrainRows, ticketRows, elementRows, equipmentRows, adventureRows, challengeRows, evolutionTreeRows, weaponRows,
     metaRows, shopTestRows, shopGemRows, shopGoldRows, shopBoxRows, shopBoxGradeRows, rushRows, formationSpawnRows,
     weaponVisualRows, combatTuningRows,
-    rushCycleRows, lavaHostRows, ticketMultRows, eventMinigameRows, skillRuntimeRows,
+    rushCycleRows, lavaHostRows, ticketMultRows, eventMinigameRows, minigameAcquireRows, minigameKillRewardRows, skillRuntimeRows,
     guardianRuntimeRows, bossPatternRows, levelUpRuleRows,
     playerVisualRows, rendererConfigRows,
   ] = await Promise.all([
@@ -786,6 +815,8 @@ export async function loadAllGameData(): Promise<GameData> {
     loadCSV(CSV_PATHS.LAVA_QUEST_HOST),
     loadCSV(CSV_PATHS.TICKET_MULT_STEP),
     loadCSV(CSV_PATHS.EVENT_MINIGAME_HOST),
+    loadCSV(CSV_PATHS.EVENT_MINIGAME_ACQUIRE),
+    loadCSV(CSV_PATHS.EVENT_MINIGAME_KILL_REWARD),
     loadCSV(CSV_PATHS.SKILL_RUNTIME),
     loadCSV(CSV_PATHS.GUARDIAN_RUNTIME),
     loadCSV(CSV_PATHS.BOSS_PATTERN),
@@ -943,6 +974,42 @@ export async function loadAllGameData(): Promise<GameData> {
       boss_spawn_sec_override: +r['boss_spawn_sec_override'] || 50,
     }));
 
+  const minigameAcquire = new Map<MinigameCurrencyId, MinigameAcquireConfig[]>();
+  for (const r of minigameAcquireRows) {
+    const id = r['minigame_id'] as MinigameCurrencyId;
+    if (id !== 'lava' && id !== 'prize' && id !== 'archery') continue;
+    if (r['enabled'] === '0') continue;
+    const row: MinigameAcquireConfig = {
+      minigame_id: id,
+      target_type: (r['target_type'] === 'boss' ? 'boss' : 'normal'),
+      kills_required: Math.max(1, +r['kills_required'] || 1),
+      reward_label: r['reward_label'] ?? '1',
+      left_icon_key: r['left_icon_key'] || 'enemy_normal',
+      reward_icon_key: r['reward_icon_key'] || '',
+      sort_order: +r['sort_order'] || 0,
+      enabled: true,
+      row_title: r['row_title'] ?? '',
+    };
+    if (!minigameAcquire.has(id)) minigameAcquire.set(id, []);
+    minigameAcquire.get(id)!.push(row);
+  }
+  for (const list of minigameAcquire.values()) {
+    list.sort((a, b) => a.sort_order - b.sort_order);
+  }
+
+  const minigameKillRewards = new Map<string, MinigameKillRewardConfig>();
+  for (const r of minigameKillRewardRows) {
+    const enemyId = r['enemy_id'];
+    if (!enemyId) continue;
+    minigameKillRewards.set(enemyId, {
+      enemy_id: enemyId,
+      lava_base: +r['lava_base'] || 0,
+      prize_base: +r['prize_base'] || 0,
+      archery_base: +r['archery_base'] || 0,
+      is_boss: r['is_boss'] === 'true' || r['is_boss'] === '1',
+    });
+  }
+
   const eventMinigames: EventMinigameHostConfig[] = [];
   const eventMinigameOrder: string[] = [];
   for (const r of eventMinigameRows) {
@@ -961,6 +1028,7 @@ export async function loadAllGameData(): Promise<GameData> {
       ticketUnit: r['ticket_unit'] || '',
       showFlag: r['show_flag_key'] || '',
       persistKeys: persistRaw ? persistRaw.split('|').map(k => k.trim()).filter(Boolean) : [],
+      durationHours: +r['duration_hours'] || 0,
       enabled: true,
     });
   }
@@ -1310,7 +1378,7 @@ export async function loadAllGameData(): Promise<GameData> {
     luckyTrain, tickets, elements, equipment, weapons, adventure, challenges, evolutionTree,
     meta, shopTest, shopGemPacks, shopGoldPacks, shopBoxes, shopBoxGrades,
     rushWaves, rushCycleTemplate, formationSpawns, ticketMultSteps: ticketMultStepsFinal, lavaQuestHost,
-    eventMinigames, eventMinigameOrder,
+    eventMinigames, eventMinigameOrder, minigameAcquire, minigameKillRewards,
     vfx, talents, talentCosts, control,
   };
 }

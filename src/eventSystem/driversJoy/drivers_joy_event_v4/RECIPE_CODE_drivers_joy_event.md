@@ -7,11 +7,13 @@ doc_generation: mdv4
 ```typescript
 import type { SalesHostBridge } from '../../sales/types';
 import { hideEventMinigameForOverlay } from '../../../game/eventMinigameHost';
+import { markRedDotSeen } from '../../../game/redDot/redDotSeen';
+import { refreshRedDots } from '../../../game/redDot/RedDotService';
 import type { DriversJoyData } from '../data';
 import { driversJoyStore } from '../store';
 
 const LS_PURCHASES = 'prism_dj_purchases_v1';
-const LS_END_KEY = 'prism_dj_ends_at_v1';
+const LS_END_KEY = 'prism_dj_ends_at_v2';
 
 function loadPurchases(): number {
   try {
@@ -69,8 +71,10 @@ export class DriversJoyController {
 
   openModal() {
     hideEventMinigameForOverlay();
+    markRedDotSeen('drivers_new');
     driversJoyStore.set('/driversJoy/modalOpen', true);
     this.refresh();
+    refreshRedDots();
   }
 
   closeModal() {
@@ -141,6 +145,7 @@ export class DriversJoyController {
     this.purchasesUsed += 1;
     savePurchases(this.purchasesUsed);
     this.refresh();
+    refreshRedDots();
     window.dispatchEvent(new CustomEvent('lobby:toast', { detail: msg || '구매 완료' }));
     return true;
   }

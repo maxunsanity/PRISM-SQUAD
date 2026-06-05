@@ -175,8 +175,8 @@ drivers_joy: driversJoy,
 ### `public/event/driversJoy/dj_event_config.csv`
 
 ```csv
-event_id,title,duration_hours,max_purchase_per_player,price_krw,side_tab_label,banner_image,enabled
-drivers_joy_01,드라이버의 기쁨,10.6,2,4400,드라이버,,1
+event_id,title,duration_hours,duration_minutes,max_purchase_per_player,price_krw,side_tab_label,banner_image,enabled
+drivers_joy_01,드라이버의 기쁨,10.6,10,2,4400,드라이버,,1
 ```
 
 ### `public/event/driversJoy/dj_reward_config.csv`

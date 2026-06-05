@@ -7,7 +7,11 @@ condense_policy: forbidden
 
 > **SKILL** = 공통 읽기 순서 (`.cursor/skills/prism-squad-v4/SKILL_v4.md`)  
 > **이 파일** = 모듈별 **어떤 v4 폴더에 뭐가 들어있는지** 색인  
-> **CSV 정책** = [`CSV_v4.md`](./CSV_v4.md)
+> **CSV(SSoT)** = 각 v4 폴더 동봉 `.csv` + **DEV §14·15 전문** (수치 변경 금지)
+
+> ⚠️ **이 문서(INDEX)·`ATTACH_MODULES_v4.md`·`HOST_ARCHITECTURE_v4.md` = 이벤트 조립 전용 상위 문서.**
+> 스퀘어(코어) 게임 **자체를 만드는 데는 필요 없음** — 코어는 `GAME/DESIGN/DEV/RECIPE/RECIPE_CODE + CSV`로 충분.
+> 이 3개는 **"코어 + 6이벤트를 통합 조립"할 때만** 본다. (코어 폴더에 동봉돼 있을 뿐, 코어 콘텐츠 아님.)
 
 ---
 
@@ -37,7 +41,6 @@ condense_policy: forbidden
 | `RECIPE_prism_squad.md` | Anti-Pattern·json-render |
 | `RECIPE_CODE_prism_squad.md` | 샘플: registry·Bridge·App·GameCore 발췌 |
 | `HOST_ARCHITECTURE_v4.md` | HANDOFF·SALES_EVENTS_PLAN |
-| `CSV_v4.md` | CSV 단계 정리 |
 
 ### B. 타이쿤·시즌 (선택)
 

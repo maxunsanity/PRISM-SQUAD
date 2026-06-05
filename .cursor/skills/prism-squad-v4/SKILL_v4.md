@@ -22,7 +22,6 @@ paths:
 |------|------|
 | 본 SKILL | 읽기 순서·조립 |
 | `src/prism_squad_v4/INDEX_v4.md` | 모듈별 v4 폴더 색인 |
-| `src/prism_squad_v4/CSV_v4.md` | CSV — v4에서 끝난 것 / 나중에 쪼갤 것 |
 
 **RECIPE_CODE** = 레포 전체가 아니라 **AI가 추론하기 쉬운 구간의 샘플 소스**. **DESIGN** = `style.css` **거의 전문**.
 

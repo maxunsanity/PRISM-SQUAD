@@ -8,7 +8,8 @@ import {
   closeEventMinigame,
   type EventMinigameId,
 } from '../game/eventMinigameHost';
-import { archeryInitPayload } from '../game/archeryMeta';
+import { archeryWalletSyncMsg } from '../game/archeryMeta';
+import { getMinigameCurrencyService } from '../game/minigameCurrency';
 import { SketchCloseButton } from './overlayUi';
 
 export function EventMinigameOverlay() {
@@ -49,12 +50,23 @@ export function EventMinigameOverlay() {
         title={cfg.label}
         allow="autoplay"
         onLoad={() => {
-          if (activeId !== 'archery') return;
           const win = document.querySelector('[data-prism-event-minigame]') as HTMLIFrameElement | null;
-          win?.contentWindow?.postMessage(
-            { type: 'host:archeryInit', ...archeryInitPayload() },
-            '*',
-          );
+          if (activeId === 'archery') {
+            win?.contentWindow?.postMessage(archeryWalletSyncMsg(), '*');
+          } else if (activeId === 'prize') {
+            const svc = getMinigameCurrencyService();
+            const rows = (svc?.getAcquireRows('prize') ?? [])
+              .filter(r => r.enabled)
+              .sort((a, b) => a.sort_order - b.sort_order);
+            win?.contentWindow?.postMessage(
+              {
+                type: 'host:walletSync',
+                balance: svc?.getPrizeBalls() ?? 0,
+                missionLines: rows.map(r => ({ title: `${r.row_title} ${r.kills_required}마리`, detail: r.reward_label })),
+              },
+              '*',
+            );
+          }
         }}
       />
       <SketchCloseButton

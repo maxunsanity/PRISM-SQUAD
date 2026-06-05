@@ -280,8 +280,9 @@ grantReward(rewards: Array<{ kind: string; amount?: number; slotId?: string }>)
 //  (slotId = equipment_config.slot_id, 예: prize_crown)
 //  보상 라인 없이 bundleId만 오면 archeryBundleToGrant(bundleId)로 변환
 ```
-- 등록: `src/game/eventMinigameRegistry.ts`(`EventMinigameId='lava'|'prize'|'archery'` union + FALLBACK 내장) + `public/event_minigame_host_config.csv`(`id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,enabled`)
-- 입장 차감(`eventMinigameHost.openEventMinigame`): `ticket_cost>0`이면 `ticket_path`에서 차감(lava=`/lobby/lavaTickets` 1, prize=`/lobby/prizeBalls` 1, archery=0)
+- 등록: `src/game/eventMinigameRegistry.ts`(`EventMinigameId='lava'|'prize'|'archery'` union + FALLBACK 내장) + `public/event_minigame_host_config.csv`(`id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,duration_hours,enabled`)
+- **입장 차감 없음**: 세 게임 모두 `ticket_cost=0`. 퍼즐·양궁 재화는 입장이 아니라 **플레이 중 게임이 자체 소비**(지갑 계약 §11) 후 `*:walletChanged`로 호스트에 잔액 저장. 라바는 단독 플레이.
+- **사이드탭 = 남은시간 카운트다운**: `duration_hours`(lava 0.5 / prize 24 / archery 48) → `eventExposure.ts`로 endMs 영속·계산. 갯수 표기 아님(§12·§13).
 - Lava만 코어 전투 진입형: iframe "도전 시작" → `lq:start_attempt` → `startLavaQuestMode` → 전투(라바 호스트) → `_onLavaQuestEnd` → iframe 복귀
 
 ### 9.3 계층 ② — 세일 오버레이 (mallMarvels / driversJoy)
@@ -618,7 +619,10 @@ boss_intro_phase2_ms,1000,BOSS_INTRO Phase2 암전~스폰(ms)
 boss_intro_phase3_ms,800,BOSS_INTRO Phase3 종료(ms)
 boss_death_result_delay_ms,3500,보스 사망 후 결과창(ms)
 scene_transition_ms,3400,스테이지/라바 전환 오버레이(ms)
-kill_per_event_ticket,30,적 처치 N마다 라바티켓+퍼즐볼 +1
+kill_per_event_ticket,30,@deprecated event_minigame_acquire_config 사용
+stage_clear_lava_bonus,1,스테이지 클리어 라바 티켓 보너스
+stage_clear_prize_bonus,1,스테이지 클리어 퍼즐볼 보너스
+archery_starter_bows,5,신규·마이그레이션 기본 활대
 result_clear_bonus_kills,50,스테이지 클리어 타이쿤 보너스 킬 수
 rush_column_col_spacing,30,러시 종대 열 간격(px)
 rush_column_row_spacing,26,러시 종대 행 간격(px)
@@ -692,13 +696,35 @@ lava_blade,WEAPON,용암 검,⚔️,LEGEND,power,0.07,10,300,1.5,"화염을 휘�
 prize_crown,NECKLACE,황금 왕관,👑,LEGEND,power,0.06,10,300,1.5,"부의 상징 황금 왕관",
 ```
 
+### `public/event_minigame_acquire_config.csv`
+
+```csv
+minigame_id,target_type,kills_required,reward_label,left_icon_key,reward_icon_key,sort_order,enabled,row_title
+prize,normal,300,1개,enemy_normal,prize_ball,1,1,일반 몬스터
+prize,boss,10,1개,enemy_boss,prize_ball,2,1,보스
+archery,normal,200,1발,enemy_normal,archery_bow,1,1,일반 몬스터
+archery,boss,2,1발,enemy_boss,archery_bow,2,1,보스
+```
+
 ### `public/event_minigame_host_config.csv`
 
 ```csv
-id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,enabled
-lava,라바,🌋,#FFB347,/event/lavaQuest/index.html,/lobby/lavaTickets,1,장,/lobby/showLavaQuest,lq_session_v1,1
-prize,퍼즐,🎰,#B388FF,/event/prizeDrop/index.html,/lobby/prizeBalls,1,개,/lobby/showPrizeDrop,,1
-archery,양궁,🏹,#7EC8A8,/event/archeryArena/index.html,/lobby/archeryBowStands,0,대,/lobby/showArcheryArena,"aa_player_state|aa_event_meta|aa_ranking_bots|aa_ranking_dummy_schema",1
+id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,duration_hours,enabled
+lava,라바,🌋,#FFB347,/event/lavaQuest/index.html,,0,장,/lobby/showLavaQuest,lq_session_v1,0.5,1
+prize,퍼즐,🎰,#B388FF,/event/prizeDrop/index.html,/lobby/prizeBalls,0,개,/lobby/showPrizeDrop,,24,1
+archery,양궁,🏹,#7EC8A8,/event/archeryArena/index.html,/lobby/archeryBowStands,0,발,/lobby/showArcheryArena,"aa_player_state|aa_event_meta|aa_ranking_bots|aa_ranking_dummy_schema",48,1
+```
+
+### `public/event_minigame_kill_reward_config.csv`
+
+```csv
+enemy_id,lava_base,prize_base,archery_base,is_boss
+basic,1,1,1,false
+dog,1,1,1,false
+bloater,1,1,1,false
+spitter,1,1,1,false
+mini_boss,1,1,1,true
+final_boss,1,1,1,true
 ```
 
 ### `public/evolution_config.csv`
@@ -2128,10 +2154,10 @@ event_id,event_name,group_size,min_level,event_duration_hours,daily_free_attempt
 config_key,config_value,description
 tournament_round_min,30,토너먼트 1라운드 길이(분). endMs = now + 이 값
 bot_tick_ms,60000,봇 점수 갱신 간격(ms). 0이면 aa_event_config bot_tick_min_ms~max 랜덤
-shots_per_bow,5,활대 1개 소비 시 WebGL 연속 발사 횟수(SET5 점수표 사용)
+shots_per_bow,5,[레거시·미사용] 구 1활대=5발 모델. 현재 1발=1재화 + 라운드당 1~5발 선택(runRound n)
 event_meta_version,3,aa_event_meta localStorage v (불일치 시 메타 리셋)
-starter_bow_stands,5,PRISM 호스트 최초·마이그레이션 지급 활대 개수
-kills_per_bow_host,100,PRISM 스퀘어 적 처치 N마리당 활대 +1
+starter_bow_stands,5,[레거시·미사용] 기본 발 지급은 combat_tuning.csv archery_starter_bows 사용
+kills_per_bow_host,100,[레거시·미사용] 발 수급은 event_minigame_acquire_config.csv(일반 200 보스 2) 사용
 storage_key_prism_host,prism_archery_host_v1,호스트 재화·수령대기 저장 키
 storage_key_player,aa_player_state,iframe 플레이어 점수·순위 저장 키
 storage_key_event_meta,aa_event_meta,iframe 토너먼트 라운드 종료·claimPending
@@ -2364,11 +2390,13 @@ interface SalesHostBridge {
 
 파일: `src/game/eventMinigameRegistry.ts`
 
-| id | 라벨 | iframe src | 입장 재화 | 로비 플래그 |
-|----|------|------------|-----------|-------------|
-| `lava` | 라바 | `/event/lavaQuest/index.html` | `/lobby/lavaTickets` 1장 | `/lobby/showLavaQuest` |
-| `prize` | 퍼즐 | `/event/prizeDrop/index.html` | `/lobby/prizeBalls` 1개 | `/lobby/showPrizeDrop` |
-| `archery` | 양궁 | `/event/archeryArena/index.html` | `/lobby/archeryBowStands` (**입장 차감 없음**, 5발 도전 시 1개) | `/lobby/showArcheryArena` |
+| id | 라벨 | iframe src | 재화·소비 (입장 차감 전부 없음) | 노출시간 | 로비 플래그 |
+|----|------|------------|--------------------------------|---------|-------------|
+| `lava` | 라바 | `/event/lavaQuest/index.html` | 단독 플레이(코어 전투 진입). 미니게임 재화 적립 대상 아님 | `duration_hours=0.5` | `/lobby/showLavaQuest` |
+| `prize` | 퍼즐 | `/event/prizeDrop/index.html` | 퍼즐볼 = 호스트 재화. **지갑 계약**(드롭당 1개 자체 소비→`pd:walletChanged`) | `24` | `/lobby/showPrizeDrop` |
+| `archery` | 양궁 | `/event/archeryArena/index.html` | 발 = 호스트 재화. **1발=1재화**, 1~5발 선택 소비(지갑 계약→`aa:walletChanged`) | `48` | `/lobby/showArcheryArena` |
+
+> 사이드탭은 보유 갯수가 아니라 **남은시간**(`duration_hours`)을 카운트다운으로 표기(EVENT_MANAGEMENT §12·§13). 입장 차감은 셋 다 없음(`ticket_cost=0`).
 
 **이벤트 추가 시:** 위 테이블에 행만 추가 + `public/event/{id}/` 빌드 산출물 + (필요 시) `persistKeys` for localStorage dispose.
 
@@ -2379,7 +2407,7 @@ interface SalesHostBridge {
 
 | 함수 | 용도 |
 |------|------|
-| `openEventMinigame(id)` | 입장권 차감 → **이전 세션 dispose** → `mountKey++` → iframe remount |
+| `openEventMinigame(id)` | (입장 차감 없음, `ticket_cost=0`) **이전 세션 dispose** → `mountKey++` → iframe remount |
 | `closeEventMinigame()` | ✕·완전 종료 — `activeId` 비움, iframe DOM 제거 |
 | `hideEventMinigameForOverlay()` | 세일·기타 풀스크린 UI 진입 전 — `close`와 동일 |
 | `suspendEventMinigame()` | 라바만: 스퀘어 전투 진입 (`lq:start_attempt`) — 숨김·세션 유지 |
@@ -2420,13 +2448,14 @@ interface SalesHostBridge {
 | iframe → host | `event:grant` | 보상 실지급 (`GameCore.grantReward`) |
 | iframe → host | `event:showRewardDetail` | 보상 아이콘 설명 (장비/재화) |
 | host → iframe | `host:eventDispose` | 탭 전환·닫기 시 자식 정리 (라바: `clearPersistentSession`) |
-| iframe → host | `aa:ready` | 양궁 기동 → host `host:archeryInit` |
-| iframe → host | `aa:consumeBow` | 활대 1개 소비 후 5발 연출 |
-| iframe → host | `aa:claimPending` | 토너먼트 종료·미수령 (레드닷) |
-| iframe → host | `aa:claimed` | 보상 수령 완료 |
+| iframe → host | `pd:ready` / `aa:ready` | 퍼즐·양궁 기동 → host `host:walletSync` 전송 |
+| host → iframe | `host:walletSync` | `{ balance, missionLines[, claimPending] }` — 보유 재화 + 획득안내(이식 지갑 계약) |
+| iframe → host | `pd:walletChanged` / `aa:walletChanged` | `{ balance }` — 게임 자체 소비 후 남은 잔액 → 호스트 저장(`setPrizeBalls`/`setBowStands`) |
+| iframe → host | `aa:claimPending` | 양궁 토너먼트 종료·미수령 (레드닷) |
+| iframe → host | `aa:claimed` | 양궁 보상 수령 완료 |
 | iframe → host | `aa:toast` | 호스트 토스트 (iframe 위 z530) |
-| host → iframe | `host:archeryInit` | 활대·claimPending·killsTowardBow |
-| host → iframe | `host:bowConsumed` / `host:bowDenied` | 활대 소비 결과 |
+
+> ⚠️ 구 양궁 프로토콜(`aa:consumeBow`/`host:archeryInit`/`host:bowConsumed`, 1활대=5발)은 **폐기**. 퍼즐·양궁 모두 위 **지갑 계약 3종**(`*:ready`/`host:walletSync`/`*:walletChanged`)으로 통일. 호스트는 잔액(숫자)만 주고받고 게임 규칙을 모른다(이식 가능).
 
 Prize Drop 마일스톤·보상 모달·Lava 보상 칩 클릭 → `event:showRewardDetail`.  
 장비 보상: CSV `reward_item_id` = `equipment_config.slot_id` (`prize_crown` 등).
@@ -2647,7 +2676,121 @@ eventManager.onEnemyKilled(enemyId, ticketMultiplier)
 
 ---
 
+## 10. 미니게임 재화 적립 — 호스트 `MinigameCurrencyService`
+
+iframe 미니게임(퍼즐·양궁)의 재화는 **스퀘어 전투에서 적을 잡아 번다.** 호스트가 적립을 소유하고, iframe은 그 재화를 **빌려 쓰는 소비자**다.
+
+> ⚠️ **라바는 제외.** 라바는 코어 전투로 진입하는 단독 플레이라 이 서비스의 적립 대상이 아니다(`SQUARE_CURRENCY_IDS = ['prize','archery']`). 라바 입장권은 별도.
+
+**파일:** `src/game/minigameCurrency/MinigameCurrencyService.ts`
+
+**적립 규칙 (타이쿤 `onEnemyKilled` 누적식과 동일):**
+- `onEnemyKilled(enemyId, ticketMultiplier)` → 적 처치마다 `prize`·`archery` 각각 **누적 카운터** +1.
+- 적 종류·일반/보스 구분: `event_minigame_kill_reward_config.csv`(`enemy_id, prize_base, archery_base, is_boss`).
+- 필요 킬 수: `event_minigame_acquire_config.csv`(`minigame_id, target_type[normal|boss], kills_required, reward_label, …`).
+- 누적이 `kills_required`에 도달하면 `max(1, floor(base × max(1,ticketMultiplier)))` 만큼 지급하고 카운터 0으로 리셋.
+- `onStageClear(mult)` → `combat_tuning.csv` `stage_clear_prize_bonus` 만큼 추가 지급(승리 시).
+- 영속: `prism_squad_save_v1`의 `minigameCurrency` 필드(GameCore `_saveMeta`/`_loadMeta`). 양궁 레거시 `prism_archery_host_v1` 마이그레이션 포함.
+
+**밸런스 레버:** 난이도는 **`event_minigame_acquire_config.csv`의 `kills_required`** 가 단일 조절점. 값↑ = 획득 느려짐(어려움). 코드 수정 불필요.
+
+**HUD 동기화(`syncHud`):** `/lobby/prizeBalls`, `/lobby/archeryBowStands`, `/lobby/prizeKillsToward`·`prizeKillsRequired`, `/archery/killsTowardBow`·`killsPerBow`.
+
+---
+
+## 11. 이식 가능 지갑 계약 — 호스트 ↔ iframe 미니게임 (host-agnostic)
+
+iframe 미니게임(퍼즐·양궁)을 **다른 호스트(예: 모노폴리 GO)에도 그대로 붙이기 위한** 핵심 계약. 호스트는 **재화 잔액(숫자)만** 주고받고 게임 내부 규칙을 1도 모른다. 게임이 **자체 소비·UI·통화명**을 전부 소유한다.
+
+### 11-1. 3개 메시지 (postMessage)
+
+```
+게임 → 호스트 :  <ns>:ready                                   (iframe 준비 완료)
+호스트 → 게임 :  host:walletSync { balance, missionLines? }    (보유 재화 + 획득안내 데이터)
+게임 → 호스트 :  <ns>:walletChanged { balance }                (자체 소비 후 남은 잔액 = 저장 요청)
+```
+- `<ns>` = 게임별 네임스페이스. 퍼즐 = `pd`, 양궁 = `aa`.
+- `balance` = 재화 개수(정수). 퍼즐=퍼즐볼, 양궁=발.
+- `missionLines` = `[{title, detail}]` — "어떻게 버는지" 안내(호스트가 제공하는 **표시용 데이터**, 게임은 그대로 렌더만). 없으면 게임이 제네릭 문구 표시.
+
+### 11-2. 역할 경계 (절대 규칙)
+
+| 책임 | 소유자 |
+|------|--------|
+| 재화 잔액 보관·지급·저장 | **호스트** (지갑) |
+| 소비 판정(부족 경고 포함) | **게임(iframe)** |
+| 입장/미션 화면, 통화명, 소비 UI | **게임(iframe)** |
+| 게임 규칙(드롭·발사·연출) | **게임(iframe)** |
+
+→ 호스트는 `balance` 숫자만 안다. **다른 호스트는 이 3개 메시지만 구현하면 게임이 그대로 붙는다.**
+
+### 11-3. 호스트 구현 (스퀘어)
+
+- **App.tsx** 메시지 핸들러:
+  - `pd:ready`/`aa:ready` → `host:walletSync` 전송(balance = `getPrizeBalls()`/`getBowStands()`, missionLines = acquire CSV에서 구성).
+  - `pd:walletChanged` → `MinigameCurrencyService.setPrizeBalls(balance)` (저장).
+  - `aa:walletChanged` → `setBowStands(balance)` (저장).
+- **EventMinigameOverlay.tsx** `onLoad` → 진입 직후 `host:walletSync` 1회 선전송(ready 누락 대비).
+- **입장 차감 없음:** `event_minigame_host_config.csv` `ticket_cost = 0`. 소비는 게임이 플레이 중 자체 차감 후 `walletChanged`로 통지.
+
+### 11-4. 게임(iframe) 구현 — 자립
+
+- 진입 시 `<ns>:ready` 송신 → `host:walletSync` 수신 → 내부 재화 카운트 = `balance`.
+- **입장/미션 화면을 게임이 소유**(퍼즐 = `PrizeIntro`, 양궁 = lobby 상단 미션 배너). missionLines를 그대로 렌더.
+- 소비할 때 자체 카운트 차감 → `<ns>:walletChanged { balance }` 송신(호스트가 저장).
+- **standalone**(호스트 없음, `window.parent === window`): `hosted=false` → 내부 기본값으로 동작(깨지지 않음).
+
+### 11-5. ⚠️ json-render 스토어 접근 주의 (`@json-render/core`)
+
+iframe의 `createStateStore`는 **JSON-pointer(중첩) 접근**이다. `/hud/ball_count` → `state.hud.ball_count`로 읽고 쓴다.
+- **반드시 `store.get('/hud/ball_count')`** 로 읽을 것. `store.getSnapshot()['/hud/ball_count']` **직접 키 접근은 stale**(초기 평면 키만 보고 update 결과를 못 봄) → 버그.
+- 초기 기본값은 평면 키라 `get()`엔 `undefined`로 보임 → 가시성 플래그는 "명시적 false일 때만 숨김"으로 판정(`get(...) !== false`).
+
+---
+
+## 12. 이벤트 노출 시간 — 사이드탭 카운트다운
+
+모든 이벤트는 **노출 기간**을 데이터로 갖는다. 사이드탭은 **남은시간을 카운트다운**으로 표시하고 만료 시 숨긴다.
+
+**기간 데이터 위치(SSoT):**
+| 이벤트 | CSV · 필드 |
+|--------|-----------|
+| 라바 | `lq_event_config.csv` `duration_hours` |
+| 퍼즐·양궁(iframe) | **`event_minigame_host_config.csv` `duration_hours`** (호스트가 노출 관리) |
+| 타이쿤·시즌 | `event_board_config.csv` `duration_hours` (`EventController`가 종료 처리) |
+| 쇼핑몰·드라이버 | `mm_/dj_event_config.csv` `duration_hours`/`duration_minutes` |
+
+**iframe 미니게임 노출(호스트):** `src/game/eventExposure.ts`
+- `getEventEndMs(id, durationHours)` — 최초 노출 시각을 `prism_event_exposure_v1`(localStorage)에 앵커·영속 → `endMs = 앵커 + duration`.
+- `getEventRemainMs` ≤ 0 이면 `EventMiniCards`에서 탭 **숨김**. `durationHours ≤ 0`이면 `Infinity`(무기한 노출).
+- `registry.tsx` `EventMiniCards`가 1초 인터벌로 재렌더하여 카운트다운 갱신.
+
+---
+
+## 13. 사이드탭 표기 규칙 (전 이벤트 통일)
+
+- **시간만 표기 + 레드닷.** 재화 **갯수 표기 금지**(요즘 라이브 게임 규격).
+- 포맷: 초·아이콘 없이 **`H시간 M분` / `M분`** (만료 `종료`). 무기한이면 빈 문자열.
+- **단일 규칙을 6개 탭 전부 동일 적용:**
+  - iframe(라바·퍼즐·양궁): `eventExposure.formatRemain`.
+  - 타이쿤·시즌·쇼핑몰·드라이버: 각 컨트롤러 `formatTimer`(동일 규칙: `EventController`·`MallMarvelsController`·`DriversJoyController`).
+
+---
+
 ## Anti-Patterns
+
+### 사이드탭에 재화 갯수 표기
+```
+❌ 퍼즐 57개 / 양궁 33발   (구버전)
+✅ 퍼즐 23시간 59분 + 레드닷   (시간만 + 레드닷)
+```
+재화 보유량은 게임 입장 후 내부 화면에서 본다. 로비 탭은 **남은시간**만.
+
+### 호스트가 미니게임 소비를 판정
+`pd:consumeBall`처럼 호스트가 차감 판정하면 게임 규칙이 호스트로 새어 이식 불가. 호스트는 `walletChanged`로 받은 **잔액 저장만**.
+
+### iframe 스토어를 getSnapshot 직접 키로 읽기
+`@json-render/core` 스토어는 JSON-pointer(중첩). `store.get(path)` 사용. 직접 키 접근은 stale.
 
 ### registry.ts 없이 App.tsx에서 직접 import
 이벤트가 늘어날수록 호스트 코드가 오염된다. 반드시 `EventManager`를 통할 것.

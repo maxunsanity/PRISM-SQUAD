@@ -1,0 +1,6 @@
+.DS_Store
+node_modules/
+dist/
+*.log
+# 로컬 참고용 대용량 미디어
+*.mov

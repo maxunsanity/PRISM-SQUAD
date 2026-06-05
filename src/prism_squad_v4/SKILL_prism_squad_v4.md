@@ -13,6 +13,9 @@ condense_policy: forbidden
 
 ---
 
+## ★ 데이터 구동 필수 (최우선 규칙)
+이 폴더의 **CSV(= DEV §14/§15 CSV 전문, 또는 동봉 `.csv`)가 모든 수치·밸런스·구성의 단일 진실(SSoT)**다. 게임은 **반드시 이 CSV를 런타임에 fetch·파싱해 구동**하도록 만들 것 — 적/스킬/웨이브/보상/이벤트 등 **어떤 수치도 코드에 하드코딩 금지**. CSV에 없는 항목만 DEV 데이터 스키마로 생성하되, 생성 후에도 CSV로 빼서 구동(데이터구동화). 이게 "에셋·수치 교체로 다양한 버전 양산"의 전제다.
+
 ## 0. 이 게임은 무엇인가
 - **PRISM SQUAD** = 탑뷰 자동공격 서바이버(탕탕특공대류). 이동만 수동, 공격은 자동. 1스테이지 = **10분**(미니보스 2 + 최종보스 1), HP 0 = 패배 / 최종보스 처치 = 승리.
 - 로비에서 스테이지·배수 선택 → 전투(레벨업마다 스킬 3장 중 택1로 빌드업) → 결과 → 로비. 상점·장비·도전·진화·영구특성 메타 성장.
@@ -23,7 +26,7 @@ condense_policy: forbidden
 3. `DESIGN_prism_squad_v4.md` — **§0 비주얼 2레이어** → **§10 화면별 UI 레이아웃 23종** + §11 `style.css` 전문
 4. `DEV_prism_squad_v4.md` — 스택·파일구조·json-render·$state·gameState·**§9 이벤트 연동 계약**·**§9-A 에셋 교체 규칙** + **§14·15 public CSV 전문**
 5. `RECIPE_prism_squad.md` → `RECIPE_CODE_prism_squad.md` — 검증된 패턴 + 추론 위험 구간 소스 발췌
-6. (선택 모듈 붙일 때) `ATTACH_MODULES_v4.md` / 색인 `INDEX_v4.md` / CSV 단계 `CSV_v4.md` / 호스트 아키텍처 `HOST_ARCHITECTURE_v4.md`
+6. **(이벤트 조립 전용 — 코어 게임 재현엔 불필요)** `ATTACH_MODULES_v4.md`(붙이기 절차·ON/OFF) / `INDEX_v4.md`(전체 모듈 색인) / `HOST_ARCHITECTURE_v4.md`(호스트↔이벤트 postMessage 프로토콜). **코어만 만들 거면 1~5번만 읽으면 끝.** 이 3개는 코어 폴더에 같이 있지만 "코어+6이벤트 통합 조립"할 때만 보는 상위 문서다.
 
 ## 2. 코딩 전 7항목 요약 (채우고 시작)
 ```

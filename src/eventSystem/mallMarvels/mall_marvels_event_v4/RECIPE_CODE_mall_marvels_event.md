@@ -7,11 +7,13 @@ doc_generation: mdv4
 ```typescript
 import type { SalesHostBridge } from '../../sales/types';
 import { hideEventMinigameForOverlay } from '../../../game/eventMinigameHost';
+import { markRedDotSeen } from '../../../game/redDot/redDotSeen';
+import { refreshRedDots } from '../../../game/redDot/RedDotService';
 import type { MallMarvelsData, MallStepConfig } from '../data';
 import { mallMarvelsStore, type MallStepLockState, type MallStepView } from '../store';
 
 const LS_KEY = 'prism_mm_claimed_v1';
-const LS_END_KEY = 'prism_mm_ends_at_v1';
+const LS_END_KEY = 'prism_mm_ends_at_v2';
 
 function loadClaimed(): Set<number> {
   try {
@@ -83,8 +85,10 @@ export class MallMarvelsController {
 
   openModal() {
     hideEventMinigameForOverlay();
+    markRedDotSeen('mall_new');
     mallMarvelsStore.set('/mallMarvels/modalOpen', true);
     this.refresh();
+    refreshRedDots();
   }
 
   closeModal() {
@@ -162,6 +166,7 @@ export class MallMarvelsController {
     this.claimed.add(stepId);
     saveClaimed(this.claimed);
     this.refresh();
+    refreshRedDots();
     window.dispatchEvent(new CustomEvent('lobby:toast', { detail: msg || '보상을 받았습니다' }));
     return true;
   }

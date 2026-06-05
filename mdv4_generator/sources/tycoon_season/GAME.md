@@ -513,3 +513,21 @@ PRISM 단독 실행: `EventBridge` 제거 시 본편만 동작.
 ### UI만 바꾸고 Spec·Store 미패치
 
 `eventHudSpec.ts` ↔ `eventExternalStore.ts` ↔ `registry.tsx` **3종 세트** 동시 수정.
+
+---
+
+## 재화·노출 모델 — iframe 지갑 계약과 다름 (주의)
+
+타이쿤·시즌은 **인게임 HUD형**이라 iframe 미니게임(퍼즐·양궁)의 "지갑 계약"과 **메커니즘이 다르다.** 혼동 금지.
+
+| 구분 | 타이쿤·시즌 (인게임 HUD) | 퍼즐·양궁 (iframe) |
+|------|------------------------|-------------------|
+| 재화 적립 | 코어 `EventBridge.onEnemyKilled` → `EventController` (in-game 상시) | 호스트 `MinigameCurrencyService` → `host:walletSync` |
+| 소비/사용 | 마일스톤·토너먼트(별도 게임 화면 없음) | iframe 내부 자체 소비 → `*:walletChanged` |
+| 통신 | postMessage 없음 (코어 직접 호출) | postMessage 지갑 계약 3종 |
+
+→ 타이쿤/시즌은 **지갑 계약(`walletSync`)을 쓰지 않는다.** 코어 연동은 `EventBridge` 경유(코어 DEV §9). 재화 적립 규칙은 `event_kill_reward_config.csv` + `event_help_acquire_config.csv`.
+
+### 노출 시간 — 표기 규칙은 공통
+- 이벤트 기간: `event_board_config.csv` `duration_hours`(72) — `EventController`가 종료 처리(maxHours).
+- 사이드탭 남은시간 표기는 **6개 이벤트 전부 동일**: 초·아이콘 없이 `H시간 M분`/`M분`, **재화 갯수 표기 금지**. 타이쿤/시즌은 컨트롤러 `formatTimer`, iframe은 `eventExposure.formatRemain`(동일 규칙). (코어 DEV §12·§13.)

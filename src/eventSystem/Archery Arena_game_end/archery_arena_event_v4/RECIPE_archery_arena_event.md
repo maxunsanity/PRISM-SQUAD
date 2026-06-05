@@ -171,12 +171,12 @@ CSV 로드 **성공 후** `import('./game.js')` 만 허용.
 
 ## R-13. PRISM — 5발 연출 (autoAdvance)
 
-**적용 위치:** `src/game.js` → `runFiveBowRound`, `runShootingScene`
+**적용 위치:** `src/game.js` → `runRound(n)`, `runShootingScene`
 
 **설명:**
-활대 1개 소비 시 `SET5` 점수표로 **5회** `calculateScore` 후
-`runShootingScene(result, rankBefore, rankBefore, { autoAdvance: true, shotIndex, shotTotal })` 순차 await.
-`autoAdvance` 분기: 확인 버튼 없이 pop 후 dispose → 다음 발.
+선택 발수 N(1~5)만큼 `SET5` 점수표로 **N회** `calculateScore` 후
+`runShootingScene(result, rankBefore, rankBefore, { autoAdvance: true, shotIndex, shotTotal: n })` 순차 await.
+`autoAdvance` 분기: 확인 버튼 없이 pop 후 dispose → 다음 발. 소비는 `requestConsumeBow(n)`(1발=1재화)로 선행.
 
 **규칙:**
 - `#shooting-shot-badge` 에 `N / 5발` 표시

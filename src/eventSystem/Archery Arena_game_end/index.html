@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Archery Arena</title>
+  <meta name="theme-color" content="#faf8f5" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- AA-UI-001 -->
+    <div id="screen-entry" class="screen">
+      <div class="mobile-frame">
+        <header class="m-header">
+          <div class="m-title" id="entry-title-bar">🏹 양궁 아레나</div>
+          <div class="m-timer timer-clickable" id="header-timer-entry" title="탭하면 세션 초기화">01:00</div>
+        </header>
+        <div class="m-body m-body-entry">
+          <div class="popup-overlay">
+            <div class="popup-box ui-interactive">
+              <div class="popup-title" id="entry-title">🏹 양궁 아레나</div>
+              <div class="popup-timer timer-clickable" id="entry-popup-timer" title="탭하면 세션 초기화">⏱ 01:00</div>
+              <div class="popup-desc" id="entry-desc">
+                재화를 소비해 활을 쏘고<br />50인 순위에서 경쟁하세요!
+              </div>
+              <button id="btn-enter" type="button" class="popup-btn">⚔️ 대련 시작</button>
+              <button id="btn-entry-close" type="button" class="popup-close">✕ 닫기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AA-UI-002 -->
+    <div id="screen-lobby" class="screen hidden">
+      <div class="mobile-frame">
+        <header class="m-header">
+          <div class="m-title">🏹 양궁 아레나</div>
+          <div class="m-timer timer-clickable" id="header-timer-lobby" title="탭하면 세션 초기화">01:00</div>
+        </header>
+        <div class="m-body m-body-lobby">
+          <div id="lobby-mission" class="lobby-mission hidden ui-interactive"></div>
+          <div class="lobby-stats ui-interactive">
+            <div class="stat-item">
+              <div class="stat-val" id="lobby-stat-rank">–</div>
+              <div class="stat-label">내 순위</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-val" id="lobby-stat-score">–</div>
+              <div class="stat-label">내 점수</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-val" id="lobby-stat-dice">🏹 –</div>
+              <div class="stat-label">보유 발</div>
+            </div>
+          </div>
+          <div id="ranking-list" class="ranking-list ui-interactive"></div>
+          <footer class="lobby-footer ui-interactive">
+            <div id="shot-selector" class="shot-selector">
+              <span class="shot-sel-label">발</span>
+              <button type="button" class="shot-opt" data-shots="1">1</button>
+              <button type="button" class="shot-opt" data-shots="2">2</button>
+              <button type="button" class="shot-opt" data-shots="3">3</button>
+              <button type="button" class="shot-opt" data-shots="4">4</button>
+              <button type="button" class="shot-opt" data-shots="5">5</button>
+            </div>
+            <button id="btn-attempt" type="button" class="lobby-btn">🏹 1발 도전</button>
+            <button id="btn-add-dice" type="button" class="btn-debug">+10 주사위 · 디버그</button>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- AA-UI-003 -->
+    <div id="screen-attempt" class="screen hidden">
+      <div class="mobile-frame">
+        <header class="m-header">
+          <div class="m-title">도전 방식 선택</div>
+          <div class="m-timer timer-clickable" id="header-timer-attempt" title="탭하면 세션 초기화">01:00</div>
+        </header>
+        <div class="m-body m-body-attempt">
+          <div id="attempt-cards" class="attempt-cards ui-interactive">
+            <div class="attempt-card" data-type="SINGLE">
+              <div class="ac-label">1회 단독</div>
+              <div class="ac-cost">🎲 ×1</div>
+              <div class="ac-score">1~3점</div>
+            </div>
+            <div class="attempt-card" data-type="SET3">
+              <div class="ac-label">3회 세트</div>
+              <div class="ac-cost">🎲 ×3</div>
+              <div class="ac-score">5~10점</div>
+              <div class="ac-badge">세트 보너스!</div>
+            </div>
+            <div class="attempt-card" data-type="SET5">
+              <div class="ac-label">5회 세트</div>
+              <div class="ac-cost">🎲 ×5</div>
+              <div class="ac-score">20~50점</div>
+              <div class="ac-badge">세트 보너스!</div>
+            </div>
+          </div>
+          <p id="attempt-resource" class="attempt-footnote">보유: 🎲 <span id="attempt-dice-display">–</span>개</p>
+          <div class="attempt-actions ui-interactive">
+            <button id="btn-confirm-attempt" type="button" class="confirm-btn" disabled>⚔️ 도전!</button>
+            <button id="btn-attempt-close" type="button" class="btn-ghost">✕ 취소</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AA-UI-004 -->
+    <div id="screen-shooting" class="screen hidden">
+      <div class="mobile-frame">
+        <header class="m-header">
+          <div class="m-title">🏹 활쏘기</div>
+          <div class="m-timer timer-clickable" id="header-timer-shooting" title="탭하면 세션 초기화">01:00</div>
+        </header>
+        <div class="m-body m-body-shooting">
+          <div class="ui-layer-root shooting-stack">
+            <div class="shooting-top ui-interactive">
+              <div id="shooting-shot-badge" class="shooting-shot-badge hidden">1 / 5발</div>
+              <div id="set-progress" class="set-progress"></div>
+            </div>
+            <div id="canvas-container" class="shoot-canvas">
+              <div id="hit-target-hud" class="hit-target-hud hidden" aria-live="polite"></div>
+            </div>
+            <div class="shooting-bottom ui-interactive">
+              <button id="btn-shooting-next" type="button" class="shoot-confirm hidden">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AA-UI-007 -->
+    <div id="screen-bullseye" class="screen hidden">
+      <div class="mobile-frame">
+        <header class="m-header m-header-bull">
+          <div class="m-title m-title-gold">⭐ BULLSEYE!!</div>
+        </header>
+        <div class="m-body m-body-bull">
+          <div class="bullseye-screen ui-interactive">
+            <div id="bullseye-bg" class="bullseye-bg"></div>
+            <div id="bullseye-target" class="bullseye-icon">🎯</div>
+            <div id="bullseye-text" class="bullseye-headline">Bullseye!!</div>
+            <div id="bullseye-score" class="bullseye-sub">
+              +<span id="bullseye-count">0</span> 타겟 점수!
+            </div>
+            <div id="bullseye-particles" class="bullseye-particles"></div>
+            <button id="btn-bullseye-confirm" type="button" class="bullseye-ok">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AA-UI-009 -->
+    <div id="screen-result" class="screen hidden">
+      <div class="mobile-frame">
+        <header class="m-header">
+          <div class="m-title">🏆 대련 종료!</div>
+        </header>
+        <div class="m-body m-body-result">
+          <div class="result-hero ui-interactive">
+            <div class="result-label">최종 순위</div>
+            <div id="result-hero-rank" class="result-hero-rank">1위</div>
+            <div id="result-total-score" class="result-subscore">총 점수: 0점</div>
+          </div>
+          <div class="result-list-wrap ui-interactive">
+            <div class="result-list-title">상위 10인</div>
+            <div id="result-ranking-snapshot" class="result-ranking-snapshot"></div>
+          </div>
+          <button id="btn-claim-reward" type="button" class="lobby-btn">🎁 보상 수령</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AA-UI-010 -->
+    <div id="screen-reward" class="screen hidden">
+      <div class="mobile-frame">
+        <header class="m-header">
+          <div class="m-title">🎁 보상 수령</div>
+        </header>
+        <div class="m-body m-body-reward">
+          <div id="reward-tier-desc" class="reward-panel ui-interactive"></div>
+          <p class="reward-hint ui-interactive">확인을 눌러 수령을 완료하세요.</p>
+          <button id="btn-reward-confirm" type="button" class="lobby-btn">확인</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

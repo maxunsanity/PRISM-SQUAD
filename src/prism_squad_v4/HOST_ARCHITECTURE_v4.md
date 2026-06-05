@@ -391,11 +391,13 @@ interface SalesHostBridge {
 
 파일: `src/game/eventMinigameRegistry.ts`
 
-| id | 라벨 | iframe src | 입장 재화 | 로비 플래그 |
-|----|------|------------|-----------|-------------|
-| `lava` | 라바 | `/event/lavaQuest/index.html` | `/lobby/lavaTickets` 1장 | `/lobby/showLavaQuest` |
-| `prize` | 퍼즐 | `/event/prizeDrop/index.html` | `/lobby/prizeBalls` 1개 | `/lobby/showPrizeDrop` |
-| `archery` | 양궁 | `/event/archeryArena/index.html` | `/lobby/archeryBowStands` (**입장 차감 없음**, 5발 도전 시 1개) | `/lobby/showArcheryArena` |
+| id | 라벨 | iframe src | 재화·소비 (입장 차감 전부 없음) | 노출시간 | 로비 플래그 |
+|----|------|------------|--------------------------------|---------|-------------|
+| `lava` | 라바 | `/event/lavaQuest/index.html` | 단독 플레이(코어 전투 진입). 미니게임 재화 적립 대상 아님 | `duration_hours=0.5` | `/lobby/showLavaQuest` |
+| `prize` | 퍼즐 | `/event/prizeDrop/index.html` | 퍼즐볼 = 호스트 재화. **지갑 계약**(드롭당 1개 자체 소비→`pd:walletChanged`) | `24` | `/lobby/showPrizeDrop` |
+| `archery` | 양궁 | `/event/archeryArena/index.html` | 발 = 호스트 재화. **1발=1재화**, 1~5발 선택 소비(지갑 계약→`aa:walletChanged`) | `48` | `/lobby/showArcheryArena` |
+
+> 사이드탭은 보유 갯수가 아니라 **남은시간**(`duration_hours`)을 카운트다운으로 표기(EVENT_MANAGEMENT §12·§13). 입장 차감은 셋 다 없음(`ticket_cost=0`).
 
 **이벤트 추가 시:** 위 테이블에 행만 추가 + `public/event/{id}/` 빌드 산출물 + (필요 시) `persistKeys` for localStorage dispose.
 
@@ -406,7 +408,7 @@ interface SalesHostBridge {
 
 | 함수 | 용도 |
 |------|------|
-| `openEventMinigame(id)` | 입장권 차감 → **이전 세션 dispose** → `mountKey++` → iframe remount |
+| `openEventMinigame(id)` | (입장 차감 없음, `ticket_cost=0`) **이전 세션 dispose** → `mountKey++` → iframe remount |
 | `closeEventMinigame()` | ✕·완전 종료 — `activeId` 비움, iframe DOM 제거 |
 | `hideEventMinigameForOverlay()` | 세일·기타 풀스크린 UI 진입 전 — `close`와 동일 |
 | `suspendEventMinigame()` | 라바만: 스퀘어 전투 진입 (`lq:start_attempt`) — 숨김·세션 유지 |
@@ -447,13 +449,14 @@ interface SalesHostBridge {
 | iframe → host | `event:grant` | 보상 실지급 (`GameCore.grantReward`) |
 | iframe → host | `event:showRewardDetail` | 보상 아이콘 설명 (장비/재화) |
 | host → iframe | `host:eventDispose` | 탭 전환·닫기 시 자식 정리 (라바: `clearPersistentSession`) |
-| iframe → host | `aa:ready` | 양궁 기동 → host `host:archeryInit` |
-| iframe → host | `aa:consumeBow` | 활대 1개 소비 후 5발 연출 |
-| iframe → host | `aa:claimPending` | 토너먼트 종료·미수령 (레드닷) |
-| iframe → host | `aa:claimed` | 보상 수령 완료 |
+| iframe → host | `pd:ready` / `aa:ready` | 퍼즐·양궁 기동 → host `host:walletSync` 전송 |
+| host → iframe | `host:walletSync` | `{ balance, missionLines[, claimPending] }` — 보유 재화 + 획득안내(이식 지갑 계약) |
+| iframe → host | `pd:walletChanged` / `aa:walletChanged` | `{ balance }` — 게임 자체 소비 후 남은 잔액 → 호스트 저장(`setPrizeBalls`/`setBowStands`) |
+| iframe → host | `aa:claimPending` | 양궁 토너먼트 종료·미수령 (레드닷) |
+| iframe → host | `aa:claimed` | 양궁 보상 수령 완료 |
 | iframe → host | `aa:toast` | 호스트 토스트 (iframe 위 z530) |
-| host → iframe | `host:archeryInit` | 활대·claimPending·killsTowardBow |
-| host → iframe | `host:bowConsumed` / `host:bowDenied` | 활대 소비 결과 |
+
+> ⚠️ 구 양궁 프로토콜(`aa:consumeBow`/`host:archeryInit`/`host:bowConsumed`, 1활대=5발)은 **폐기**. 퍼즐·양궁 모두 위 **지갑 계약 3종**(`*:ready`/`host:walletSync`/`*:walletChanged`)으로 통일. 호스트는 잔액(숫자)만 주고받고 게임 규칙을 모른다(이식 가능).
 
 Prize Drop 마일스톤·보상 모달·Lava 보상 칩 클릭 → `event:showRewardDetail`.  
 장비 보상: CSV `reward_item_id` = `equipment_config.slot_id` (`prize_crown` 등).

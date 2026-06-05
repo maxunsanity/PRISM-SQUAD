@@ -28,7 +28,10 @@ boss_intro_phase2_ms,1000,BOSS_INTRO Phase2 암전~스폰(ms)
 boss_intro_phase3_ms,800,BOSS_INTRO Phase3 종료(ms)
 boss_death_result_delay_ms,3500,보스 사망 후 결과창(ms)
 scene_transition_ms,3400,스테이지/라바 전환 오버레이(ms)
-kill_per_event_ticket,30,적 처치 N마다 라바티켓+퍼즐볼 +1
+kill_per_event_ticket,30,@deprecated event_minigame_acquire_config 사용
+stage_clear_lava_bonus,1,스테이지 클리어 라바 티켓 보너스
+stage_clear_prize_bonus,1,스테이지 클리어 퍼즐볼 보너스
+archery_starter_bows,5,신규·마이그레이션 기본 활대
 result_clear_bonus_kills,50,스테이지 클리어 타이쿤 보너스 킬 수
 rush_column_col_spacing,30,러시 종대 열 간격(px)
 rush_column_row_spacing,26,러시 종대 행 간격(px)

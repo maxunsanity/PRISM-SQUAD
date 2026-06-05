@@ -32,11 +32,12 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     emoji: '🌋',
     tabBg: '#FFB347',
     src: '/event/lavaQuest/index.html',
-    ticketPath: '/lobby/lavaTickets',
-    ticketCost: 1,
+    ticketPath: '',
+    ticketCost: 0,
     ticketUnit: '장',
     showFlag: '/lobby/showLavaQuest',
     persistKeys: ['lq_session_v1'],
+    durationHours: 0.5,
     enabled: true,
   },
   prize: {
@@ -46,10 +47,11 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     tabBg: '#B388FF',
     src: '/event/prizeDrop/index.html',
     ticketPath: '/lobby/prizeBalls',
-    ticketCost: 1,
+    ticketCost: 0,
     ticketUnit: '개',
     showFlag: '/lobby/showPrizeDrop',
     persistKeys: [],
+    durationHours: 24,
     enabled: true,
   },
   archery: {
@@ -60,9 +62,10 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     src: '/event/archeryArena/index.html',
     ticketPath: '/lobby/archeryBowStands',
     ticketCost: 0,
-    ticketUnit: '대',
+    ticketUnit: '발',
     showFlag: '/lobby/showArcheryArena',
     persistKeys: ['aa_player_state', 'aa_event_meta', 'aa_ranking_bots', 'aa_ranking_dummy_schema'],
+    durationHours: 48,
     enabled: true,
   },
 };
@@ -251,15 +254,8 @@ export class EventBridge {
     }
 
     this.eventBridge?.onEnemyKilled(dead.cfg.enemy_id, this.ticketMultiplier);
-    archeryOnEnemyKill();
+    getMinigameCurrencyService()?.onEnemyKilled(dead.cfg.enemy_id, this.ticketMultiplier);
     refreshEventRedDots();
-
-    /* 이벤트 재화 — 30킬마다 티켓/볼 +1 */
-    this.killAccumForTicket++;
-    if (this.killAccumForTicket >= this._ct('kill_per_event_ticket', 30)) {
-      this.killAccumForTicket = 0;
-      this._addEventCurrency(1, 1);
-    }
   }
 ```
 
@@ -270,7 +266,7 @@ export class EventBridge {
 ```typescript
   private _onBossDeath() {
     this.eventBridge?.onEnemyKilled('final_boss', this.ticketMultiplier);
-    this._addEventCurrency(1, 1); // 보스 처치 보너스
+    getMinigameCurrencyService()?.onEnemyKilled('final_boss', this.ticketMultiplier);
     const bossX = this.bossCtrl.x;
     const bossY = this.bossCtrl.y;
     const bossName = this.bossCtrl.cfg.boss_name;
@@ -400,20 +396,13 @@ export class EventBridge {
     const onMessage = (ev: MessageEvent) => {
       if (!ev.data) return;
       if (ev.data.type === 'aa:ready') {
-        postToArcheryIframe({ type: 'host:archeryInit', ...archeryInitPayload() });
+        postToArcheryIframe(archeryWalletSyncMsg());
         return;
       }
-      if (ev.data.type === 'aa:consumeBow') {
-        const ok = archeryConsumeBow();
-        postToArcheryIframe({
-          type: ok ? 'host:bowConsumed' : 'host:bowDenied',
-          ...archeryInitPayload(),
-        });
-        if (!ok) {
-          const msg = '활대가 없습니다. 전투에서 몬스터 100마리 처치 시 활대 1개(5발)를 받을 수 있어요.';
-          window.dispatchEvent(new CustomEvent('lobby:toast', { detail: msg }));
-        }
+      if (ev.data.type === 'aa:walletChanged') {
+        setArcheryBowStands(Number(ev.data.balance ?? 0));
         syncArcheryHud();
+        refreshEventRedDots();
         return;
       }
       if (ev.data.type === 'aa:toast') {
@@ -428,7 +417,18 @@ export class EventBridge {
       }
       if (ev.data.type === 'aa:claimed') {
         archerySetClaimPending(false);
-        postToArcheryIframe({ type: 'host:archeryInit', ...archeryInitPayload() });
+        postToArcheryIframe(archeryWalletSyncMsg());
+        refreshEventRedDots();
+        return;
+      }
+      /* 퍼즐(Prize Drop) ↔ 스퀘어 = 이식 가능 지갑 계약 (호스트는 balance만 주고받음) */
+      if (ev.data.type === 'pd:ready') {
+        postToPrizeIframe(prizeWalletSyncMsg());
+        return;
+      }
+      if (ev.data.type === 'pd:walletChanged') {
+        const svc = getMinigameCurrencyService();
+        svc?.setPrizeBalls(Number(ev.data.balance ?? 0));
         refreshEventRedDots();
         return;
       }
@@ -693,11 +693,12 @@ export const prismHudSpec: CatalogElement[] = [
 /**
  * iframe 미니게임 단일 호스트 — 열기/닫기/교체/일시중지(라바 전투)
  */
-import { hudStore, type HudState } from './hudExternalStore';
+import { hudStore } from './hudExternalStore';
 import {
   EVENT_MINIGAMES,
   type EventMinigameId,
 } from './eventMinigameRegistry';
+import { getMinigameCurrencyService } from './minigameCurrency';
 import { markRedDotSeen } from './redDot/redDotSeen';
 import { refreshRedDots } from './redDot/RedDotService';
 
@@ -806,16 +807,15 @@ export function openEventMinigame(id: EventMinigameId) {
   const cfg = EVENT_MINIGAMES[id];
   markRedDotSeen(MINIGAME_NEW_DOT[id]);
   refreshRedDots();
-  const snap = hudStore.getSnapshot();
-  if (cfg.ticketCost > 0) {
-    const ticketKey = cfg.ticketPath as keyof HudState;
-    const tickets = Number(snap[ticketKey] ?? 0);
-    if (tickets < cfg.ticketCost) {
+  /* 라바 — 단독 iframe, 호스트 재화 차감 없음 */
+  if (cfg.ticketCost > 0 && id !== 'lava') {
+    const svc = getMinigameCurrencyService();
+    if (!svc?.tryConsume(id, cfg.ticketCost)) {
       window.dispatchEvent(new CustomEvent('lobby:toast', { detail: '재화가 부족합니다' }));
       return;
     }
-    hudStore.set(ticketKey, (tickets - cfg.ticketCost) as HudState[typeof ticketKey]);
   }
+  const snap = hudStore.getSnapshot();
 
   hudStore.setMany({
     '/scene/transitionText': id === 'lava' ? 'LAVA QUEST' : id === 'prize' ? 'PUZZLE DROP' : 'ARCHERY ARENA',
@@ -931,13 +931,15 @@ type HudState = {
   '/lobby/metaGold': number;
   '/meta/avatarProfileLimit': number;
   '/lobby/entryTickets': number;
-  '/lobby/lavaTickets': number;        // 라바 티켓
   '/lobby/prizeBalls': number;         // 프라이즈 볼
+  '/lobby/prizeKillsToward': number;
+  '/lobby/prizeKillsRequired': number;
   '/lobby/archeryBowStands': number;   // 양궁 활대
   '/lobby/showLavaQuest': boolean;     // 이벤트 카드 노출
   '/lobby/showPrizeDrop': boolean;     // 이벤트 카드 노출
   '/lobby/showArcheryArena': boolean;  // 양궁 아레나 탭
   '/archery/killsTowardBow': number;
+  '/archery/killsPerBow': number;
   '/archery/claimPending': boolean;
   '/event/redDot/lava': boolean;
   '/event/redDot/prize': boolean;
@@ -1243,13 +1245,15 @@ class HudExternalStore {
     '/lobby/metaGold': 0,
     '/meta/avatarProfileLimit': 16,
     '/lobby/entryTickets': 10,
-    '/lobby/lavaTickets': 3,
-    '/lobby/prizeBalls': 5,
+    '/lobby/prizeBalls': 0,
+    '/lobby/prizeKillsToward': 0,
+    '/lobby/prizeKillsRequired': 30,
     '/lobby/archeryBowStands': 5,
     '/lobby/showLavaQuest': true,
     '/lobby/showPrizeDrop': true,
     '/lobby/showArcheryArena': true,
     '/archery/killsTowardBow': 0,
+    '/archery/killsPerBow': 100,
     '/archery/claimPending': false,
     '/event/redDot/lava': false,
     '/event/redDot/prize': false,
@@ -1438,11 +1442,12 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     emoji: '🌋',
     tabBg: '#FFB347',
     src: '/event/lavaQuest/index.html',
-    ticketPath: '/lobby/lavaTickets',
-    ticketCost: 1,
+    ticketPath: '',
+    ticketCost: 0,
     ticketUnit: '장',
     showFlag: '/lobby/showLavaQuest',
     persistKeys: ['lq_session_v1'],
+    durationHours: 0.5,
     enabled: true,
   },
   prize: {
@@ -1452,10 +1457,11 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     tabBg: '#B388FF',
     src: '/event/prizeDrop/index.html',
     ticketPath: '/lobby/prizeBalls',
-    ticketCost: 1,
+    ticketCost: 0,
     ticketUnit: '개',
     showFlag: '/lobby/showPrizeDrop',
     persistKeys: [],
+    durationHours: 24,
     enabled: true,
   },
   archery: {
@@ -1466,9 +1472,10 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     src: '/event/archeryArena/index.html',
     ticketPath: '/lobby/archeryBowStands',
     ticketCost: 0,
-    ticketUnit: '대',
+    ticketUnit: '발',
     showFlag: '/lobby/showArcheryArena',
     persistKeys: ['aa_player_state', 'aa_event_meta', 'aa_ranking_bots', 'aa_ranking_dummy_schema'],
+    durationHours: 48,
     enabled: true,
   },
 };

@@ -16,7 +16,8 @@ import { fmtKrw, pickEnemyIdFromRates, pickWeighted } from './shopUtils';
 import type { EventBridge } from '../eventSystem/tycoonSeason/host/EventBridge';
 import type { SalesRewardLine } from '../eventSystem/sales/types';
 import { focusPrismGameShell, getActiveMinigameIframe, resumeEventMinigame } from './eventMinigameHost';
-import { archeryOnEnemyKill, syncArcheryHud } from './archeryMeta';
+import { applyMinigameCurrencySave, minigameCurrencySavePayload } from './archeryMeta';
+import { initMinigameCurrencyService, getMinigameCurrencyService } from './minigameCurrency';
 import { refreshEventRedDots } from './eventRedDots';
 
 export class GameCore {
@@ -46,8 +47,6 @@ export class GameCore {
   private speedMult = 1.0;  // elasticShoes 패시브
   private gold = 0;
   private killCount = 0;
-  private killAccumForTicket = 0;
-
   /* 스킬 장착 현황: skillId → level */
   private equippedSkills: Map<string, number> = new Map();
 
@@ -179,8 +178,8 @@ export class GameCore {
       }
     }
     /* 영구 데이터 로드 (메타 골드 + 특성 + 장비 레벨 + 아바타 ID) */
+    initMinigameCurrencyService(data);
     this._loadMeta();
-    syncArcheryHud();
     refreshEventRedDots();
 
     const activeChar = this.data.players.find(p => p.player_id === this.selectedPlayerId) || this.data.player;
@@ -274,6 +273,8 @@ export class GameCore {
     window.addEventListener('shop:openBox', this._onShopOpenBox);
     window.addEventListener('shop:resetCash', this._onShopResetCash);
     window.addEventListener('prism:quickSkill', this._onQuickSkill);
+    window.addEventListener('minigame:currencyGain', this._onMinigameCurrencyPersist);
+    window.addEventListener('minigame:currencyChanged', this._onMinigameCurrencyPersist);
 
     hudStore.set('/lobby/visible', true);
     this._syncLobbyInfo();
@@ -841,21 +842,14 @@ export class GameCore {
     }
 
     this.eventBridge?.onEnemyKilled(dead.cfg.enemy_id, this.ticketMultiplier);
-    archeryOnEnemyKill();
+    getMinigameCurrencyService()?.onEnemyKilled(dead.cfg.enemy_id, this.ticketMultiplier);
     refreshEventRedDots();
-
-    /* 이벤트 재화 — 30킬마다 티켓/볼 +1 */
-    this.killAccumForTicket++;
-    if (this.killAccumForTicket >= this._ct('kill_per_event_ticket', 30)) {
-      this.killAccumForTicket = 0;
-      this._addEventCurrency(1, 1);
-    }
   }
 
   /* ── 보스 사망 ── */
   private _onBossDeath() {
     this.eventBridge?.onEnemyKilled('final_boss', this.ticketMultiplier);
-    this._addEventCurrency(1, 1); // 보스 처치 보너스
+    getMinigameCurrencyService()?.onEnemyKilled('final_boss', this.ticketMultiplier);
     const bossX = this.bossCtrl.x;
     const bossY = this.bossCtrl.y;
     const bossName = this.bossCtrl.cfg.boss_name;
@@ -1466,7 +1460,6 @@ export class GameCore {
       return;
     }
     this._bankGold();
-    this._addEventCurrency(1, 1); // 게임 클리어 보너스
     this._setGameState('GAMEOVER');
     const mins = Math.floor(this.elapsedSec / 60);
     const secs = Math.floor(this.elapsedSec % 60);
@@ -1577,16 +1570,6 @@ export class GameCore {
     }, 1200);
   }
 
-  /* 이벤트 재화 적립 — localStorage + hudStore 동시 업데이트 */
-  private _addEventCurrency(lavaTickets: number, prizeBalls: number) {
-    const curLava  = Number(hudStore.get('/lobby/lavaTickets') ?? 0);
-    const curPrize = Number(hudStore.get('/lobby/prizeBalls') ?? 0);
-    hudStore.setMany({
-      '/lobby/lavaTickets': curLava  + lavaTickets,
-      '/lobby/prizeBalls':  curPrize + prizeBalls,
-    });
-  }
-
   /* ── 이벤트 보상 실지급 (App.tsx event:grant 수신 → 호출) ──
    * rewards: [{ kind: 'gold'|'gem'|'lightning'|'equip', amount?, slotId? }] */
   /** 장비 상세 팝업용 HUD 동기화 (iframe 보상 설명) */
@@ -1641,6 +1624,7 @@ export class GameCore {
       }
     }
     this._bankGold();
+    getMinigameCurrencyService()?.onStageClear(this.ticketMultiplier);
     this._setGameState('GAMEOVER');
     const mins = Math.floor(this.elapsedSec / 60);
     const secs = Math.floor(this.elapsedSec % 60);
@@ -2213,6 +2197,10 @@ export class GameCore {
     window.dispatchEvent(new CustomEvent('lobby:toast', { detail: msg }));
   }
 
+  private _onMinigameCurrencyPersist = () => {
+    this._saveMeta();
+  };
+
   private _ensureTestGemsFloor() {
     const floor = this.data.shopTest.testResetGems;
     if (this.metaGems < floor) this.metaGems = floor;
@@ -2607,7 +2595,14 @@ export class GameCore {
     try {
       const raw = localStorage.getItem(GameCore._SAVE_KEY);
       if (!raw) return;
-      const data = JSON.parse(raw) as { metaGold?: number; talentLevels?: Record<string, number>; equipLevels?: Record<string, number>; metaGems?: number; supplyKeys?: number; defensePity?: number; purchasedGemPacks?: string[]; adventureExp?: number; adventureLevel?: number; clearedChallenges?: number[]; unlockedEvolutions?: number[]; metaDna?: number; metaEnergy?: number; selectedPlayerId?: string; equippedSlots?: string[] };
+      const data = JSON.parse(raw) as {
+        metaGold?: number; talentLevels?: Record<string, number>; equipLevels?: Record<string, number>;
+        metaGems?: number; supplyKeys?: number; defensePity?: number; purchasedGemPacks?: string[];
+        adventureExp?: number; adventureLevel?: number; clearedChallenges?: number[]; unlockedEvolutions?: number[];
+        metaDna?: number; metaEnergy?: number; selectedPlayerId?: string; equippedSlots?: string[];
+        minigameCurrency?: import('./minigameCurrency/types').MinigameCurrencySave;
+        prizeBalls?: number;
+      };
       if (typeof data.metaGold === 'number') this.metaGold = data.metaGold;
       if (typeof data.supplyKeys === 'number') this.supplyKeys = data.supplyKeys;
       if (typeof data.defensePity === 'number') this.defensePity = data.defensePity;
@@ -2648,7 +2643,13 @@ export class GameCore {
       } else if (equippedWeapons.length > 1) {
         for (const id of equippedWeapons.slice(1)) this.equippedSlots.delete(id);
       }
+      applyMinigameCurrencySave(
+        data.minigameCurrency ?? { prizeBalls: data.prizeBalls },
+      );
     } catch { /* 손상된 저장 무시 */ }
+    getMinigameCurrencyService()?.migrateLegacyArchery();
+    getMinigameCurrencyService()?.ensureStarterCurrency();
+    getMinigameCurrencyService()?.syncHud();
     /* 캐시 DB는 저장하지 않음 — 리셋/새 접속 시 항상 테스트 금액 */
     this.metaCashKrw = this.data.shopTest.testCashKrw;
     this._ensureTestGemsFloor();
@@ -2672,6 +2673,7 @@ export class GameCore {
         metaDna: this.metaDna,
         metaEnergy: this.metaEnergy,
         selectedPlayerId: this.selectedPlayerId,
+        minigameCurrency: minigameCurrencySavePayload(),
       }));
     } catch { /* 저장 실패 무시 */ }
   }
@@ -3018,6 +3020,8 @@ export class GameCore {
     window.removeEventListener('shop:openBox', this._onShopOpenBox);
     window.removeEventListener('shop:resetCash', this._onShopResetCash);
     window.removeEventListener('prism:quickSkill', this._onQuickSkill);
+    window.removeEventListener('minigame:currencyGain', this._onMinigameCurrencyPersist);
+    window.removeEventListener('minigame:currencyChanged', this._onMinigameCurrencyPersist);
     this.input.dispose();
     this.player.dispose(this.renderer.scene);
     this.enemySystem.clear();

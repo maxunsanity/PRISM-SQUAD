@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Prize Drop — Arcade</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="prize-drop-root">
+    <!-- Three.js Viewport -->
+    <div id="game-viewport"></div>
+
+    <!-- json-render UI Layers -->
+    <div id="jr-hud-widgets"></div>
+    <div id="jr-overlay-buttons"></div>
+    <div id="jr-lobby-copy"></div>
+    <div id="milestone-hud"></div>
+    
+    <!-- Overlays & Modals -->
+    <div id="reward-modal"></div>
+    <div id="jackpot-overlay"></div>
+  </div>
+
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

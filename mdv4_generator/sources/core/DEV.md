@@ -256,8 +256,9 @@ grantReward(rewards: Array<{ kind: string; amount?: number; slotId?: string }>)
 //  (slotId = equipment_config.slot_id, 예: prize_crown)
 //  보상 라인 없이 bundleId만 오면 archeryBundleToGrant(bundleId)로 변환
 ```
-- 등록: `src/game/eventMinigameRegistry.ts`(`EventMinigameId='lava'|'prize'|'archery'` union + FALLBACK 내장) + `public/event_minigame_host_config.csv`(`id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,enabled`)
-- 입장 차감(`eventMinigameHost.openEventMinigame`): `ticket_cost>0`이면 `ticket_path`에서 차감(lava=`/lobby/lavaTickets` 1, prize=`/lobby/prizeBalls` 1, archery=0)
+- 등록: `src/game/eventMinigameRegistry.ts`(`EventMinigameId='lava'|'prize'|'archery'` union + FALLBACK 내장) + `public/event_minigame_host_config.csv`(`id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,duration_hours,enabled`)
+- **입장 차감 없음**: 세 게임 모두 `ticket_cost=0`. 퍼즐·양궁 재화는 입장이 아니라 **플레이 중 게임이 자체 소비**(지갑 계약 §11) 후 `*:walletChanged`로 호스트에 잔액 저장. 라바는 단독 플레이.
+- **사이드탭 = 남은시간 카운트다운**: `duration_hours`(lava 0.5 / prize 24 / archery 48) → `eventExposure.ts`로 endMs 영속·계산. 갯수 표기 아님(§12·§13).
 - Lava만 코어 전투 진입형: iframe "도전 시작" → `lq:start_attempt` → `startLavaQuestMode` → 전투(라바 호스트) → `_onLavaQuestEnd` → iframe 복귀
 
 ### 9.3 계층 ② — 세일 오버레이 (mallMarvels / driversJoy)

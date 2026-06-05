@@ -1,0 +1,2 @@
+visual_config_id,event_id,arrow_flight_ms,trail_fade_ms,hit_ring_pulse_ms,score_popup_total_ms,bullseye_particle_count,bullseye_particle_radius_px,bullseye_particle_duration_ms,bullseye_countup_ms,ortho_view_half_height,backdrop_sprite_url,outer_sprite_url,middle_sprite_url,center_sprite_url,bullseye_sprite_url
+1,1,300,500,200,1000,15,100,1500,800,10,,,,,

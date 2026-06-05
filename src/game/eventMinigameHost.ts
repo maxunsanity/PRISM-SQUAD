@@ -1,11 +1,12 @@
 /**
  * iframe 미니게임 단일 호스트 — 열기/닫기/교체/일시중지(라바 전투)
  */
-import { hudStore, type HudState } from './hudExternalStore';
+import { hudStore } from './hudExternalStore';
 import {
   EVENT_MINIGAMES,
   type EventMinigameId,
 } from './eventMinigameRegistry';
+import { getMinigameCurrencyService } from './minigameCurrency';
 import { markRedDotSeen } from './redDot/redDotSeen';
 import { refreshRedDots } from './redDot/RedDotService';
 
@@ -114,16 +115,15 @@ export function openEventMinigame(id: EventMinigameId) {
   const cfg = EVENT_MINIGAMES[id];
   markRedDotSeen(MINIGAME_NEW_DOT[id]);
   refreshRedDots();
-  const snap = hudStore.getSnapshot();
-  if (cfg.ticketCost > 0) {
-    const ticketKey = cfg.ticketPath as keyof HudState;
-    const tickets = Number(snap[ticketKey] ?? 0);
-    if (tickets < cfg.ticketCost) {
+  /* 라바 — 단독 iframe, 호스트 재화 차감 없음 */
+  if (cfg.ticketCost > 0 && id !== 'lava') {
+    const svc = getMinigameCurrencyService();
+    if (!svc?.tryConsume(id, cfg.ticketCost)) {
       window.dispatchEvent(new CustomEvent('lobby:toast', { detail: '재화가 부족합니다' }));
       return;
     }
-    hudStore.set(ticketKey, (tickets - cfg.ticketCost) as HudState[typeof ticketKey]);
   }
+  const snap = hudStore.getSnapshot();
 
   hudStore.setMany({
     '/scene/transitionText': id === 'lava' ? 'LAVA QUEST' : id === 'prize' ? 'PUZZLE DROP' : 'ARCHERY ARENA',

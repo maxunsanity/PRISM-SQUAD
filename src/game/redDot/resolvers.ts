@@ -65,11 +65,7 @@ export const RED_DOT_RESOLVERS: Record<string, RedDotResolver> = {
     return Boolean(ev['/event/seasonLapCompletePending']) && !isRedDotSeen('express_lap_guide');
   },
   lava_claim_pending: () => readLavaClaimPending(),
-  lava_ticket_ready: ({ minInt }: RedDotResolverContext) => {
-    const hud = hudStore.getSnapshot();
-    if (!hud['/lobby/showLavaQuest']) return false;
-    return Number(hud['/lobby/lavaTickets'] ?? 0) >= minInt;
-  },
+  lava_ticket_ready: () => false, /* 라바 단독 — 호스트 티켓 없음 */
   lava_first_visit: () => {
     const hud = hudStore.getSnapshot();
     if (!hud['/lobby/showLavaQuest']) return false;

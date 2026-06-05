@@ -241,9 +241,10 @@ ArcheryGame.ts → notify() → syncArcheryHud() → hudExternalStore.set() → 
 |---|---|---|
 | tournament_round_min | 30 | 라운드 분 |
 | bot_tick_ms | 60000 | 봇 tick(ms). 0=event CSV 랜덤 |
-| shots_per_bow | 5 | 활대 1개당 연출 발수 |
+| shots_per_bow | 5 | **[레거시·미사용]** 구 1활대=5발. 현재 1발=1재화 + 1~5발 선택(`runRound(n)`) |
 | event_meta_version | 3 | `aa_event_meta.v` |
-| starter_bow_stands | 5 | 호스트 기본 활대 |
+| starter_bow_stands | 5 | **[레거시·미사용]** 기본 발 = `combat_tuning.csv archery_starter_bows` |
+| kills_per_bow_host | 100 | **[레거시·미사용]** 발 수급 = `event_minigame_acquire_config.csv`(일반 200/보스 2) |
 | kills_per_bow_host | 100 | 스퀘어 N킬당 활대+1 |
 | storage_key_prism_host | prism_archery_host_v1 | 호스트 LS |
 | storage_key_player | aa_player_state | iframe LS |
@@ -361,7 +362,7 @@ PRISM `archeryBundleToGrant` · iframe `event:grant` **둘 다 이 CSV 우선**.
 | 활쏘기 canvas 0px | #root CSS 누락 | height:100% flex column 추가 |
 | Cannot access 'T' before initialization | shootingBusy TDZ + 정적 import | shootingBusy 상단 선언 + game.js dynamic import |
 | CSV 404 | 절대경로 only | data.js resolveCsvUrl |
-| 연출 생략 | runFiveBowRound 합산만 | runShootingScene autoAdvance ×5 |
+| 연출 생략 | runRound(n) 합산만 | runShootingScene autoAdvance ×N(선택 발수) |
 
 ---
 
@@ -421,6 +422,38 @@ npm run build        # archery 선행 포함
 → 코드: RECIPE_CODE.md 해당 R-번호 참조
 → 코드: RECIPE_CODE.md 해당 R-번호 참조
 
+---
+
+## 호스트 지갑 연동 + 1발 단위 (구현)
+
+> 재화 = "발"(1 재화 = 1발). 호스트(스퀘어)가 잔액 보관·저장, 양궁이 자체 소비. (공통 스펙: 코어 DEV "11. 이식 가능 지갑 계약".)
+> ⚠️ 구버전 `shots_per_bow=5`(1활대=5발, 입장 1회 차감, `aa:consumeBow`↔`host:bowConsumed` 왕복) 폐기.
+
+### 메시지 (postMessage)
+| 방향 | 메시지 | 동작 |
+|------|--------|------|
+| 양궁→호스트 | `aa:ready` | walletSync 요청 |
+| 호스트→양궁 | `host:walletSync { balance, missionLines, claimPending }` | 보유 발 = balance, 미션 배너 데이터 |
+| 양궁→호스트 | `aa:walletChanged { balance }` | 소비 후 남은 발 — 호스트 저장 |
+| 양궁→호스트 | `aa:claimPending`/`aa:claimed` | 토너먼트 보상 수령(기존 유지) |
+
+### iframe 측 파일
+| 파일 | 변경 |
+|------|------|
+| `src/hostBridge.js` | 지갑 계약으로 재작성. `balance`(발) 보관 · `requestConsumeBow(n)`(n발 자체 차감 후 `aa:walletChanged`) · `getHostBowStands()`=balance · `getMissionLines()` · `host:walletSync` 수신 |
+| `src/game.js` | `runFiveBowRound`→`runRound(n)`(n발 루프) · `selectedShots`(1~5) · `#shot-selector` 버튼 와이어링 · `syncShotSelector()`/`renderMission()` · `requestConsumeBow(selectedShots)` |
+| `index.html` | lobby에 `#lobby-mission` 배너 + `#shot-selector`(1~5) 추가, "보유 활대"→"보유 발" |
+| `src/style-ui.css` | `.lobby-mission` · `.shot-selector .shot-opt` 스타일 |
+
+### 호스트(스퀘어) 측
+- `archeryMeta.ts`: `archeryWalletSyncMsg()`(balance=`getBowStands()` + missionLines from acquire CSV + claimPending) · `setArcheryBowStands(balance)`. (구 `archeryInitPayload`/`archeryConsumeBow` 제거.)
+- `MinigameCurrencyService.setBowStands(balance)` — `aa:walletChanged` 저장.
+- `App.tsx`: `aa:ready`→`host:walletSync`, `aa:walletChanged`→`setArcheryBowStands`. (`aa:consumeBow` 핸들러 제거.)
+- `event_minigame_host_config.csv` archery: `ticket_unit=발`, `duration_hours=48`.
+
+### 밸런스 (CSV)
+`event_minigame_acquire_config.csv` archery: 일반 `kills_required=200`, 보스 `2`, reward `1발`. (1발 단위 ×5 + 킬 ×2 = 기존 대비 ×10 난이도.)
+
 
 ---
 
@@ -461,10 +494,10 @@ event_id,event_name,group_size,min_level,event_duration_hours,daily_free_attempt
 config_key,config_value,description
 tournament_round_min,30,토너먼트 1라운드 길이(분). endMs = now + 이 값
 bot_tick_ms,60000,봇 점수 갱신 간격(ms). 0이면 aa_event_config bot_tick_min_ms~max 랜덤
-shots_per_bow,5,활대 1개 소비 시 WebGL 연속 발사 횟수(SET5 점수표 사용)
+shots_per_bow,5,[레거시·미사용] 구 1활대=5발 모델. 현재 1발=1재화 + 라운드당 1~5발 선택(runRound n)
 event_meta_version,3,aa_event_meta localStorage v (불일치 시 메타 리셋)
-starter_bow_stands,5,PRISM 호스트 최초·마이그레이션 지급 활대 개수
-kills_per_bow_host,100,PRISM 스퀘어 적 처치 N마리당 활대 +1
+starter_bow_stands,5,[레거시·미사용] 기본 발 지급은 combat_tuning.csv archery_starter_bows 사용
+kills_per_bow_host,100,[레거시·미사용] 발 수급은 event_minigame_acquire_config.csv(일반 200 보스 2) 사용
 storage_key_prism_host,prism_archery_host_v1,호스트 재화·수령대기 저장 키
 storage_key_player,aa_player_state,iframe 플레이어 점수·순위 저장 키
 storage_key_event_meta,aa_event_meta,iframe 토너먼트 라운드 종료·claimPending

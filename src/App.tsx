@@ -27,14 +27,15 @@ import { GameCore } from './game/GameCore';
 import { ToastOverlay } from './jsonRender/ToastOverlay';
 import { RewardDetailOverlay, type RewardDetailPayload } from './jsonRender/RewardDetailOverlay';
 import { EventMinigameOverlay } from './jsonRender/EventMinigameOverlay';
+import { getMinigameCurrencyService } from './game/minigameCurrency';
 import {
   suspendEventMinigame,
   getActiveMinigameIframe,
   getActiveMinigameId,
 } from './game/eventMinigameHost';
 import {
-  archeryInitPayload,
-  archeryConsumeBow,
+  archeryWalletSyncMsg,
+  setArcheryBowStands,
   archerySetClaimPending,
   archeryBundleToGrant,
   syncArcheryHud,
@@ -345,25 +346,36 @@ export default function App() {
     getActiveMinigameIframe()?.contentWindow?.postMessage(msg, '*');
   }
 
+  function postToPrizeIframe(msg: Record<string, unknown>) {
+    if (getActiveMinigameId() !== 'prize') return;
+    getActiveMinigameIframe()?.contentWindow?.postMessage(msg, '*');
+  }
+
+  /** 이식 가능 지갑 동기화 — balance(필수) + 획득규칙 안내(선택, 호스트 제공 데이터) */
+  function prizeWalletSyncMsg() {
+    const svc = getMinigameCurrencyService();
+    const rows = (svc?.getAcquireRows('prize') ?? [])
+      .filter(r => r.enabled)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const missionLines = rows.map(r => ({
+      title: `${r.row_title} ${r.kills_required}마리`,
+      detail: r.reward_label,
+    }));
+    return { type: 'host:walletSync', balance: svc?.getPrizeBalls() ?? 0, missionLines };
+  }
+
   /* 4) 라바 퀘스트 ↔ 스퀘어 postMessage 브릿지 */
   useEffect(() => {
     const onMessage = (ev: MessageEvent) => {
       if (!ev.data) return;
       if (ev.data.type === 'aa:ready') {
-        postToArcheryIframe({ type: 'host:archeryInit', ...archeryInitPayload() });
+        postToArcheryIframe(archeryWalletSyncMsg());
         return;
       }
-      if (ev.data.type === 'aa:consumeBow') {
-        const ok = archeryConsumeBow();
-        postToArcheryIframe({
-          type: ok ? 'host:bowConsumed' : 'host:bowDenied',
-          ...archeryInitPayload(),
-        });
-        if (!ok) {
-          const msg = '활대가 없습니다. 전투에서 몬스터 100마리 처치 시 활대 1개(5발)를 받을 수 있어요.';
-          window.dispatchEvent(new CustomEvent('lobby:toast', { detail: msg }));
-        }
+      if (ev.data.type === 'aa:walletChanged') {
+        setArcheryBowStands(Number(ev.data.balance ?? 0));
         syncArcheryHud();
+        refreshEventRedDots();
         return;
       }
       if (ev.data.type === 'aa:toast') {
@@ -378,7 +390,18 @@ export default function App() {
       }
       if (ev.data.type === 'aa:claimed') {
         archerySetClaimPending(false);
-        postToArcheryIframe({ type: 'host:archeryInit', ...archeryInitPayload() });
+        postToArcheryIframe(archeryWalletSyncMsg());
+        refreshEventRedDots();
+        return;
+      }
+      /* 퍼즐(Prize Drop) ↔ 스퀘어 = 이식 가능 지갑 계약 (호스트는 balance만 주고받음) */
+      if (ev.data.type === 'pd:ready') {
+        postToPrizeIframe(prizeWalletSyncMsg());
+        return;
+      }
+      if (ev.data.type === 'pd:walletChanged') {
+        const svc = getMinigameCurrencyService();
+        svc?.setPrizeBalls(Number(ev.data.balance ?? 0));
         refreshEventRedDots();
         return;
       }

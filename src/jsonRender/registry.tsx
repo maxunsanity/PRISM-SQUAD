@@ -11,6 +11,7 @@ import {
   openEventMinigame,
   type EventMinigameId,
 } from '../game/eventMinigameHost';
+import { getEventRemainMs, formatRemain } from '../game/eventExposure';
 import { eventStore } from '../eventSystem/tycoonSeason/store/eventExternalStore';
 import {
   eventMiniCardStackIndex,
@@ -421,6 +422,12 @@ function EventMiniCards({ hud }: { hud: ReturnType<typeof useHud> }) {
     cb => eventStore.subscribe(cb),
     () => eventStore.getSnapshot(),
   );
+  // 남은시간 카운트다운 — 1초마다 갱신
+  const [, setTick] = React.useState(0);
+  React.useEffect(() => {
+    const t = window.setInterval(() => setTick(x => x + 1), 1000);
+    return () => window.clearInterval(t);
+  }, []);
   const expressConfigured = Boolean(eventSnap['/event/expressTabVisible']);
   const seasonTabVisible = expressConfigured && isBattleLobbyHud(hud);
   const battleLobby = isBattleLobbyHud(hud);
@@ -428,8 +435,10 @@ function EventMiniCards({ hud }: { hud: ReturnType<typeof useHud> }) {
   const showPrize = Boolean(hud['/lobby/showPrizeDrop']);
 
   const visible = EVENT_MINIGAME_ORDER.filter(id => {
-    const flag = EVENT_MINIGAMES[id].showFlag as keyof typeof hud;
-    return Boolean(hud[flag]);
+    const cfg = EVENT_MINIGAMES[id];
+    if (!hud[cfg.showFlag as keyof typeof hud]) return false;
+    // 노출 기간 만료 시 탭 숨김 (무기한이면 Infinity > 0)
+    return getEventRemainMs(id, cfg.durationHours) > 0;
   });
   if (!visible.length) return null;
 
@@ -452,7 +461,7 @@ function EventMiniCards({ hud }: { hud: ReturnType<typeof useHud> }) {
     <>
       {visible.map(id => {
         const cfg = EVENT_MINIGAMES[id];
-        const tickets = Number(hud[cfg.ticketPath as keyof typeof hud] ?? 0);
+        const remainLabel = formatRemain(getEventRemainMs(id, cfg.durationHours));
         const dotCategory = redDotCategoryFor(id);
         return (
           <div
@@ -480,16 +489,18 @@ function EventMiniCards({ hud }: { hud: ReturnType<typeof useHud> }) {
             }}>
               {cfg.label}
             </div>
-            <div style={{
-              marginTop: 5, fontSize: 10, fontWeight: 900,
-              background: '#FFFFFF', border: '2px solid #000000',
-              borderRadius: 6, padding: '2px 3px', color: '#000000',
-              display: 'inline-block', boxShadow: '1px 1px 0 #000000',
-              minWidth: 32, textAlign: 'center',
-              whiteSpace: 'nowrap',
-            }}>
-              {tickets}{cfg.ticketUnit}
-            </div>
+            {remainLabel ? (
+              <div style={{
+                marginTop: 5, fontSize: 9, fontWeight: 900,
+                background: '#FFFFFF', border: '2px solid #000000',
+                borderRadius: 6, padding: '2px 3px', color: '#000000',
+                display: 'inline-block', boxShadow: '1px 1px 0 #000000',
+                minWidth: 32, textAlign: 'center',
+                whiteSpace: 'nowrap',
+              }}>
+                {remainLabel}
+              </div>
+            ) : null}
           </div>
         );
       })}

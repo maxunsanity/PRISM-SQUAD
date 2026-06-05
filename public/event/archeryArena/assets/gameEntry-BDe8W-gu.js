@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/game-BFIRptBX.js","assets/data-LjOWL3L_.js"])))=>i.map(i=>d[i]);
+import{t as e}from"./index-CcEvZzwd.js";import{t}from"./data-LjOWL3L_.js";async function n(){let n=await t(),{startGame:r}=await e(async()=>{let{startGame:e}=await import(`./game-BFIRptBX.js`);return{startGame:e}},__vite__mapDeps([0,1]));r(n)}n().catch(e=>{console.error(e);let t=document.getElementById(`app`);t&&(t.innerHTML=`<p style="padding:16px;font-weight:700;">데이터 로드 실패: ${e?.message??e}</p>`)});

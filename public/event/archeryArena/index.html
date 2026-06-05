@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/event/archeryArena/assets/index-DbEPx51d.js"></script>
+  <script type="module" crossorigin src="/event/archeryArena/assets/index-CcEvZzwd.js"></script>
 </head>
 <body>
   <div id="app">
@@ -43,6 +43,7 @@
           <div class="m-timer timer-clickable" id="header-timer-lobby" title="탭하면 세션 초기화">01:00</div>
         </header>
         <div class="m-body m-body-lobby">
+          <div id="lobby-mission" class="lobby-mission hidden ui-interactive"></div>
           <div class="lobby-stats ui-interactive">
             <div class="stat-item">
               <div class="stat-val" id="lobby-stat-rank">–</div>
@@ -54,12 +55,20 @@
             </div>
             <div class="stat-item">
               <div class="stat-val" id="lobby-stat-dice">🏹 –</div>
-              <div class="stat-label">보유 활대</div>
+              <div class="stat-label">보유 발</div>
             </div>
           </div>
           <div id="ranking-list" class="ranking-list ui-interactive"></div>
           <footer class="lobby-footer ui-interactive">
-            <button id="btn-attempt" type="button" class="lobby-btn">🏹 활대 5발 도전</button>
+            <div id="shot-selector" class="shot-selector">
+              <span class="shot-sel-label">발</span>
+              <button type="button" class="shot-opt" data-shots="1">1</button>
+              <button type="button" class="shot-opt" data-shots="2">2</button>
+              <button type="button" class="shot-opt" data-shots="3">3</button>
+              <button type="button" class="shot-opt" data-shots="4">4</button>
+              <button type="button" class="shot-opt" data-shots="5">5</button>
+            </div>
+            <button id="btn-attempt" type="button" class="lobby-btn">🏹 1발 도전</button>
             <button id="btn-add-dice" type="button" class="btn-debug">+10 주사위 · 디버그</button>
           </footer>
         </div>

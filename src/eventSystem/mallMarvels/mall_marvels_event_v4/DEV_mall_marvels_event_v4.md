@@ -205,8 +205,8 @@ npm run build
 ### `public/event/mallMarvels/mm_event_config.csv`
 
 ```csv
-event_id,title,intro_tip,duration_hours,hero_image,enabled
-mall_marvels_01,쇼핑몰의 경이로움,각각의 팩을 잠금 해제하면 더 많은 보상을 받을 수 있습니다.,34,,1
+event_id,title,intro_tip,duration_hours,duration_minutes,hero_image,enabled
+mall_marvels_01,쇼핑몰의 경이로움,각각의 팩을 잠금 해제하면 더 많은 보상을 받을 수 있습니다.,34,10,,1
 ```
 
 ### `public/event/mallMarvels/mm_step_config.csv`

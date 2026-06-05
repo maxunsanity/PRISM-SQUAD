@@ -105,7 +105,7 @@ HUD·버튼·모달은 json-render 선언형. Three.js 보드·공 궤적은 명
 [1] Catalog   src/catalog/prizedropCatalog.ts
               액션 4개:
                 prizedropDropBall        — 드롭 버튼 탭
-                prizedropAddBalls        — +10 공 추가
+                prizedropAddBalls        — [레거시·미사용] 구 +10 치트(ball_count 탭). 실재화 전환으로 제거
                 prizedropCycleMultiplier — 배수 순환
                 prizedropDismissModal    — 보상 모달 닫기
 
@@ -386,6 +386,45 @@ npm run build
 
 ### 재생성 / 교체 예시
 → 코드: RECIPE_CODE.md 해당 R-번호 참조
+
+---
+
+## 호스트 지갑 연동 (이식 가능 계약 — 구현)
+
+> 퍼즐볼 = **호스트(스퀘어) 재화**. 퍼즐은 잔액을 받아 자체 소비하는 소비자다. (공통 스펙: 코어 DEV "11. 이식 가능 지갑 계약".)
+> ⚠️ 이 절로 인해 위 "Session Storage(세션 저장 없음)"·"State Paths(ball_count 초기 10)"·catalog `prizedropAddBalls(+10)` 기술은 **구버전**이다. 현재는 호스트 영속 + 호스트 보유량으로 시작 + 치트 제거.
+
+### 메시지 (postMessage)
+| 방향 | 메시지 | 동작 |
+|------|--------|------|
+| 퍼즐→호스트 | `pd:ready` | 부팅 완료, walletSync 요청 |
+| 호스트→퍼즐 | `host:walletSync { balance, missionLines }` | `ball_count = balance`, missionLines 저장 |
+| 퍼즐→호스트 | `pd:walletChanged { balance }` | 드롭 소비 후 남은 잔액 — 호스트가 저장 |
+
+### 파일
+| 파일 | 역할 |
+|------|------|
+| `src/hostBridge.ts` | `installPrizeHostBridge()`(리스너) · `notifyReady()` · `notifyWalletChanged(balance)` · `host:walletSync` 수신 → `ball_count`·`mission_lines` 갱신 · `hosted` 플래그 |
+| `src/PrizeIntro.tsx` | 입장/미션 인트로 오버레이(게임 소유). `intro_visible` 가시성, missionLines 렌더, 보유 퍼즐볼, [입장하기] |
+| `src/game/gameStore.ts` | `useBall()`/`addBalls()` → `ball_count` 변경 후 `notifyWalletChanged(next)` |
+| `src/main.tsx` | 부팅 시 `installPrizeHostBridge()` 먼저 → bootstrap 후 `notifyReady()` · `<PrizeIntro/>` 렌더 |
+
+### 스토어 키 추가 (`hudExternalStore.ts`)
+| 키 | 초기값 | 용도 |
+|----|--------|------|
+| `/hud/intro_visible` | true | 입장 인트로 표시 (false=닫음) |
+| `/hud/mission_lines` | [] | 호스트 walletSync가 채우는 획득안내 `[{title,detail}]` |
+
+### ⚠️ JSON-pointer 스토어 접근 (필수)
+`@json-render/core` `createStateStore`는 **중첩 경로** 접근(`/hud/ball_count`→`state.hud.ball_count`).
+- **읽기는 `hudStore.get('/hud/ball_count')`** 사용. `getSnapshot()['/hud/ball_count']` 직접 키 접근은 **stale**(평면 초기키만 보고 update 결과 못 봄).
+- `intro_visible` 초기값(평면)은 `get()`엔 `undefined`로 보이므로 **`get(...) !== false` 일 때 표시**(undefined=최초=표시).
+
+### 호스트(스퀘어) 측
+- `App.tsx`: `pd:ready`→`host:walletSync` 전송, `pd:walletChanged`→`MinigameCurrencyService.setPrizeBalls(balance)`.
+- `EventMinigameOverlay.tsx` `onLoad`: prize면 `host:walletSync` 선전송.
+- `event_minigame_host_config.csv` prize `ticket_cost=0`(입장 차감 없음), `duration_hours=24`(사이드탭 카운트다운).
+- `+10` 치트: `ball_count` 탭 `on:press` 및 `btn-add-balls` 버튼 제거.
 
 
 ---

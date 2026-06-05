@@ -38,13 +38,15 @@ type HudState = {
   '/lobby/metaGold': number;
   '/meta/avatarProfileLimit': number;
   '/lobby/entryTickets': number;
-  '/lobby/lavaTickets': number;        // 라바 티켓
   '/lobby/prizeBalls': number;         // 프라이즈 볼
+  '/lobby/prizeKillsToward': number;
+  '/lobby/prizeKillsRequired': number;
   '/lobby/archeryBowStands': number;   // 양궁 활대
   '/lobby/showLavaQuest': boolean;     // 이벤트 카드 노출
   '/lobby/showPrizeDrop': boolean;     // 이벤트 카드 노출
   '/lobby/showArcheryArena': boolean;  // 양궁 아레나 탭
   '/archery/killsTowardBow': number;
+  '/archery/killsPerBow': number;
   '/archery/claimPending': boolean;
   '/event/redDot/lava': boolean;
   '/event/redDot/prize': boolean;
@@ -350,13 +352,15 @@ class HudExternalStore {
     '/lobby/metaGold': 0,
     '/meta/avatarProfileLimit': 16,
     '/lobby/entryTickets': 10,
-    '/lobby/lavaTickets': 3,
-    '/lobby/prizeBalls': 5,
+    '/lobby/prizeBalls': 0,
+    '/lobby/prizeKillsToward': 0,
+    '/lobby/prizeKillsRequired': 30,
     '/lobby/archeryBowStands': 5,
     '/lobby/showLavaQuest': true,
     '/lobby/showPrizeDrop': true,
     '/lobby/showArcheryArena': true,
     '/archery/killsTowardBow': 0,
+    '/archery/killsPerBow': 100,
     '/archery/claimPending': false,
     '/event/redDot/lava': false,
     '/event/redDot/prize': false,

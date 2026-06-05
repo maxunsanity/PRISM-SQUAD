@@ -160,10 +160,11 @@ registry.tsx          ← React 컴포넌트 구현 + eventRegistry 등록
 | `/event/lastTpGain` | number | 직전 처치 TP (파티클 연출용) |
 | `/event/milestoneRows` | MilestoneRow[] | 마일스톤 목록 |
 | `/event/milestoneListVisible` | boolean | 마일스톤 목록 팝업 표시 |
-| `/event/milestonePopupVisible` | boolean | 보상 팝업 표시 |
-| `/event/milestonePopupTitle` | string | 보상 팝업 제목 |
-| `/event/milestonePopupAssetKey` | string | 보상 팝업 아이콘 |
-| `/event/milestonePopupLabel` | string | 보상 팝업 라벨 |
+| `/event/tycoonMilestonePopupVisible` · `…/seasonMilestonePopupVisible` | boolean | 타이쿤/시즌 보상 팝업 표시 (**독립 2채널**, 서로 안 막음) |
+| `/event/{tycoon,season}MilestonePopupTitle` | string | 보상 팝업 제목(이벤트명 포함) |
+| `/event/{tycoon,season}MilestonePopupAssetKey` | string | 보상 팝업 아이콘 |
+| `/event/{tycoon,season}MilestonePopupLabel` | string | 보상 팝업 라벨 |
+| `/event/{tycoon,season}MilestonePopup{Lap,Step}` | number | 회차·단계 |
 
 ### 시즌 토너먼트
 
@@ -258,7 +259,7 @@ UI 컴포넌트 간 통신은 `window.dispatchEvent(new CustomEvent(...))`:
 | 이벤트명 | 설명 |
 |----------|------|
 | `event:toggleMilestoneList` | 마일스톤 목록 토글 |
-| `event:closeMilestonePopup` | 보상 팝업 닫기 |
+| `event:closeTycoonMilestonePopup` / `event:closeSeasonMilestonePopup` | 보상 팝업 닫기 (채널별 — 타이쿤/시즌 독립) |
 | `event:toggleTournamentPanel` | 순위판 토글 |
 | `event:closeTournamentPanel` | 순위판 닫기 |
 | `event:closeSettlement` | 정산 팝업 닫기 |
@@ -369,7 +370,7 @@ event_id,event_name,duration_hours,reward_asset_key,icon_key
 
 ```csv
 event_kind,target_type,row_title,kills_required,reward_label,left_icon_key,reward_icon_key,sort_order
-TYCOON_MILEAGE,normal,일반 몬스터,30,1장,enemy_normal,tycoon_coin,1
+TYCOON_MILEAGE,normal,일반 몬스터,10,1장,enemy_normal,tycoon_coin,1
 TYCOON_MILEAGE,boss,중간 보스,1,1장,enemy_mini_boss,tycoon_coin,2
 SEASON_TOURNAMENT,normal,일반 몬스터,50,1장,enemy_normal,season_coin,1
 SEASON_TOURNAMENT,boss,최종 보스,2,1장,enemy_boss,season_coin,2
@@ -390,13 +391,13 @@ express_help,SEASON_EXPRESS,시즌 익스프레스,스프린트 익스프레스,
 
 ```csv
 enemy_id,tycoon_point_base,season_point_base,is_boss
-basic,1,2,false
-dog,1,2,false
-bloater,2,3,false
-spitter,2,3,false
-mini_boss,8,0,false
-crusher,10,0,false
-nexus,10,0,false
+basic,3,2,false
+dog,3,2,false
+bloater,4,3,false
+spitter,4,3,false
+mini_boss,15,0,false
+crusher,15,0,false
+nexus,15,0,false
 final_boss,0,25,true
 ```
 
@@ -404,26 +405,26 @@ final_boss,0,25,true
 
 ```csv
 milestone_group_id,step,required_point,reward_bundle_id,reward_asset_key,reward_qty_label
-mg_ty_01,1,1500,reward_energy_25,reward_energy,×25
-mg_ty_01,2,3600,reward_gold_500,reward_gold,×500
-mg_ty_01,3,7200,reward_energy_40,reward_energy,×40
-mg_ty_01,4,12600,reward_dna_1,reward_dna,×1
-mg_ty_01,5,19500,reward_gem_50,reward_gem,×50
-mg_ty_01,6,28000,reward_gold_1000,reward_gold,×1000
-mg_ty_01,7,38000,reward_energy_60,reward_energy,×60
-mg_ty_01,8,50000,reward_dna_3,reward_dna,×3
-mg_ty_01,9,65000,reward_gem_150,reward_gem,×150
-mg_ty_01,10,85000,reward_gem_300_gold_3000,reward_gem,×300
-mg_se_01,1,1000,reward_energy_20,reward_energy,×20
-mg_se_01,2,2500,reward_gold_300,reward_gold,×300
-mg_se_01,3,5000,reward_energy_30,reward_energy,×30
-mg_se_01,4,9000,reward_dna_1,reward_dna,×1
-mg_se_01,5,15000,reward_gem_30,reward_gem,×30
-mg_se_01,6,22000,reward_gold_800,reward_gold,×800
-mg_se_01,7,30000,reward_energy_50,reward_energy,×50
-mg_se_01,8,40000,reward_dna_2,reward_dna,×2
-mg_se_01,9,52000,reward_gem_100,reward_gem,×100
-mg_se_01,10,70000,reward_gem_200_gold_2000,reward_gem,×200
+mg_ty_01,1,400,reward_energy_25,reward_energy,×25
+mg_ty_01,2,1200,reward_gold_500,reward_gold,×500
+mg_ty_01,3,2400,reward_energy_40,reward_energy,×40
+mg_ty_01,4,4000,reward_dna_1,reward_dna,×1
+mg_ty_01,5,6000,reward_gem_50,reward_gem,×50
+mg_ty_01,6,8400,reward_gold_1000,reward_gold,×1000
+mg_ty_01,7,11200,reward_energy_60,reward_energy,×60
+mg_ty_01,8,14400,reward_dna_3,reward_dna,×3
+mg_ty_01,9,18000,reward_gem_150,reward_gem,×150
+mg_ty_01,10,22000,reward_gem_300_gold_3000,reward_gem,×300
+mg_se_01,1,400,reward_energy_20,reward_energy,×20
+mg_se_01,2,1200,reward_gold_300,reward_gold,×300
+mg_se_01,3,2400,reward_energy_30,reward_energy,×30
+mg_se_01,4,4000,reward_dna_1,reward_dna,×1
+mg_se_01,5,6000,reward_gem_30,reward_gem,×30
+mg_se_01,6,8400,reward_gold_800,reward_gold,×800
+mg_se_01,7,11200,reward_energy_50,reward_energy,×50
+mg_se_01,8,14400,reward_dna_2,reward_dna,×2
+mg_se_01,9,18000,reward_gem_100,reward_gem,×100
+mg_se_01,10,22000,reward_gem_200_gold_2000,reward_gem,×200
 ```
 
 ### `public/event/tycoonSeason/event_ui_theme_config.csv`

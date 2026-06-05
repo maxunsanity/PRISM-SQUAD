@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "npm run build:archery && vite",
+    "build": "npm run build:archery && tsc -b && vite build",
+    "build:archery": "npm run build --prefix \"src/eventSystem/Archery Arena_game_end\"",
     "preview": "vite preview"
   },
   "dependencies": {

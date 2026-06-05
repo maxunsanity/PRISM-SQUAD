@@ -1,0 +1,7 @@
+enemy_id,lava_base,prize_base,archery_base,is_boss
+basic,1,1,1,false
+dog,1,1,1,false
+bloater,1,1,1,false
+spitter,1,1,1,false
+mini_boss,1,1,1,true
+final_boss,1,1,1,true

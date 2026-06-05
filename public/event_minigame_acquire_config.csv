@@ -1,0 +1,5 @@
+minigame_id,target_type,kills_required,reward_label,left_icon_key,reward_icon_key,sort_order,enabled,row_title
+prize,normal,300,1개,enemy_normal,prize_ball,1,1,일반 몬스터
+prize,boss,10,1개,enemy_boss,prize_ball,2,1,보스
+archery,normal,200,1발,enemy_normal,archery_bow,1,1,일반 몬스터
+archery,boss,2,1발,enemy_boss,archery_bow,2,1,보스

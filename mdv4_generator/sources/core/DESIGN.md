@@ -314,7 +314,9 @@ hover: scale(1.05)
 - **컨테이너**: `position:absolute; inset:0; zIndex:45; background:#F4EFE6`.
 - **상단 바(`CommonTopBar`, App z55)**: 햄버거 `≡`(36×36 → `/lobby/menuOpen` 토글) / 아바타(36×36, `/lobby/selectedPlayerColorHex` → `lobby:openAvatar`) / `PLAYER 1` + `LV.{/lobby/advLevel}` + 모험 EXP바(56×6, `/lobby/advExpPct`) / 재화 3종: ⚡`/lobby/entryTickets`(클릭 `energy:open`), 💎`/lobby/gems`, 🪙`/lobby/metaGold`(K 축약).
 - **중앙 스테이지 뷰**: 제목 `{selectedStage}. {stageName}`(24px, `/lobby/selectedStage`·`/lobby/stageName`) / `최장 생존시간 {bestTime}`(`/lobby/bestTime`) / 디오라마 박스 180×150(`renderStageDiorama`, 1~10 분기) + 좌`‹`/우`›` 화살표(34×34 → `lobby:selectStage`, `/lobby/maxStages` 제한) / 챕터 보상 선물상자(`renderNeonGiftIcon` → 토스트) / 배수 토글(minWidth 94: `×{selectedMult}`·"배수"·`⚡{multEnergyCost} 소모` → `lobby:cycleMult`) / **게임 시작 버튼**(padding 12×32, `canStart = entryTickets >= multEnergyCost`; 활성 `#FFB347`→`START_GAME`, 비활성 `#cccccc`→`energy:open`).
-- **이벤트 사이드 탭(우측 세로, `EventMiniCards`, z48)**: `EVENT_MINIGAME_ORDER` 중 show 플래그 true(`/lobby/showLavaQuest`·`showPrizeDrop`·`showArcheryArena`)인 것. 44×44 원형 + 라벨 + 티켓 핍, 레드닷 `/event/redDot/*`. 클릭 `openEventMinigame(id)`.
+- **이벤트 사이드 탭(우측 세로, `EventMiniCards`, z48)**: `EVENT_MINIGAME_ORDER` 중 show 플래그 true(`/lobby/showLavaQuest`·`showPrizeDrop`·`showArcheryArena`)인 것. 44×44 원형 + 라벨 + **남은시간 핍**, 레드닷 `/event/redDot/*`. 클릭 `openEventMinigame(id)`.
+  - **표기 규칙(요즘 라이브 게임 규격):** 핍은 **재화 갯수가 아니라 남은시간**(`event_minigame_host_config.csv` `duration_hours` → `eventExposure.getEventRemainMs`). 포맷 초·아이콘 없이 `H시간 M분`/`M분`. 기간 만료(`remain≤0`) 시 탭 **숨김**(`durationHours≤0`이면 무기한 노출). 1초 간격 카운트다운. **갯수 표기 금지** — 보유 재화는 입장 후 게임 내부 화면에서 본다.
+  - 타이쿤·시즌·쇼핑몰·드라이버 탭도 **동일 시간 포맷**(각 컨트롤러 `formatTimer`). 6개 이벤트 표기 일관(코어 DEV §13).
 - **하단 탭바**: `<NavTabBar active="battle"/>` (10.2).
 - **토스트**: `LobbyToast`(`/toast/visible`·`/toast/text`, bottom:96, z48).
 

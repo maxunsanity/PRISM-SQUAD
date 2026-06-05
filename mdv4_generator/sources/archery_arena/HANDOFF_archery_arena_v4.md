@@ -14,20 +14,20 @@
 | 슬롯 | `eventMinigameRegistry` id **`archery`** (라바·퍼즐과 동일 iframe 호스트) |
 | 배포 | `public/event/archeryArena/` (`npm run build:archery` → PRISM `npm run build` 선행) |
 | 입장 | 로비 우측 🏹 사이드탭 → `openEventMinigame('archery')`, **입장 무료**(host config `ticket_cost=0`) |
-| 재화 | **활대**(주사위 아님). 호스트 `prism_archery_host_v1` · iframe은 표시만 동기화 |
-| 도전 | 활대 **1개** 소비 → **5발** WebGL 연출(SET5 점수표, `shots_per_bow=5`) → 로비 복귀 |
+| 재화 | **발**(arrow, 1 재화 = 1발). 호스트 `MinigameCurrencyService.bowStands`가 SSoT · iframe은 **지갑 계약**으로 받아 자체 소비 |
+| 도전 | **1~5발 선택** → 선택 수만큼 발 소비 + WebGL 연출 → 로비 복귀 (`runRound(n)`) |
 | 토너먼트 | **30분** 라운드 → 종료 후 **보상 수령 필수** → `event:grant`→`grantReward`(gem/gold) → 새 라운드 |
-| 활대 수급 | 코어 전투 적 처치 **`KILLS_PER_BOW=100`마리당 활대 +1** (`archeryOnEnemyKill` ← `GameCore._onEnemyDeath`) |
-| 스퀘어 전투 | **불필요** (라바 suspend/resume 없음 — 활대만 코어 킬에서 누적) |
+| 발 수급 | 코어 전투 적 처치 — `MinigameCurrencyService.onEnemyKilled`, `event_minigame_acquire_config.csv`(일반 **200킬→발+1**, 보스 **2킬→+1**) |
+| 스퀘어 전투 | **불필요** (라바 suspend/resume 없음 — 발만 코어 킬에서 누적) |
 
 ### 코어 재화 사이클 (한눈에)
 
 ```
-[코어 전투]  적 1킬 → archeryOnEnemyKill()
-                       ├─ /archery/killsTowardBow += 1
-                       └─ killsTowardBow ≥ 100 → /lobby/archeryBowStands += 1, 누적 0 리셋
-[이벤트 진입] 🏹 탭(무료) → aa:ready → host:archeryInit{ bowStands, killsTowardBow, killsPerBow }
-[도전]        활대 1개 소비(aa:consumeBow→archeryConsumeBow) → 5발 연출 → 순위 갱신
+[코어 전투]  적 1킬 → MinigameCurrencyService.onEnemyKilled('archery'…)
+                       ├─ 누적 += 1 (event_minigame_acquire_config.csv kills_required)
+                       └─ 일반 200킬 / 보스 2킬 도달 → bowStands += 1 → /lobby/archeryBowStands
+[이벤트 진입] 🏹 탭(무료) → aa:ready → host:walletSync{ balance, missionLines, claimPending }
+[도전]        1~5발 선택 → requestConsumeBow(n) → balance -= n → aa:walletChanged{balance} → runRound(n)
 [라운드 종료] aa:claimPending → 결과/보상 → event:grant{bundleId}
                        └─ archeryBundleToGrant(bundleId) → grantReward(gem/gold) → aa:claimed
 ```
@@ -40,10 +40,10 @@
 |------|------|
 | 레지스트리 | `src/game/eventMinigameRegistry.ts` — `archery` 항목 |
 | 호스트 API | `src/game/eventMinigameHost.ts` — `openEventMinigame` (archery는 입장 시 활대 차감 **없음**) |
-| 활대·킬·저장 | `src/game/archeryMeta.ts` |
+| 발·킬·저장·walletSync | `src/game/archeryMeta.ts` (`archeryWalletSyncMsg`/`setArcheryBowStands`) |
 | 번들→지급 | `archeryMeta.archeryBundleToGrant` ← `aa_bundle_reward_config.csv` |
 | 레드닷 | `src/game/eventRedDots.ts` + `hudStore` `/event/redDot/archery` |
-| message | `src/App.tsx` — `aa:*`, `host:archeryInit`, `event:grant` |
+| message | `src/App.tsx` — `aa:ready`/`aa:walletChanged`/`aa:claim*`, `host:walletSync`, `event:grant` |
 | iframe 셸 | `src/jsonRender/EventMinigameOverlay.tsx` |
 | 로비 탭 | `src/jsonRender/registry.tsx` — `EventMiniCards` |
 | 햄버거 ON/OFF | `src/jsonRender/LobbyMenuDropdown.tsx` — `/lobby/showArcheryArena` |
@@ -100,8 +100,8 @@
 
 | type | payload | 동작 |
 |------|---------|------|
-| `aa:ready` | — | iframe 기동 완료 → host가 `host:archeryInit` 회신 |
-| `aa:consumeBow` | — | 5발 도전 요청 → host `archeryConsumeBow()` |
+| `aa:ready` | — | iframe 기동 완료 → host가 `host:walletSync` 회신 |
+| `aa:walletChanged` | `{ balance }` | N발 자체 소비 후 남은 잔액 → host `setArcheryBowStands(balance)` 저장 |
 | `aa:claimPending` | `{ pending: boolean }` | 라운드 종료·미수령 → 레드닷 |
 | `aa:claimed` | — | 보상 수령 완료 → host `claimPending` 해제 |
 | `aa:toast` | `{ message: string }` | 호스트 ToastOverlay (z530) |
@@ -111,10 +111,10 @@
 
 | type | payload | 동작 |
 |------|---------|------|
-| `host:archeryInit` | `bowStands, claimPending, killsTowardBow, killsPerBow, roundBlocked` | 활대 수·라운드 차단 동기화 |
-| `host:bowConsumed` | 위와 동일 | 소비 성공 → `runFiveBowRound()` |
-| `host:bowDenied` | 위와 동일 | 활대 부족 → iframe 토스트 |
+| `host:walletSync` | `{ balance, missionLines, claimPending }` | 보유 발(=balance)·미션 안내·라운드 차단 동기화 (이식 지갑 계약) |
 | `host:eventDispose` | `{ eventId: 'archery' }` | 탭 전환·닫기 — LS 키 정리 (`eventMinigameRegistry.persistKeys`) |
+
+> ⚠️ 구 프로토콜 `aa:consumeBow`/`host:archeryInit`/`host:bowConsumed`/`host:bowDenied`(1활대=5발)는 **폐기**. 소비는 iframe이 자체 판정 후 `aa:walletChanged`로 잔액만 통지한다.
 
 ### 라바와 공통
 
@@ -135,13 +135,13 @@ sequenceDiagram
 
   L->>I: openEventMinigame(archery)
   I->>L: aa:ready
-  L->>I: host:archeryInit (bowStands=5)
-  I->>I: Entry → Lobby
-  Note over I: 스퀘어 100킬마다 H += 활대
-  I->>L: aa:consumeBow
-  L->>H: archeryConsumeBow()
-  L->>I: host:bowConsumed
-  I->>I: 5발 WebGL 연출
+  L->>I: host:walletSync (balance, missionLines)
+  I->>I: Entry → Lobby (미션배너 + 보유 발 + 1~5 선택)
+  Note over I: 스퀘어 200킬마다 H += 발
+  I->>I: N발 선택 → requestConsumeBow(N)
+  I->>L: aa:walletChanged (balance -= N)
+  L->>H: setArcheryBowStands(balance)
+  I->>I: runRound(N) — N발 WebGL 연출
   Note over I: 30분 후 라운드 종료
   I->>L: aa:claimPending
   I->>I: Result → Reward
@@ -160,7 +160,7 @@ sequenceDiagram
 | 데이터 로드 실패 (404) | CSV 절대경로 `/event/...` 만 사용 | `data.js` `resolveCsvUrl()` — index.html 기준 상대 URL |
 | 데이터 로드 실패 (TDZ) | `gameEntry`가 `game.js` 정적 import | `gameEntry` → dynamic import `game.js` |
 | 활대 없는데 메시지 없음 | `btn-attempt` **disabled** | 활대 0이어도 클릭 가능 + 토스트 |
-| 연출 없이 점수만 | `runFiveBowRound`가 합산만 함 | `runShootingScene(..., { autoAdvance: true })` × 5 |
+| 연출 없이 점수만 | `runRound(n)`이 합산만 함 | `runShootingScene(..., { autoAdvance: true })` × N(선택 발수) |
 | 호스트 토스트 안 보임 | Toast z-index < iframe | iframe 열림 시 Toast **z530** |
 | 1대만 표시 | `STARTER_BOW_STANDS=1` 시절 저장 | `starterV2` 마이그레이션 → **5** (`aa_integration_config.csv`) |
 

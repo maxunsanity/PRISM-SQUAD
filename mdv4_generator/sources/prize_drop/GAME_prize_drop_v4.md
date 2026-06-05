@@ -218,12 +218,11 @@ RewardCircle 충돌 감지는 런타임 물리 없이 렌더 루프에서 거리
 
 ### 입장 재화 — `/lobby/prizeBalls`
 
-- **차감**: `openEventMinigame('prize')` 진입 시 `ticket_path=/lobby/prizeBalls` 에서 `ticket_cost=1` 차감(`eventMinigameHost.ts:96-104`). 잔량 부족 시 `재화가 부족합니다` 토스트 후 진입 취소(차감·마운트 모두 안 함).
-- **수급**(`GameCore.ts`):
-  - 코어 전투 **30킬마다 +1** (`kill_per_event_ticket`, 기본 30 / `GameCore.ts:807-809` → `_addEventCurrency(1, 1)`)
-  - **보스 처치 보너스 +1** (`_onBossDeath`, `GameCore.ts:816`)
-  - **게임 클리어 보너스 +1** (`GameCore.ts:1425`)
-  - 적립 함수 `_addEventCurrency(lavaTickets, prizeBalls)` 가 `/lobby/lavaTickets`·`/lobby/prizeBalls` 동시 갱신.
+- **차감**: 입장 차감 없음(`ticket_cost=0`). 퍼즐볼은 **드롭마다 1개**를 게임이 자체 소비하고 `pd:walletChanged`로 호스트에 잔액 저장(아래 "호스트 지갑 계약").
+- **수급**(`MinigameCurrencyService.onEnemyKilled`, `event_minigame_acquire_config.csv`):
+  - 코어 전투 일반 **300킬마다 퍼즐볼 +1** (보스 **10킬마다 +1**) — `kills_required` 누적식 × `ticketMultiplier`
+  - **스테이지 클리어 보너스** (`combat_tuning.csv stage_clear_prize_bonus`)
+  - ⚠️ 구 `_addEventCurrency(lavaTickets, prizeBalls)`(30킬·`/lobby/lavaTickets` 동시 갱신)는 **폐기** — 라바는 미니게임 재화 제외, 적립은 `MinigameCurrencyService`로 통합.
 
 ### 이벤트→코어 보상 — `event:grant`
 
@@ -283,6 +282,27 @@ prize,퍼즐,🎰,#B388FF,/event/prizeDrop/index.html,/lobby/prizeBalls,1,개,/l
 ```
 
 핵심 보강 포인트:
-- 입장권 차감은 **진입 시 1회**(드롭마다 차감 아님). 한 세션 동안 `ball_count`(기본 10) 만큼 드롭 가능, `add_balls` 로 +10.
+- **퍼즐볼은 호스트(스퀘어) 재화다.** 입장 시 차감 없음(`ticket_cost=0`). `ball_count`는 호스트가 보낸 보유량으로 시작하고 **드롭마다 1개 소비** 후 남은 잔액을 호스트에 통지·저장한다(아래 "호스트 지갑 계약"). `+10` 치트(공 카운터 탭)는 실재화 전환으로 **제거됨**.
 - 보상 지급은 **마일스톤 단위**이며, 잭팟 슬롯(slot 3)은 화면 연출(잭팟 모달)일 뿐 자체로 코어 재화를 직접 지급하지 않는다(번개 누적 → 마일스톤 경유로만 코어 적립).
 - 복수 마일스톤 동시 달성 시 모달은 큐로 순차 표시되고, `event:grant` 도 달성 순서대로 각각 전송된다.
+
+---
+
+## 호스트 지갑 계약 (퍼즐볼 = 호스트 재화, 이식 가능)
+
+퍼즐볼은 **스퀘어 전투에서 적을 잡아 버는 호스트 재화**다. 퍼즐 게임은 그 잔액을 받아 자체 소비하는 소비자다. 호스트는 잔액(숫자)만 주고받으며 퍼즐 규칙을 모른다 → **모노폴리 GO 등 어느 호스트에도 같은 구조로 붙는다.** (공통 스펙: 코어 DEV "11. 이식 가능 지갑 계약".)
+
+**메시지 3종:**
+```
+퍼즐 → 호스트 :  pd:ready
+호스트 → 퍼즐 :  host:walletSync { balance, missionLines }   (보유 퍼즐볼 + 획득안내)
+퍼즐 → 호스트 :  pd:walletChanged { balance }                (드롭 소비 후 남은 잔액 저장)
+```
+
+**입장/미션 화면을 퍼즐이 소유:** 진입 시 `PrizeIntro` 오버레이가 먼저 표시 — "퍼즐볼 모으는 법"(missionLines: 일반 N마리→1개, 보스 M마리→1개) + 보유 퍼즐볼 + [입장하기]. 호스트는 missionLines(획득 규칙 텍스트)를 **데이터로만** 제공하고 퍼즐이 렌더한다.
+
+**소비:** 드롭(`release_drop`) → `ball_count` -1 → `pd:walletChanged{balance}` 송신. 부족 판정·경고도 퍼즐 자체.
+
+**standalone:** 호스트 없으면(`window.parent===window`) `hosted=false` → 내부 기본 공으로 동작.
+
+**노출 시간:** 사이드탭은 보유 갯수가 아니라 **남은시간**(`event_minigame_host_config.csv` `duration_hours`, 퍼즐 기본 24h)을 카운트다운으로 표시(코어 DEV §12·§13).

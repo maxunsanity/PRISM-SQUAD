@@ -179,9 +179,9 @@ localStorage 버전 체크가 필수다(`aa_event_meta` `event_meta_version`, CS
 
 **도전 카드 진입 시 clearAttemptSelection 누락** — 이전 선택이 잔존한다. 항상 초기화.
 
-**SET3/SET5 도전 시 화살 1회만 연출** — 세트 횟수만큼 순차 실행 필수.
+**N발 도전 시 화살 1회만 연출** — 선택 발수(N)만큼 순차 실행 필수.
 
-**localStorage 버전 체크 누락 / 호스트 SSoT 무시** — 구버전 메타 잔존 시 오작동. PRISM 모드는 활대 수를 `getHostBowStands()`(호스트)에서 받아야 한다. iframe 로컬 `dice_count`를 SSoT로 쓰면 호스트와 어긋난다. 부트 시 `event_meta_version` 체크 + `aa:ready`→`host:archeryInit` 동기화 필수.
+**localStorage 버전 체크 누락 / 호스트 SSoT 무시** — 구버전 메타 잔존 시 오작동. PRISM 모드는 발 잔액을 `getHostBowStands()`(호스트 `host:walletSync.balance`)에서 받아야 한다. iframe 로컬 `dice_count`를 SSoT로 쓰면 호스트와 어긋난다. 부트 시 `event_meta_version` 체크 + `aa:ready`→`host:walletSync` 동기화 필수.
 
 **flashRing에서 mesh.scale 변경** — 과녁 크기가 변동된다. 색 lerp만 허용.
 
@@ -197,11 +197,11 @@ localStorage 버전 체크가 필수다(`aa_event_meta` `event_meta_version`, CS
 
 | 항목 | 규칙 |
 |------|------|
-| 재화명 | **활대** (주사위·스퀘어 주사위 보드 **미연동**) |
-| 획득 | 스퀘어 **적 100처치당 활대 +1** (호스트 `archeryOnEnemyKill`) |
-| 기본 지급 | **활대 5개** (`aa_integration_config.starter_bow_stands`) |
-| 소비 | 로비 **「활대 5발 도전」** 1회당 활대 **1개** |
-| 연출 | 활대 1개 → **5발** WebGL (`SET5` 점수표, `shots_per_bow`) |
+| 재화명 | **발**(arrow). **1 재화 = 1발** (주사위·스퀘어 주사위 보드 **미연동**) |
+| 획득 | 스퀘어 적 처치 — `MinigameCurrencyService` 누적식, `event_minigame_acquire_config.csv`(일반 **200킬→발+1**, 보스 **2킬→+1**) |
+| 기본 지급 | **발 5개** (`combat_tuning.csv archery_starter_bows=5`, `ensureStarterCurrency`) |
+| 소비 | 로비 **1~5발 선택** → 선택 수만큼 발 소비 (`requestConsumeBow(n)`) |
+| 연출 | 선택 N발 → **N발** WebGL (`runRound(n)`, `SET5` 점수표) |
 | 토너먼트 | **30분** 라운드 (`tournament_round_min`) |
 | 봇 | **60초**마다 점수 갱신 (`bot_tick_ms`) |
 | 보상 | 라운드 종료 → **수령 필수** → `event:grant` → 수령 전 **재도전 불가** |
@@ -212,21 +212,21 @@ localStorage 버전 체크가 필수다(`aa_event_meta` `event_meta_version`, CS
 ```yaml
   prism_bow_grant:
     actor: host
-    trigger: "GameCore._onEnemyDeath"
+    trigger: "GameCore → MinigameCurrencyService.onEnemyKilled('archery'…)"
     effects:
-      - "killsTowardBow += 1"
-      - "killsTowardBow >= 100 → bowStands += 1, killsTowardBow = 0"
+      - "누적 += 1 (event_minigame_acquire_config.csv kills_required)"
+      - "일반 200킬 / 보스 2킬 도달 → bowStands += 1, 누적 0 리셋"
 
-  prism_five_shot_attempt:
+  prism_select_shot_attempt:
     actor: player
     preconditions:
-      - "bowStands >= 1 (host)"
+      - "balance(발) >= 선택 발수 N (1~5)"
       - "not claimPending"
       - "not eventEnded (또는 결과 화면)"
     effects:
-      - "postMessage aa:consumeBow"
-      - "host archeryConsumeBow → host:bowConsumed"
-      - "runFiveBowRound: runShootingScene × shots_per_bow (autoAdvance)"
+      - "requestConsumeBow(N): balance -= N (iframe 자체 판정)"
+      - "postMessage aa:walletChanged{balance} → host setArcheryBowStands 저장"
+      - "runRound(N): runShootingScene × N (autoAdvance)"
       - "target_score 합산 → ranking 갱신"
 
   prism_round_end:
@@ -239,10 +239,11 @@ localStorage 버전 체크가 필수다(`aa_event_meta` `event_meta_version`, CS
 
 ### Anti-Patterns (PRISM)
 
-- **활대 0일 때 btn-attempt disabled** — 클릭·토스트 불가. 활대 없어도 버튼 활성 + 안내 문구.
+- **발 0일 때 btn-attempt disabled** — 클릭·토스트 불가. 발 없어도 버튼 활성 + 안내 문구.
+- **선택 발수 > 보유 발인데 소비 허용** — `requestConsumeBow(n)`은 `balance < n`이면 거부(deny). 선택기는 보유 초과 옵션 비활성.
 - **gameEntry에서 game.js 정적 import** — `Cannot access before initialization` TDZ. **dynamic import 필수**.
 - **refreshRank()를 let shootingBusy 선언 전 호출** — 동일 TDZ. `shootingBusy`를 `startGame` 최상단에 선언.
-- **runFiveBowRound에서 점수만 합산** — 연출 생략 금지. `runShootingScene` 5회 필수.
+- **runRound(n)에서 점수만 합산** — 연출 생략 금지. `runShootingScene` N회 필수.
 
 ---
 
@@ -262,21 +263,21 @@ PRISM 코어(탕탕 서바이버) **로비 안의 iframe 이벤트 미니게임*
 | 1. 탭 | 로비 **우측 세로 사이드탭(🏹 양궁)** — `registry.tsx` `EventMiniCards`, `/lobby/showArcheryArena=true`일 때만 노출 |
 | 2. 클릭 | `openEventMinigame('archery')` (`eventMinigameHost.ts`) — `ticketCost=0`이라 **입장 차감 없음** → 이전 세션 dispose → `mountKey++` → iframe remount |
 | 3. ready | iframe 부팅 완료 → `aa:ready` postMessage |
-| 4. init | 코어가 `host:archeryInit` 회신 — **활대 수(`bowStands`) · `killsTowardBow` · `killsPerBow` · `claimPending` · `roundBlocked`** 전달 (`archeryInitPayload()`) |
+| 4. init | 코어가 `host:walletSync` 회신 — **balance(보유 발) · missionLines(획득안내) · claimPending** 전달 (`archeryWalletSyncMsg()`) |
 
-### 입장 재화 — 활대(Bow Stand)
+### 재화 — 발(Arrow), 이식 지갑 계약
 
 | 항목 | 값/경로 |
 |------|---------|
 | 입장 비용 | **무료** — host config `ticket_cost=0` (`event_minigame_host_config.csv`, archery 행) |
-| 진행 소모 | **활대 1개 / 「활대 5발 도전」 1회** (`archeryConsumeBow` ← `aa:consumeBow`) |
-| 활대 상태 | `/lobby/archeryBowStands` (호스트 SSoT `prism_archery_host_v1`) |
-| 활대 수급 | 코어 전투 **적 처치 N마리당 활대 +1** — `archeryMeta.KILLS_PER_BOW` (CSV `kills_per_bow_host=100`), 훅 `archeryOnEnemyKill()` ← `GameCore._onEnemyDeath` |
-| 누적 진척 | `/archery/killsTowardBow` (0~99, 100 도달 시 활대+1·0 리셋) |
-| 수령 대기 | `/archery/claimPending` (토너먼트 종료·미수령 시 재도전 차단) |
-| 기본 지급 | 신규/마이그레이션 시 **활대 5개** (CSV `starter_bow_stands=5`, `ensureArcheryStarterBows`) |
+| 진행 소모 | **1~5발 선택 → N발 소비** (`requestConsumeBow(N)` → `aa:walletChanged{balance}`). 1 재화 = 1발 |
+| 발 잔액 | `/lobby/archeryBowStands` (호스트 SSoT `MinigameCurrencyService.bowStands`, 저장 `prism_squad_save_v1.minigameCurrency`) |
+| 발 수급 | 코어 전투 적 처치 — `MinigameCurrencyService.onEnemyKilled`, `event_minigame_acquire_config.csv`(일반 **200킬→발+1**, 보스 **2킬→+1**) × `ticketMultiplier` |
+| 누적 진척 | `/archery/killsTowardBow`·`/archery/killsPerBow`(=200) |
+| 수령 대기 | `/archery/claimPending` (토너먼트 종료·미수령 시 재도전 차단, `host:walletSync.claimPending`) |
+| 기본 지급 | 신규/마이그레이션 시 **발 5개** (`combat_tuning.csv archery_starter_bows=5`, `ensureStarterCurrency`) |
 
-> **활대 1개 = 5발**: `aa_integration_config.csv` `shots_per_bow=5` — 도전 1회당 `runShootingScene` 5연발(SET5 점수표). `KILLS_PER_BOW`(=100, 활대 획득 단위)와 `shots_per_bow`(=5, 발사 횟수)는 별개 상수다.
+> ⚠️ 구버전 **"활대 1개 = 5발"**(`aa_integration_config.csv` `shots_per_bow=5`, `kills_per_bow_host=100`, `starter_bow_stands`)은 **폐기**. 이제 **1발 = 1재화**이고 라운드당 1~5발을 선택해 그만큼 소비한다. (해당 CSV 필드는 미사용 레거시.)
 
 ### 이벤트 → 코어 보상
 
@@ -307,3 +308,29 @@ archery,양궁,🏹,#7EC8A8,/event/archeryArena/index.html,/lobby/archeryBowStan
 | 런타임 토글 | `/lobby/showArcheryArena` (`hudExternalStore` 기본 `true`) — 햄버거 메뉴(`LobbyMenuDropdown.tsx`) 또는 store 직접. false면 사이드탭 숨김 |
 | CSV OFF | `event_minigame_host_config.csv` archery 행 `enabled=0`/삭제 |
 | 완전 제외 | 위 + `eventMinigameRegistry.ts` `FALLBACK`·union 타입에서 archery 제거 (FALLBACK 하드코드가 살아있으면 CSV만으론 미제거) |
+
+---
+
+## 재화 = "발" + 호스트 지갑 계약 (이식 가능)
+
+양궁 재화는 **"발"(arrow)** 이며 **1 재화 = 1발**. 스퀘어 전투에서 적을 잡아 벌고(호스트 `MinigameCurrencyService`), 양궁은 그 잔액을 받아 자체 소비한다. 호스트는 잔액(숫자)만 주고받으며 양궁 규칙을 모른다 → 이식 가능. (공통 스펙: 코어 DEV "11. 이식 가능 지갑 계약".)
+
+> ⚠️ **구버전 정정:** 과거 "활대 1개 = 5발"(`shots_per_bow=5`, 1회 입장에 1활대 차감) 모델은 폐기. 이제 **1발 = 1재화**, 한 라운드에 **1~5발을 선택**해 그만큼 소비한다.
+
+**메시지 3종 (`aa` 네임스페이스):**
+```
+양궁 → 호스트 :  aa:ready
+호스트 → 양궁 :  host:walletSync { balance, missionLines, claimPending }   (보유 발 + 획득안내)
+양궁 → 호스트 :  aa:walletChanged { balance }                              (소비 후 남은 발 저장)
+```
+(토너먼트 보상 수령은 별도: `aa:claimPending` / `aa:claimed`.)
+
+**1~5발 선택 + 소비:**
+- lobby 하단 **1~5 선택 버튼**(`#shot-selector`). 보유량 초과 옵션은 비활성. 버튼 라벨 `🏹 N발 도전`.
+- 도전 → `requestConsumeBow(N)` → 보유 발에서 N 차감 + `aa:walletChanged` 통지 → `runRound(N)`(N발 발사).
+
+**lobby 상단 미션 배너:** `#lobby-mission` 에 "발 모으는 법"(missionLines: 일반 N마리→1발, 보스 M마리→1발) + 보유 발 표시. 호스트가 missionLines를 데이터로 제공, 양궁이 렌더.
+
+**단위 표기:** 사이드탭·lobby 모두 "발"(기존 "활대/대" 폐기). 사이드탭은 갯수가 아니라 **남은시간**(`duration_hours=48`) 카운트다운(코어 DEV §12·§13).
+
+**standalone:** 호스트 없으면 내부 기본값으로 동작.

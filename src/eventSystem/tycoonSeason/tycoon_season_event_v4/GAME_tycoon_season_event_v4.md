@@ -9,7 +9,7 @@ ui_pixel_precision: "DESIGN·외부 팀. DEV는 json-render 슬롯·$state·DOM 
 
 > **대상**: 게임 기획 · 밸런스 · 운영  
 > **코드/연동 요약**: 같은 폴더 `EVENT_SYSTEM.md`  
-> **호스트 게임**: 스퀘어(탕탕류). PRISM 본편 `src/GAME.md`와 별도 문서.
+> **호스트 게임**: 스퀘어(탕탕류). PRISM 본편 `mdv4_generator/sources/core/GAME.md`와 별도 문서.
 
 ## 1. 이 모듈이 하는 일
 
@@ -76,6 +76,11 @@ CSV: `event_help_acquire_config.csv` + `event_help_config.csv` (`acquire_section
 | 배너 색·높이 | `event_asset_config`(색) + `event_ui_theme_config`(크기) |
 
 **레퍼런스**: 모노폴리 GO 「식은 죽 먹기」 상단 캡슐.
+
+### 2-1-b. 보상 아이콘 스왑 + 보상 팝업 연쇄 (구현 주의 — 최종 튜닝)
+- **다음 보상 아이콘 스왑**(`eventMonopolyUi.tsx` + `style.css`): 마일스톤 달성 시 우측 보상 아이콘이 다음 단계로 교체. `.event-reward-badge-swap-out` **0.26s** → `.event-reward-badge-swap-in` **0.38s**. `eventMonopolyUi.tsx` 3중 중첩 `setTimeout` 지연 **300ms / 260ms / 380ms**(총 ~0.94s)로 버벅임 제거.
+- **보상 획득 팝업 가속**(`registry.tsx`): 팝업 카드 축소 `cardClaimDisappear` + 오버레이 `bgFadeOut` 모두 **0.15s**, 언마운트 대기 `setTimeout` **150ms**. 불필요한 파티클 없이 빠르게 소멸(연속 수령 시인성·반응성).
+- **[CRITICAL] 타이쿤·시즌 보상 팝업 채널 완전 분리**: 두 이벤트가 **독립 큐**(`pendingTycoonPopups`/`pendingSeasonPopups`) + **독립 상태**(`/event/tycoonMilestonePopup*`/`/event/seasonMilestonePopup*`)를 가져 서로 막지 않음. **게임(전투) 중엔 안 뜨고**, 타이쿤 창(마일스톤 리스트)·시즌 창(익스프레스/토너먼트)이 **열릴 때만** 대기 보상이 표시된다(`showNext*`가 해당 창 visible일 때만, 창 닫으면 닫힘). 제목·카드 헤더에 **이벤트명** 포함(혼동 방지). 닫을 때 채널별 `dismissTycoonMilestonePopup()`/`dismissSeasonMilestonePopup()` → 같은 채널 `setTimeout 50ms` 후 다음(React 배칭 stuck 방지). close 이벤트도 채널별 `event:closeTycoonMilestonePopup`/`event:closeSeasonMilestonePopup`. (구: 단일 공유 큐·채널 → 시즌이 타이쿤을 막고 제목이 `N회차 N단계`로 동일해 "보상이 같다"고 오인되던 버그 → 채널 분리로 해결.)
 
 ### 2-2. 우측 — 토너먼트 탭 (`EventTournamentLeaderboard`)
 
@@ -387,7 +392,7 @@ CSV: `event_help_acquire_config.csv` + `event_help_config.csv` (`acquire_section
 
 ## 11. PRISM 본편과의 관계
 
-| | PRISM `src/GAME.md` | 이 문서 |
+| | PRISM `mdv4_generator/sources/core/GAME.md` | 이 문서 |
 |--|---------------------|---------|
 | 범위 | 서바이버 전투·로비·장비 | **이벤트만** |
 | 데이터 | `public/*.csv` | `public/event/*.csv` |
@@ -425,3 +430,21 @@ PRISM 단독 실행: `EventBridge` 제거 시 본편만 동작.
 ### UI만 바꾸고 Spec·Store 미패치
 
 `eventHudSpec.ts` ↔ `eventExternalStore.ts` ↔ `registry.tsx` **3종 세트** 동시 수정.
+
+---
+
+## 재화·노출 모델 — iframe 지갑 계약과 다름 (주의)
+
+타이쿤·시즌은 **인게임 HUD형**이라 iframe 미니게임(퍼즐·양궁)의 "지갑 계약"과 **메커니즘이 다르다.** 혼동 금지.
+
+| 구분 | 타이쿤·시즌 (인게임 HUD) | 퍼즐·양궁 (iframe) |
+|------|------------------------|-------------------|
+| 재화 적립 | 코어 `EventBridge.onEnemyKilled` → `EventController` (in-game 상시) | 호스트 `MinigameCurrencyService` → `host:walletSync` |
+| 소비/사용 | 마일스톤·토너먼트(별도 게임 화면 없음) | iframe 내부 자체 소비 → `*:walletChanged` |
+| 통신 | postMessage 없음 (코어 직접 호출) | postMessage 지갑 계약 3종 |
+
+→ 타이쿤/시즌은 **지갑 계약(`walletSync`)을 쓰지 않는다.** 코어 연동은 `EventBridge` 경유(코어 DEV §9). 재화 적립 규칙은 `event_kill_reward_config.csv` + `event_help_acquire_config.csv`.
+
+### 노출 시간 — 표기 규칙은 공통
+- 이벤트 기간: `event_board_config.csv` `duration_hours`(72) — `EventController`가 종료 처리(maxHours).
+- 사이드탭 남은시간 표기는 **6개 이벤트 전부 동일**: 초·아이콘 없이 `H시간 M분`/`M분`, **재화 갯수 표기 금지**. 타이쿤/시즌은 컨트롤러 `formatTimer`, iframe은 `eventExposure.formatRemain`(동일 규칙). (코어 DEV §12·§13.)

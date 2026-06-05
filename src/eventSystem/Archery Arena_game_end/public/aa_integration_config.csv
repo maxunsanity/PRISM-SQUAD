@@ -1,0 +1,13 @@
+config_key,config_value,description
+tournament_round_min,30,토너먼트 1라운드 길이(분). endMs = now + 이 값
+bot_tick_ms,60000,봇 점수 갱신 간격(ms). 0이면 aa_event_config bot_tick_min_ms~max 랜덤
+shots_per_bow,5,활대 1개 소비 시 WebGL 연속 발사 횟수(SET5 점수표 사용)
+event_meta_version,3,aa_event_meta localStorage v (불일치 시 메타 리셋)
+starter_bow_stands,5,PRISM 호스트 최초·마이그레이션 지급 활대 개수
+kills_per_bow_host,100,PRISM 스퀘어 적 처치 N마리당 활대 +1
+storage_key_prism_host,prism_archery_host_v1,호스트 재화·수령대기 저장 키
+storage_key_player,aa_player_state,iframe 플레이어 점수·순위 저장 키
+storage_key_event_meta,aa_event_meta,iframe 토너먼트 라운드 종료·claimPending
+iframe_deploy_base,/event/archeryArena/,Vite base URL·CSV fetch 기준 경로
+minigame_id,archery,eventMinigameRegistry 슬롯 id
+minigame_src,/event/archeryArena/index.html,iframe src

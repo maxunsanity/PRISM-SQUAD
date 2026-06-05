@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prize Drop — 기획서 v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #1a1a18;
+  --paper:  #faf8f5;
+  --paper2: #f3f0eb;
+  --paper3: #eceae3;
+  --sky:    #4a90d9;
+  --sky2:   #dceeff;
+  --red:    #e03030;
+  --red2:   #ffe8e8;
+  --gold:   #e8a020;
+  --gold2:  #fff3cc;
+  --green:  #2a8a40;
+  --green2: #e8f5ec;
+  --purple: #7b4fd4;
+  --purple2:#f0eaff;
+  --shadow:    3px 3px 0 #1a1a18;
+  --shadow-sm: 2px 2px 0 #1a1a18;
+  --border: 1.5px solid #1a1a18;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+/* ── 헤더 ── */
+.header { background: var(--ink); color: var(--paper); padding: 18px 32px; display: flex; align-items: baseline; gap: 16px; border-bottom: 3px solid var(--gold); }
+.header-title { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; color: var(--gold); }
+.header-sub { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #aaa; }
+.header-badge { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; background: var(--gold); color: var(--ink); padding: 3px 10px; border-radius: 3px; }
+
+/* ── 탭 ── */
+.tab-bar { display: flex; background: var(--paper2); border-bottom: var(--border); overflow-x: auto; }
+.tab-btn { font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 500; padding: 12px 22px; background: none; border: none; border-right: var(--border); cursor: pointer; color: #888; white-space: nowrap; transition: background .15s; }
+.tab-btn:hover { background: var(--paper3); color: var(--ink); }
+.tab-btn.active { background: var(--paper); color: var(--ink); font-weight: 700; border-bottom: 3px solid var(--sky); margin-bottom: -1.5px; }
+
+.tab-panel { display: none; padding: 28px 32px; }
+.tab-panel.active { display: block; }
+
+/* ── 공통 ── */
+.section-title { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; border-left: 4px solid var(--sky); padding-left: 10px; margin-bottom: 18px; margin-top: 32px; }
+.section-title:first-child { margin-top: 0; }
+.spec-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px; }
+.spec-table th { background: var(--ink); color: var(--paper); font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 8px 12px; text-align: left; border: var(--border); }
+.spec-table td { padding: 8px 12px; border: var(--border); vertical-align: top; background: var(--paper); }
+.spec-table tr:nth-child(even) td { background: var(--paper2); }
+.code-block { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--ink); color: #c9f0b0; padding: 16px 18px; border-radius: 4px; margin-bottom: 20px; overflow-x: auto; line-height: 1.7; white-space: pre; }
+.note-box { border: var(--border); border-left: 4px solid var(--gold); background: var(--gold2); padding: 12px 16px; font-size: 13px; margin-bottom: 20px; border-radius: 0 4px 4px 0; }
+.note-box.critical { border-left-color: var(--red); background: var(--red2); }
+.note-box.info { border-left-color: var(--sky); background: var(--sky2); }
+.badge { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 3px; border: var(--border); margin: 2px; }
+.badge-sky    { background: var(--sky2); color: var(--sky); }
+.badge-gold   { background: var(--gold2); color: #9a6800; }
+.badge-red    { background: var(--red2); color: var(--red); }
+.badge-green  { background: var(--green2); color: var(--green); }
+.badge-purple { background: var(--purple2); color: var(--purple); }
+
+/* ══════════════════════════════
+   탭1: UI 화면 — 정밀 목업
+══════════════════════════════ */
+.mockup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 32px; margin-bottom: 32px; }
+.mockup-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.mockup-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #888; }
+.mockup-title { font-family: 'Caveat', cursive; font-size: 16px; font-weight: 700; }
+
+/* ── 디바이스 프레임 ── */
+.device {
+  width: 240px;
+  aspect-ratio: 390/700;
+  background: #9b59b6;          /* 보라 배경 */
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px 6px;
+  gap: 4px;
+}
+
+/* ── 상단 HUD ── */
+.m-top-hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+.m-coin-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1a1a18;
+  border-radius: 20px;
+  padding: 3px 10px 3px 4px;
+  border: 1.5px solid #333;
+}
+.m-coin-icon {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffd700, #e8a020);
+  border: 1.5px solid #9a6800;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7px; font-weight: 700; color: #9a6800;
+}
+.m-coin-val { color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; }
+.m-mult-badge {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffd700, #e8a020);
+  border: 2px solid #9a6800;
+  box-shadow: 0 2px 6px rgba(232,160,32,0.5), 0 0 0 1px #fff3;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; color: #5a3a00;
+}
+
+/* ── 아케이드 보드 프레임 ── */
+.m-arcade-frame {
+  width: 100%;
+  flex: 1;
+  background: linear-gradient(180deg, #48c9b0 0%, #1abc9c 100%);
+  border-radius: 14px 14px 6px 6px;
+  border: 2px solid #0e9e88;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), inset 0 3px 0 rgba(255,255,255,0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 프레임 상단 톱니/홈 장식 */
+.m-frame-notch {
+  height: 8px;
+  background: linear-gradient(90deg, #1abc9c 0%, #48c9b0 50%, #1abc9c 100%);
+  border-bottom: 1.5px solid #0e9e88;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding-bottom: 1px;
+  flex-shrink: 0;
+}
+.m-notch-tooth {
+  width: 8px; height: 5px;
+  background: #0e9e88;
+  border-radius: 2px 2px 0 0;
+}
+
+/* ── 투하 버튼 영역 ── */
+.m-drop-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px 8px 4px;
+  flex-shrink: 0;
+}
+.m-drop-btn {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ff7070, #e03030);
+  border: 2px solid #9a1f1f;
+  box-shadow: 0 3px 0 #9a1f1f, 0 4px 6px rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: transform .1s, box-shadow .1s;
+  position: relative;
+}
+.m-drop-btn::after {
+  content: '';
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #fff;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.3));
+}
+.m-drop-btn.active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #9a1f1f, 0 2px 3px rgba(0,0,0,0.3);
+}
+
+/* ── 핀 보드 SVG 컨테이너 ── */
+.m-board-svg-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.m-board-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── 하단 슬롯 영역 ── */
+.m-slot-row {
+  display: flex;
+  border-top: 1.5px solid #0e9e88;
+  flex-shrink: 0;
+}
+.m-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 1px;
+  border-right: 1px solid #0e9e88;
+  background: rgba(0,0,0,0.15);
+  gap: 1px;
+}
+.m-slot:last-child { border-right: none; }
+.m-slot-icon {
+  font-size: 9px;
+  color: #a0ff60;
+  filter: drop-shadow(0 0 2px #60ff00);
+}
+.m-slot-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  color: #a0ff60;
+}
+.m-slot.jackpot .m-slot-icon { color: #ffd700; filter: drop-shadow(0 0 3px #ffd700); }
+.m-slot.jackpot .m-slot-val  { color: #ffd700; }
+
+/* ── 하단 마일스톤 HUD ── */
+.m-milestone-hud {
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  border-radius: 0 0 12px 12px;
+  padding: 5px 6px;
+  flex-shrink: 0;
+}
+.m-ms-reward-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+}
+.m-ms-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.m-ms-icon {
+  font-size: 9px;
+  color: #a0d0ff;
+}
+.m-ms-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7px;
+  color: #ccc;
+}
+.m-ms-label {
+  font-size: 8px;
+  color: #aaa;
+  text-align: center;
+  margin-top: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.m-ms-lightning { font-size: 14px; color: #a0ff60; margin-right: 2px; filter: drop-shadow(0 0 3px #60ff00); }
+
+/* ── 보상 모달 ── */
+.m-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10; }
+.m-modal { background: linear-gradient(180deg,#6a2fbc,#4a1f8c); border: 2px solid #9b6be0; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); padding: 14px 12px; width: 80%; text-align: center; }
+.m-modal-reward { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.6); }
+.m-modal-label { font-size: 9px; color: #ccc; margin-bottom: 6px; }
+.m-modal-btn { margin-top: 10px; background: linear-gradient(180deg,#ffd700,#e8a020); color: var(--ink); border: 2px solid #9a6800; padding: 5px 14px; border-radius: 20px; font-family: 'Noto Sans KR', sans-serif; font-size: 9px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 0 #9a6800; }
+
+/* 잭팟 오버레이 */
+.m-jackpot-overlay { position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, rgba(255,200,0,0.9), rgba(0,0,0,0.85)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; z-index: 10; }
+.m-jackpot-text { font-family: 'Caveat', cursive; font-size: 24px; font-weight: 700; color: #ffd700; text-shadow: 2px 2px 0 #000, 0 0 12px rgba(255,215,0,0.8); animation: jackpot-bounce .4s ease-in-out infinite alternate; }
+@keyframes jackpot-bounce { from { transform: scale(1); } to { transform: scale(1.08); } }
+.m-jackpot-amount { font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: #fff; font-weight: 700; }
+.m-jackpot-coins { display: flex; gap: 4px; margin-top: 4px; }
+.m-jackpot-coin { width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35%35%,#ffd700,#e8a020); border: 1px solid #9a6800; animation: float-coin 1s ease-in-out infinite alternate; }
+.m-jackpot-coin:nth-child(2){animation-delay:.15s}
+.m-jackpot-coin:nth-child(3){animation-delay:.3s}
+.m-jackpot-coin:nth-child(4){animation-delay:.45s}
+@keyframes float-coin { from{transform:translateY(0)}to{transform:translateY(-6px)} }
+
+/* ══ 스펙 박스 ══ */
+.spec-box { background: var(--paper2); border: var(--border); border-radius: 4px; padding: 14px 16px; font-size: 12px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+.spec-box-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--sky); font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing:.05em; }
+.spec-row { display: flex; gap: 8px; margin-bottom: 4px; align-items: baseline; }
+.spec-key { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #888; min-width: 120px; flex-shrink: 0; }
+.spec-val { font-size: 12px; line-height: 1.5; }
+
+/* ══ 플로우 ══ */
+.flow-wrap { display: flex; flex-direction: column; align-items: flex-start; }
+.flow-box { border: var(--border); border-radius: 6px; padding: 10px 18px; font-size: 13px; background: var(--paper); box-shadow: var(--shadow-sm); min-width: 200px; }
+.flow-box.screen  { background: var(--sky2); border-color: var(--sky); }
+.flow-box.action  { background: var(--paper2); }
+.flow-box.branch  { background: var(--gold2); border-color: var(--gold); }
+.flow-box.end     { background: var(--ink); color: var(--paper); }
+.flow-id { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #888; margin-bottom: 3px; }
+.flow-box.screen .flow-id { color: #4a7fc8; }
+.flow-label { font-weight: 700; font-size: 13px; }
+.flow-desc  { font-size: 11px; color: #666; margin-top: 3px; }
+.flow-box.end .flow-id, .flow-box.end .flow-desc { color: #aaa; }
+.flow-vline { width: 2px; height: 20px; background: var(--ink); margin-left: 32px; }
+.flow-branch-row { display: flex; gap: 16px; margin: 6px 0; flex-wrap: wrap; }
+.flow-branch-item { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.flow-branch-cond { font-family: 'IBM Plex Mono', monospace; font-size: 10px; background: var(--paper3); border: 1px solid #ccc; padding: 2px 8px; border-radius: 3px; color: #555; }
+
+/* ══ 애니 카드 ══ */
+.ani-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.ani-card { border: var(--border); border-radius: 6px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.ani-card-head { background: var(--ink); color: var(--paper); padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+.ani-card-id { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); }
+.ani-card-name { font-size: 13px; font-weight: 700; }
+.ani-card-body { padding: 12px 14px; background: var(--paper); font-size: 12px; }
+.ani-row { display: flex; gap: 6px; margin-bottom: 5px; align-items: flex-start; }
+.ani-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #888; min-width: 60px; }
+.ani-value { font-size: 12px; line-height: 1.5; }
+.ani-demo { height: 50px; background: var(--paper2); border-top: 1px solid var(--paper3); display: flex; align-items: center; justify-content: center; gap: 6px; overflow: hidden; }
+
+/* 애니 데모 */
+.demo-spark { display: flex; gap: 3px; }
+.demo-spark span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: spark .6s ease-out infinite; }
+.demo-spark span:nth-child(2){animation-delay:.1s;background:var(--red)}
+.demo-spark span:nth-child(3){animation-delay:.2s;background:var(--sky)}
+@keyframes spark{0%{transform:scale(0)translate(0,0);opacity:1}100%{transform:scale(1.5)translate(4px,-8px);opacity:0}}
+.demo-rainbow { width: 50px; height: 20px; border-radius: 4px; animation: rainbow-cycle 1.5s linear infinite; }
+@keyframes rainbow-cycle{0%{background:#ff6b6b}16%{background:#ffa500}33%{background:#ffd700}50%{background:#a0ff60}66%{background:#4a90d9}83%{background:#9b6be0}100%{background:#ff6b6b}}
+.demo-wood-slide { width: 40px; height: 32px; background: linear-gradient(135deg,#8B6914,#5D4412); border-radius: 4px; border: 1.5px solid #3a2a08; animation: wood-slide .8s ease-out infinite alternate; box-shadow: inset 0 2px 0 rgba(255,200,100,.3); }
+@keyframes wood-slide{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.demo-wave-arrow { display: flex; gap: 2px; align-items: center; }
+.demo-wave-arrow span { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #00d8e8; animation: wave-arrow .6s ease-in-out infinite alternate; }
+.demo-wave-arrow span:nth-child(2){animation-delay:.15s}
+.demo-wave-arrow span:nth-child(3){animation-delay:.3s}
+@keyframes wave-arrow{from{transform:translateX(0);opacity:.4}to{transform:translateX(4px);opacity:1}}
+.demo-ripple { position: relative; width: 30px; height: 30px; }
+.demo-ripple::before,.demo-ripple::after { content:''; position:absolute; border-radius:50%; border:2px solid var(--sky); animation: ripple 1s ease-out infinite; }
+.demo-ripple::after { animation-delay:.5s; }
+@keyframes ripple{0%{inset:40%;opacity:1}100%{inset:-10%;opacity:0}}
+.demo-liquid { width: 80px; height: 12px; border: 1px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--paper3); }
+.demo-liquid-fill { height: 100%; background: linear-gradient(90deg, #a0ff60, #ffd700); animation: liquid-fill 2s ease-in-out infinite alternate; border-radius: 6px; }
+@keyframes liquid-fill{from{width:20%}to{width:85%}}
+.demo-bounce-text { font-family: 'Caveat',cursive; font-size: 16px; font-weight: 700; color: transparent; background: linear-gradient(90deg,#ff6b6b,#ffa500,#ffd700,#a0ff60); -webkit-background-clip: text; background-clip: text; animation: bounce-text .4s ease-in-out infinite alternate; }
+@keyframes bounce-text{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+
+/* ══ CSV ══ */
+.csv-section { margin-bottom: 36px; }
+.csv-filename { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--ink); color: var(--gold); padding: 4px 12px; border-radius: 3px 3px 0 0; display: inline-block; }
+.csv-table-wrap { border: var(--border); border-radius: 0 4px 4px 4px; overflow: auto; }
+.csv-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.csv-table th { background: var(--paper3); border: 1px solid var(--paper3); padding: 7px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-align: left; }
+.csv-table td { padding: 7px 12px; border: 1px solid var(--paper3); vertical-align: top; }
+.csv-table tr:hover td { background: var(--paper2); }
+.csv-type { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--sky); }
+.col-spec { background: var(--sky2); }
+.col-spec th { background: #c5dffa; }
+
+/* ══ 뱅크 ══ */
+.bank-step { display: flex; gap: 0; align-items: stretch; }
+.bank-step-num { width: 36px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; background: var(--ink); color: var(--paper); border: var(--border); flex-shrink: 0; }
+.bank-step-body { flex: 1; border: var(--border); border-left: none; padding: 12px 16px; background: var(--paper); }
+.bank-step-title { font-family: 'Caveat', cursive; font-size: 17px; font-weight: 700; margin-bottom: 5px; }
+.bank-step-desc { font-size: 12px; color: #555; line-height: 1.6; }
+.bank-step-arrow { height: 20px; border-left: 2px dashed var(--paper3); margin-left: 18px; }
+.bank-matrix { display: grid; grid-template-columns: repeat(8,1fr); gap: 3px; margin-bottom: 16px; }
+.bank-cell { border: 1px solid var(--paper3); border-radius: 3px; padding: 5px 3px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 9px; background: var(--paper2); line-height: 1.3; }
+.bank-cell.header { background: var(--ink); color: var(--paper); font-weight: 700; }
+.bank-cell.jackpot { background: var(--gold2); }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <span class="header-title">🔵 Prize Drop</span>
+  <span class="header-sub">Plinko 구슬치기 — 기획서 v2.0 (실제 화면 기준)</span>
+  <span class="header-badge">1단계 산출물</span>
+</div>
+
+<!-- 탭바 -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">📱 UI 화면</button>
+  <button class="tab-btn" onclick="switchTab(1)">🔀 플로우</button>
+  <button class="tab-btn" onclick="switchTab(2)">✨ 애니메이션</button>
+  <button class="tab-btn" onclick="switchTab(3)">📊 CSV 데이터</button>
+  <button class="tab-btn" onclick="switchTab(4)">🎲 시뮬 뱅크</button>
+</div>
+
+<!-- ══════════════════════
+     탭1: UI 화면
+══════════════════════ -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="section-title">화면 목록 — 실제 화면 기준 정밀 재현</div>
+
+  <div class="mockup-grid">
+
+    <!-- PD-UI-001: 로비 -->
+    <div class="mockup-wrap">
+      <div class="mockup-label">PD-UI-001</div>
+      <div class="mockup-title">로비 / 대기</div>
+      <div class="device">
+        <!-- 상단 HUD -->
+        <div class="m-top-hud">
+          <div class="m-coin-badge">
+            <div class="m-coin-icon">M</div>
+            <span class="m-coin-val">10</span>
+          </div>
+          <div class="m-mult-badge">x1</div>
+        </div>
+
+        <!-- 아케이드 프레임 -->
+        <div class="m-arcade-frame">
+          <div class="m-frame-notch">
+            <div class="m-notch-tooth"></div><div class="m-notch-tooth"></div>
+            <div class="m-notch-tooth"></div><div class="m-notch-tooth"></div>
+            <div class="m-notch-tooth"></div><div class="m-notch-tooth"></div>
+          </div>
+          <!-- 투하 버튼 5개 -->
+          <div class="m-drop-row">
+            <div class="m-drop-btn"></div>
+            <div class="m-drop-btn"></div>
+            <div class="m-drop-btn"></div>
+            <div class="m-drop-btn"></div>
+            <div class="m-drop-btn"></div>
+          </div>
+          <!-- 핀보드 SVG -->
+          <div class="m-board-svg-wrap">
+            <svg viewBox="0 0 224 280" xmlns="http://www.w3.org/2000/svg">
+              <!-- 보드 배경 -->
+              <rect width="224" height="280" fill="#6a2fbc"/>
+              <!-- 좌우 경사벽 (민트색 화살표형) -->
+              <polygon points="0,60 28,110 0,160" fill="#1abc9c" stroke="#0e9e88" stroke-width="1.5"/>
+              <polygon points="224,60 196,110 224,160" fill="#1abc9c" stroke="#0e9e88" stroke-width="1.5"/>
+
+              <!-- 중앙 대형 장애물 원 (글로우 효과) -->
+              <circle cx="112" cy="120" r="44" fill="#5a1fa8" stroke="#9b6be0" stroke-width="2"/>
+              <circle cx="112" cy="120" r="40" fill="none" stroke="#7b4fd4" stroke-width="1" opacity="0.5"/>
+              <!-- 원 내부 3갈래 곡선 (steering wheel 형태) -->
+              <path d="M112,80 Q125,100 112,120 Q99,100 112,80" fill="none" stroke="#9b6be0" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M76,140 Q97,130 112,120 Q100,138 76,140" fill="none" stroke="#9b6be0" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M148,140 Q127,130 112,120 Q124,138 148,140" fill="none" stroke="#9b6be0" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- 중앙 원 내부 보상 아이콘 -->
+              <circle cx="112" cy="108" r="16" fill="#3a1a80" stroke="#7b4fd4" stroke-width="1.5"/>
+              <text x="112" y="112" text-anchor="middle" font-size="9" fill="#a0d0ff" font-family="sans-serif" font-weight="bold">🎲20</text>
+
+              <!-- 좌측 대형 보상 원 -->
+              <circle cx="44" cy="120" r="26" fill="#3a1a80" stroke="#7b4fd4" stroke-width="2"/>
+              <circle cx="44" cy="120" r="22" fill="#2a1060" stroke="#5a3fa0" stroke-width="1"/>
+              <text x="44" y="115" text-anchor="middle" font-size="7" fill="#ffd700" font-family="sans-serif">💰</text>
+              <text x="44" y="128" text-anchor="middle" font-size="7" fill="#ffd700" font-family="sans-serif" font-weight="bold">1.66M</text>
+
+              <!-- 우측 대형 보상 원 -->
+              <circle cx="180" cy="120" r="26" fill="#3a1a80" stroke="#7b4fd4" stroke-width="2"/>
+              <circle cx="180" cy="120" r="22" fill="#2a1060" stroke="#5a3fa0" stroke-width="1"/>
+              <text x="180" y="115" text-anchor="middle" font-size="7" fill="#a0d0ff" font-family="sans-serif">🎲</text>
+              <text x="180" y="128" text-anchor="middle" font-size="7" fill="#a0d0ff" font-family="sans-serif" font-weight="bold">20</text>
+
+              <!-- 핀 배치 — 원형 트랙 + 주변 격자 혼합 -->
+              <!-- 외곽 핀 링 (중앙 원 주변) -->
+              <circle cx="112" cy="68" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="140" cy="76" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="156" cy="100" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="156" cy="140" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="140" cy="164" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="84" cy="164" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="68" cy="140" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="68" cy="100" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="84" cy="76" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <!-- 상단 산발 핀 -->
+              <circle cx="50" cy="50" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="80" cy="40" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="144" cy="40" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="174" cy="50" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <!-- 하단 핀들 (슬롯 위) -->
+              <circle cx="32" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="64" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="96" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="128" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="160" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="192" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <!-- 다이아몬드 장애물 (중하단) -->
+              <rect x="105" y="170" width="14" height="14" transform="rotate(45,112,177)" fill="#1abc9c" stroke="#0e9e88" stroke-width="1.5"/>
+
+              <!-- 구슬 (대기 중, 상단) -->
+              <circle cx="112" cy="28" r="7" fill="radial-gradient(circle at 35% 35%, #fff, #b0d8ff)" stroke="#4a90d9" stroke-width="1.5"/>
+              <circle cx="112" cy="28" r="7" fill="#b0d8ff" stroke="#4a90d9" stroke-width="1.5"/>
+              <circle cx="109" cy="25" r="2.5" fill="rgba(255,255,255,0.7)"/>
+
+              <!-- 슬롯 칸막이 선 -->
+              <line x1="32"  y1="210" x2="32"  y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="64"  y1="210" x2="64"  y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="96"  y1="210" x2="96"  y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="128" y1="210" x2="128" y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="160" y1="210" x2="160" y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="192" y1="210" x2="192" y2="280" stroke="#0e9e88" stroke-width="1"/>
+
+              <!-- 슬롯 번개 아이콘 + 숫자 -->
+              <text x="16"  y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text>
+              <text x="16"  y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">1</text>
+              <text x="48"  y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text>
+              <text x="48"  y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">10</text>
+              <text x="80"  y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text>
+              <text x="80"  y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">20</text>
+              <text x="112" y="220" text-anchor="middle" font-size="8" fill="#ffd700">⚡</text>
+              <text x="112" y="232" text-anchor="middle" font-size="7" fill="#ffd700" font-weight="bold">100</text>
+              <text x="144" y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text>
+              <text x="144" y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">20</text>
+              <text x="176" y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text>
+              <text x="176" y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">10</text>
+              <text x="208" y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text>
+              <text x="208" y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">1</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 마일스톤 HUD -->
+        <div class="m-milestone-hud">
+          <div class="m-ms-reward-row">
+            <span class="m-ms-lightning">⚡</span>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">80</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">100</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">120</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">140</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">800</span></div>
+          </div>
+          <div class="m-ms-label">보상 0/8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PD-UI-002: 낙하 중 -->
+    <div class="mockup-wrap">
+      <div class="mockup-label">PD-UI-002</div>
+      <div class="mockup-title">플레이 — 낙하 중</div>
+      <div class="device">
+        <div class="m-top-hud">
+          <div class="m-coin-badge"><div class="m-coin-icon">M</div><span class="m-coin-val">9</span></div>
+          <div class="m-mult-badge">x1</div>
+        </div>
+        <div class="m-arcade-frame">
+          <div class="m-frame-notch">
+            <div class="m-notch-tooth"></div><div class="m-notch-tooth"></div>
+            <div class="m-notch-tooth"></div><div class="m-notch-tooth"></div>
+          </div>
+          <div class="m-drop-row" style="opacity:.4;pointer-events:none;">
+            <div class="m-drop-btn"></div><div class="m-drop-btn"></div>
+            <div class="m-drop-btn active"></div>
+            <div class="m-drop-btn"></div><div class="m-drop-btn"></div>
+          </div>
+          <div class="m-board-svg-wrap">
+            <svg viewBox="0 0 224 280" xmlns="http://www.w3.org/2000/svg">
+              <rect width="224" height="280" fill="#6a2fbc"/>
+              <polygon points="0,60 28,110 0,160" fill="#1abc9c" stroke="#0e9e88" stroke-width="1.5"/>
+              <polygon points="224,60 196,110 224,160" fill="#1abc9c" stroke="#0e9e88" stroke-width="1.5"/>
+              <circle cx="112" cy="120" r="44" fill="#5a1fa8" stroke="#9b6be0" stroke-width="2"/>
+              <path d="M112,80 Q125,100 112,120 Q99,100 112,80" fill="none" stroke="#9b6be0" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M76,140 Q97,130 112,120 Q100,138 76,140" fill="none" stroke="#9b6be0" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M148,140 Q127,130 112,120 Q124,138 148,140" fill="none" stroke="#9b6be0" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="112" cy="108" r="16" fill="#3a1a80" stroke="#7b4fd4" stroke-width="1.5"/>
+              <text x="112" y="112" text-anchor="middle" font-size="9" fill="#a0d0ff" font-family="sans-serif" font-weight="bold">🎲20</text>
+              <circle cx="44" cy="120" r="26" fill="#3a1a80" stroke="#7b4fd4" stroke-width="2"/>
+              <text x="44" y="115" text-anchor="middle" font-size="7" fill="#ffd700">💰</text>
+              <text x="44" y="128" text-anchor="middle" font-size="7" fill="#ffd700" font-weight="bold">1.66M</text>
+              <circle cx="180" cy="120" r="26" fill="#3a1a80" stroke="#7b4fd4" stroke-width="2"/>
+              <text x="180" y="115" text-anchor="middle" font-size="7" fill="#a0d0ff">🎲</text>
+              <text x="180" y="128" text-anchor="middle" font-size="7" fill="#a0d0ff" font-weight="bold">20</text>
+              <!-- 핀들 -->
+              <circle cx="112" cy="68" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="140" cy="76" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="156" cy="100" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="156" cy="140" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="140" cy="164" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="84" cy="164" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="68" cy="140" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="68" cy="100" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="84" cy="76" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="50" cy="50" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="80" cy="40" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="144" cy="40" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="174" cy="50" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="32" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="64" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="96" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="128" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="160" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <circle cx="192" cy="192" r="4" fill="#e0e0e0" stroke="#aaa" stroke-width="1"/>
+              <rect x="105" y="170" width="14" height="14" transform="rotate(45,112,177)" fill="#1abc9c" stroke="#0e9e88" stroke-width="1.5"/>
+              <!-- 구슬 낙하 중 (핀 충돌 위치) -->
+              <circle cx="140" cy="100" r="7" fill="#b0d8ff" stroke="#4a90d9" stroke-width="1.5"/>
+              <circle cx="137" cy="97" r="2.5" fill="rgba(255,255,255,0.7)"/>
+              <!-- 충돌 빛 파동 -->
+              <circle cx="140" cy="100" r="12" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" opacity="0.7"/>
+              <circle cx="140" cy="100" r="18" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1" opacity="0.4"/>
+              <!-- 스파크 파티클 -->
+              <circle cx="150" cy="93" r="2.5" fill="#ffd700" opacity="0.9"/>
+              <circle cx="155" cy="98" r="2" fill="#ff6b6b" opacity="0.8"/>
+              <circle cx="148" cy="89" r="2" fill="#a0d0ff" opacity="0.8"/>
+              <!-- 슬롯 -->
+              <line x1="32"  y1="210" x2="32"  y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="64"  y1="210" x2="64"  y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="96"  y1="210" x2="96"  y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="128" y1="210" x2="128" y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="160" y1="210" x2="160" y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <line x1="192" y1="210" x2="192" y2="280" stroke="#0e9e88" stroke-width="1"/>
+              <text x="16"  y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text><text x="16"  y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">1</text>
+              <text x="48"  y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text><text x="48"  y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">10</text>
+              <text x="80"  y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text><text x="80"  y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">20</text>
+              <text x="112" y="220" text-anchor="middle" font-size="8" fill="#ffd700">⚡</text><text x="112" y="232" text-anchor="middle" font-size="7" fill="#ffd700" font-weight="bold">100</text>
+              <text x="144" y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text><text x="144" y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">20</text>
+              <text x="176" y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text><text x="176" y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">10</text>
+              <text x="208" y="220" text-anchor="middle" font-size="8" fill="#a0ff60">⚡</text><text x="208" y="232" text-anchor="middle" font-size="7" fill="#a0ff60" font-weight="bold">1</text>
+            </svg>
+          </div>
+        </div>
+        <div class="m-milestone-hud">
+          <div class="m-ms-reward-row">
+            <span class="m-ms-lightning">⚡</span>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">80</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">100</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">120</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">140</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">800</span></div>
+          </div>
+          <div class="m-ms-label">보상 0/8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PD-UI-003: 보상 모달 -->
+    <div class="mockup-wrap">
+      <div class="mockup-label">PD-UI-003</div>
+      <div class="mockup-title">보상 모달</div>
+      <div class="device">
+        <div class="m-top-hud">
+          <div class="m-coin-badge"><div class="m-coin-icon">M</div><span class="m-coin-val">9</span></div>
+          <div class="m-mult-badge">x1</div>
+        </div>
+        <div class="m-arcade-frame" style="position:relative;">
+          <div class="m-frame-notch">
+            <div class="m-notch-tooth"></div><div class="m-notch-tooth"></div><div class="m-notch-tooth"></div>
+          </div>
+          <div class="m-drop-row" style="opacity:.2;"><div class="m-drop-btn"></div><div class="m-drop-btn"></div><div class="m-drop-btn"></div><div class="m-drop-btn"></div><div class="m-drop-btn"></div></div>
+          <div class="m-board-svg-wrap" style="opacity:.3;">
+            <svg viewBox="0 0 224 280" xmlns="http://www.w3.org/2000/svg">
+              <rect width="224" height="280" fill="#6a2fbc"/>
+              <circle cx="112" cy="120" r="44" fill="#5a1fa8" stroke="#9b6be0" stroke-width="2"/>
+              <circle cx="44"  cy="120" r="26" fill="#3a1a80" stroke="#7b4fd4" stroke-width="2"/>
+              <circle cx="180" cy="120" r="26" fill="#3a1a80" stroke="#7b4fd4" stroke-width="2"/>
+            </svg>
+          </div>
+          <!-- 모달 오버레이 -->
+          <div class="m-overlay">
+            <div class="m-modal">
+              <div class="m-modal-label">착지! ⚡ ×20</div>
+              <div class="m-modal-reward">⚡ 20</div>
+              <div style="font-size:8px;color:#ccc;margin-top:2px;">배수 ×1 적용</div>
+              <button class="m-modal-btn">확인</button>
+            </div>
+          </div>
+        </div>
+        <div class="m-milestone-hud">
+          <div class="m-ms-reward-row">
+            <span class="m-ms-lightning">⚡</span>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">80</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">100</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">120</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">140</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">800</span></div>
+          </div>
+          <div class="m-ms-label">보상 1/8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PD-UI-004: 잭팟 -->
+    <div class="mockup-wrap">
+      <div class="mockup-label">PD-UI-004</div>
+      <div class="mockup-title">잭팟 — ×100 착지</div>
+      <div class="device" style="background:#3a0080;">
+        <div class="m-top-hud">
+          <div class="m-coin-badge"><div class="m-coin-icon">M</div><span class="m-coin-val">9</span></div>
+          <div class="m-mult-badge" style="background:radial-gradient(circle at 35% 30%,#ff80ff,#9b6be0);border-color:#7b4fd4;color:#fff;">x1</div>
+        </div>
+        <div class="m-arcade-frame" style="position:relative;background:linear-gradient(180deg,#2a0060,#1a0040);">
+          <div class="m-frame-notch" style="background:#2a0060;border-color:#7b4fd4;">
+            <div class="m-notch-tooth" style="background:#7b4fd4;"></div><div class="m-notch-tooth" style="background:#7b4fd4;"></div><div class="m-notch-tooth" style="background:#7b4fd4;"></div>
+          </div>
+          <div class="m-drop-row" style="opacity:.1;"><div class="m-drop-btn"></div><div class="m-drop-btn"></div><div class="m-drop-btn"></div><div class="m-drop-btn"></div><div class="m-drop-btn"></div></div>
+          <div class="m-board-svg-wrap" style="opacity:.4;">
+            <svg viewBox="0 0 224 280" xmlns="http://www.w3.org/2000/svg">
+              <rect width="224" height="280" fill="#3a0080"/>
+              <circle cx="112" cy="120" r="44" fill="#5a1fa8" stroke="#9b6be0" stroke-width="2"/>
+              <!-- 중앙 슬롯 강조 -->
+              <rect x="96" y="210" width="32" height="70" fill="rgba(255,215,0,0.2)" stroke="#ffd700" stroke-width="1.5"/>
+              <text x="112" y="250" text-anchor="middle" font-size="10" fill="#ffd700" font-weight="bold">⚡100</text>
+            </svg>
+          </div>
+          <!-- 잭팟 오버레이 -->
+          <div class="m-jackpot-overlay">
+            <div class="m-jackpot-text">WINNER!</div>
+            <div class="m-jackpot-amount">⚡ 100</div>
+            <div style="font-size:8px;color:#ffd;margin-top:2px;">×1 배수 적용</div>
+            <div class="m-jackpot-coins">
+              <div class="m-jackpot-coin"></div><div class="m-jackpot-coin"></div>
+              <div class="m-jackpot-coin"></div><div class="m-jackpot-coin"></div>
+            </div>
+            <button style="margin-top:8px;background:linear-gradient(180deg,#ffd700,#e8a020);color:#3a0000;border:2px solid #9a6800;padding:4px 14px;border-radius:20px;font-size:9px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 #9a6800;">계속하기</button>
+          </div>
+        </div>
+        <div class="m-milestone-hud" style="background:rgba(100,0,180,0.6);">
+          <div class="m-ms-reward-row">
+            <span class="m-ms-lightning">⚡</span>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">80</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">100</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">120</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">140</span></div>
+            <div class="m-ms-item"><span class="m-ms-icon">🎲</span><span class="m-ms-val">800</span></div>
+          </div>
+          <div class="m-ms-label">보상 1/8</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mockup-grid -->
+
+  <!-- 화면 구조 상세 스펙 -->
+  <div class="section-title">화면 구조 상세 스펙</div>
+
+  <div class="note-box info">
+    📐 실제 게임(Monopoly GO Prize Drop) 화면 직접 분석 기준. 보드는 아케이드 머신 프레임 형태 (민트/청록색), 내부 배경은 보라색.
+  </div>
+
+  <!-- 레이아웃 레이어 분해 -->
+  <div class="spec-box">
+    <div class="spec-box-title">레이아웃 레이어 분해 (위→아래)</div>
+    <div class="spec-row"><span class="spec-key">L1: 배경</span><span class="spec-val">보라색 패턴 (#9b59b6 계열)</span></div>
+    <div class="spec-row"><span class="spec-key">L2: 상단 HUD</span><span class="spec-val">코인 뱃지 (좌) + x1 배수 원형 버튼 (우상단 gold 원)</span></div>
+    <div class="spec-row"><span class="spec-key">L3: 아케이드 프레임</span><span class="spec-val">민트/청록색 (#1abc9c), 상단 톱니 장식, 좌우 두꺼운 테두리, 둥근 모서리</span></div>
+    <div class="spec-row"><span class="spec-key">L4: 투하 버튼 행</span><span class="spec-val">빨간 원형 5개, 흰 역삼각형 아이콘, 프레임 상단 내부 배치</span></div>
+    <div class="spec-row"><span class="spec-key">L5: 핀보드</span><span class="spec-val">보라 배경, 흰색 구슬형 핀, 원형 트랙 + 산발 배치 혼합</span></div>
+    <div class="spec-row"><span class="spec-key">L6: 중앙 장애물</span><span class="spec-val">대형 원 (steering wheel 패턴), 좌/우 보상 원형 (1.66M / 주사위20)</span></div>
+    <div class="spec-row"><span class="spec-key">L7: 측면 화살표</span><span class="spec-val">좌우 청록색 삼각형 화살표 (벽 반사판 역할)</span></div>
+    <div class="spec-row"><span class="spec-key">L8: 다이아몬드</span><span class="spec-val">중하단 청록색 마름모 장애물</span></div>
+    <div class="spec-row"><span class="spec-key">L9: 슬롯</span><span class="spec-val">7칸 (⚡1/⚡10/⚡20/⚡100/⚡20/⚡10/⚡1), 번개 아이콘 + 숫자, 핀과 교차 배치</span></div>
+    <div class="spec-row"><span class="spec-key">L10: 하단 마일스톤</span><span class="spec-val">번개 아이콘 + 누적 단계 (80/100/120/140/800), "보상 0/8" 텍스트</span></div>
+  </div>
+
+  <!-- 핀 배치 방식 -->
+  <div class="spec-box">
+    <div class="spec-box-title">핀 배치 방식 — 실제 화면 기준</div>
+    <div class="spec-row"><span class="spec-key">배치 방식</span><span class="spec-val">격자형 아님. 중앙 대형 원 주변에 원형 트랙으로 배치 + 상하단 산발 배치</span></div>
+    <div class="spec-row"><span class="spec-key">핀 외형</span><span class="spec-val">흰색 작은 구슬 (#e0e0e0), 반경 4~5px (논리 단위)</span></div>
+    <div class="spec-row"><span class="spec-key">중앙 원형 링</span><span class="spec-val">반경 52px 원 위에 9개 균등 배치 (40° 간격)</span></div>
+    <div class="spec-row"><span class="spec-key">상단 핀</span><span class="spec-val">4개 산발 (중앙 원 상단 영역 좌우)</span></div>
+    <div class="spec-row"><span class="spec-key">하단 핀</span><span class="spec-val">6개 격자 (슬롯 위 구분선 역할)</span></div>
+    <div class="spec-row"><span class="spec-key">⚠️ 주의</span><span class="spec-val">단순 격자 배치 금지. 중앙 원형 장애물을 고려한 배치 필수.</span></div>
+  </div>
+
+  <!-- DOM Elements -->
+  <div class="section-title">DOM Elements</div>
+  <div class="note-box critical">⚠️ main.tsx id와 index.html id 1글자 불일치 = 해당 React 트리 조용히 스킵.</div>
+  <table class="spec-table">
+    <thead><tr><th>DOM ID</th><th>역할</th><th>마운트 대상</th></tr></thead>
+    <tbody>
+      <tr><td><code>#game-viewport</code></td><td>Three.js WebGL 마운트</td><td>PrizeDrop.ts</td></tr>
+      <tr><td><code>#jr-hud-widgets</code></td><td>상단 HUD (코인 수, 배수)</td><td>GameJsonHud.tsx</td></tr>
+      <tr><td><code>#jr-overlay-buttons</code></td><td>투하 버튼 5개</td><td>GameOverlayActionButtons.tsx</td></tr>
+      <tr><td><code>#jr-lobby-copy</code></td><td>로비 카피</td><td>GameLobbyCopySpec.tsx</td></tr>
+      <tr><td><code>#milestone-hud</code></td><td>하단 마일스톤 바 (React)</td><td>GameJsonHud.tsx 내 서브</td></tr>
+      <tr><td><code>#reward-modal</code></td><td>보상 모달 오버레이</td><td>DOM 직접</td></tr>
+      <tr><td><code>#jackpot-overlay</code></td><td>잭팟/WINNER 전체화면</td><td>DOM 직접</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 화면 전환표 -->
+  <div class="section-title">화면 전환 요약</div>
+  <table class="spec-table">
+    <thead><tr><th>화면 ID</th><th>화면명</th><th>진입 조건</th><th>이탈 조건</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-sky">PD-UI-001</span></td><td>로비/대기</td><td>게임 진입 시 기본</td><td>투하 버튼 Release</td></tr>
+      <tr><td><span class="badge badge-sky">PD-UI-002</span></td><td>낙하 중</td><td>서버 target_slot 수신 후</td><td>duration_ms 경과 → 슬롯 착지</td></tr>
+      <tr><td><span class="badge badge-sky">PD-UI-003</span></td><td>보상 모달</td><td>일반 슬롯 착지 (⚡1/10/20)</td><td>확인 버튼 → UI-001</td></tr>
+      <tr><td><span class="badge badge-gold">PD-UI-004</span></td><td>잭팟 WINNER</td><td>⚡100 중앙 슬롯 착지</td><td>계속하기 → UI-001</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ══════════════════════
+     탭2: 플로우
+══════════════════════ -->
+<div class="tab-panel" id="tab-1">
+
+  <div class="section-title">화면 전환 플로우</div>
+  <div class="flow-wrap">
+    <div class="flow-box screen"><div class="flow-id">PD-UI-001</div><div class="flow-label">로비 / 대기</div><div class="flow-desc">코인 확인 → 배수 선택 → 투하 위치(0~4) 선택</div></div>
+    <div class="flow-vline"></div>
+    <div class="flow-box action"><div class="flow-id">action: hold_drop</div><div class="flow-label">버튼 Hold</div><div class="flow-desc">나무 보드 슬라이드인 연출 (PD-ANI-001). 조준 점선 가이드 표시 (PD-ANI-002).</div></div>
+    <div class="flow-vline"></div>
+    <div class="flow-box action"><div class="flow-id">action: release_drop</div><div class="flow-label">Release → 서버 요청</div><div class="flow-desc">{drop_position, multiplier} → 서버 → {target_slot} 수신</div></div>
+    <div class="flow-vline"></div>
+    <div class="flow-box branch"><div class="flow-id">bank matching</div><div class="flow-label">뱅크 path 선택</div><div class="flow-desc">bank_slot{N}_drop{M}.json → bankPlayer.ts 재생 시작</div></div>
+    <div class="flow-vline"></div>
+    <div class="flow-box screen"><div class="flow-id">PD-UI-002</div><div class="flow-label">낙하 중</div><div class="flow-desc">구슬 낙하 keyframe 재생. 핀 충돌마다 빛 파동 (PD-ANI-003). 투하 버튼 비활성.</div></div>
+    <div class="flow-vline"></div>
+    <div class="flow-box branch"><div class="flow-id">슬롯 착지 분기</div><div class="flow-label">target_slot 판정</div><div class="flow-desc">무지개 하이라이트 착지 연출 (PD-ANI-004)</div></div>
+    <div style="padding-left:40px;margin-top:6px;">
+      <div class="flow-branch-row">
+        <div class="flow-branch-item">
+          <div class="flow-branch-cond">일반 슬롯 (⚡1/10/20)</div>
+          <div class="flow-vline" style="margin-left:16px;height:10px;"></div>
+          <div class="flow-box screen" style="min-width:160px;"><div class="flow-id">PD-UI-003</div><div class="flow-label">보상 모달</div><div class="flow-desc">확인 → UI-001</div></div>
+        </div>
+        <div class="flow-branch-item">
+          <div class="flow-branch-cond">잭팟 (⚡100)</div>
+          <div class="flow-vline" style="margin-left:16px;height:10px;"></div>
+          <div class="flow-box screen" style="min-width:160px;background:#fff3cc;border-color:#e8a020;"><div class="flow-id">PD-UI-004</div><div class="flow-label">WINNER!</div><div class="flow-desc">Rainbow + 폭죽 FX → 계속하기</div></div>
+        </div>
+        <div class="flow-branch-item">
+          <div class="flow-branch-cond">코인 부족</div>
+          <div class="flow-vline" style="margin-left:16px;height:10px;"></div>
+          <div class="flow-box end" style="min-width:120px;"><div class="flow-id">external</div><div class="flow-label">상점 유도</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:40px;">서버↔클라이언트 데이터 흐름</div>
+  <div class="code-block">Client → Server
+  { drop_position: 0~4, multiplier: 1|5|10|50|100, session_id: string }
+
+Server → Client
+  { target_slot: 0~6, reward_lightning: number, milestone_delta: number }
+  // target_slot: 0=⚡1, 1=⚡10, 2=⚡20, 3=⚡100(잭팟), 4=⚡20, 5=⚡10, 6=⚡1
+
+Client (내부)
+  bank = bank_slot{target_slot}_drop{drop_position}.json
+  path = bank[random_index]
+  bankPlayer.play(path) → Three.js 재생</div>
+
+  <div class="section-title">핀 좌표 생성 공식 — 원형 트랙 방식</div>
+  <div class="note-box info">이 게임의 핀은 격자형이 아니라 중앙 원형 장애물 주변 링 + 상하단 산발 혼합 방식.</div>
+  <div class="code-block">// 보드 상수
+const BOARD_W = 360, BOARD_H = 540;
+const CENTER_X = 180, CENTER_Y = 220;  // 중앙 원형 장애물 중심
+
+// 중앙 대형 원형 장애물
+const CENTER_OBSTACLE_R = 88;  // 논리 단위
+
+// 핀 링 (중앙 원 바깥 링, 9개 균등)
+const PIN_RING_R = 105;
+for (let i = 0; i < 9; i++) {
+  const angle = (i * 40 - 90) * Math.PI / 180;
+  x = CENTER_X + PIN_RING_R * Math.cos(angle);
+  y = CENTER_Y + PIN_RING_R * Math.sin(angle);
+}
+
+// 상단 산발 핀 (4개 수동 배치)
+const topPins = [
+  { x: 80,  y: 80  },
+  { x: 130, y: 65  },
+  { x: 230, y: 65  },
+  { x: 280, y: 80  }
+];
+
+// 하단 슬롯 구분 핀 (6개, 슬롯 경계)
+const SLOT_W = BOARD_W / 7;  // ≈ 51.4
+for (let i = 1; i <= 6; i++) {
+  x = SLOT_W * i;
+  y = BOARD_H - 140;  // 슬롯 위 고정
+}
+
+// 좌우 반사 화살표 (삼각형)
+leftArrow  = { x: 0,     y: 220, tip: 45 };
+rightArrow = { x: BOARD_W, y: 220, tip: 45 };
+
+// 다이아몬드 장애물
+diamond = { cx: CENTER_X, cy: CENTER_Y + 100, size: 24, rotation: 45 };</div>
+
+</div>
+
+<!-- ══════════════════════
+     탭3: 애니메이션
+══════════════════════ -->
+<div class="tab-panel" id="tab-2">
+
+  <div class="section-title">ANI ID 목록 — 연출 기획서 반영</div>
+  <div class="note-box info">📋 연출 분석 (02_구슬치기_연출_분석.md) 기준으로 4단계 연출 시퀀스 반영.</div>
+
+  <div class="ani-grid">
+
+    <div class="ani-card">
+      <div class="ani-card-head"><span class="ani-card-id">PD-ANI-001</span><span class="ani-card-name">보드 팝업 슬라이드인</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">게임 진입 or 투하 Hold 시작</span></div>
+        <div class="ani-row"><span class="ani-label">효과</span><span class="ani-value">나무 재질 보드가 <strong>아래서 위로 슬라이드인</strong>. translateY(100%) → 0</span></div>
+        <div class="ani-row"><span class="ani-label">duration</span><span class="ani-value">0.5s, cubic-bezier(.22,.68,0,1.2) 스프링 인</span></div>
+        <div class="ani-row"><span class="ani-label">사운드</span><span class="ani-value">둔탁한 나무 부딪히는 소리 (wood_thud.mp3)</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-purple">안티그래비티</span></span></div>
+      </div>
+      <div class="ani-demo"><div class="demo-wood-slide"></div></div>
+    </div>
+
+    <div class="ani-card">
+      <div class="ani-card-head"><span class="ani-card-id">PD-ANI-002</span><span class="ani-card-name">조준 가이드 점선</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">투하 버튼 Hold 중 (드래그 가이드)</span></div>
+        <div class="ani-row"><span class="ani-label">효과</span><span class="ani-value"><strong>Cyan 점선 화살표</strong>가 물결치듯 움직임. 화살표 끝 [PUSH!] 텍스트 깜빡임.</span></div>
+        <div class="ani-row"><span class="ani-label">색상</span><span class="ani-value">#00d8e8 (Cyan), [PUSH!] = Red</span></div>
+        <div class="ani-row"><span class="ani-label">사운드</span><span class="ani-value">스윽하는 가죽 마찰음 (guide_swipe.mp3)</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-purple">안티그래비티</span></span></div>
+      </div>
+      <div class="ani-demo"><div class="demo-wave-arrow"><span></span><span></span><span></span></div></div>
+    </div>
+
+    <div class="ani-card">
+      <div class="ani-card-head"><span class="ani-card-id">PD-ANI-003</span><span class="ani-card-name">핀 충돌 빛 파동</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">구슬이 핀(못)에 충돌하는 순간</span></div>
+        <div class="ani-row"><span class="ani-value"><strong>구슬이 작게 튕기며 빛의 파동</strong>이 충돌 지점에서 방사형으로 퍼짐.</span></div>
+        <div class="ani-row"><span class="ani-label">파동</span><span class="ani-value">원형 ripple 2~3겹, scale 0→2, opacity 1→0</span></div>
+        <div class="ani-row"><span class="ani-label">구슬 반응</span><span class="ani-value">scale 1→0.85→1 스쿼시 0.15s</span></div>
+        <div class="ani-row"><span class="ani-label">사운드</span><span class="ani-value">통! 탱! 맑은 플라스틱 소리 (pin_hit.mp3)</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-purple">안티그래비티</span></span></div>
+      </div>
+      <div class="ani-demo"><div class="demo-ripple"></div></div>
+    </div>
+
+    <div class="ani-card">
+      <div class="ani-card-head" style="background:#4a2090;"><span class="ani-card-id">PD-ANI-004</span><span class="ani-card-name">슬롯 무지개 착지</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">구슬이 슬롯에 최종 착지</span></div>
+        <div class="ani-row"><span class="ani-value">슬롯 주변이 <strong>무지개색 하이라이트</strong>로 빛나며 화려하게 진동.</span></div>
+        <div class="ani-row"><span class="ani-label">색상</span><span class="ani-value">Red→Orange→Yellow→Green→Blue→Purple 사이클</span></div>
+        <div class="ani-row"><span class="ani-label">진동</span><span class="ani-value">슬롯 테두리 scale 1→1.15→1, 3회 반복, 0.3s</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-purple">안티그래비티</span></span></div>
+      </div>
+      <div class="ani-demo"><div class="demo-rainbow"></div></div>
+    </div>
+
+    <div class="ani-card">
+      <div class="ani-card-head" style="background:#9a6800;"><span class="ani-card-id" style="color:#fff;">PD-ANI-005</span><span class="ani-card-name">WINNER! 텐션 텍스트</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">⚡100 중앙 잭팟 슬롯 착지</span></div>
+        <div class="ani-row"><span class="ani-value"><strong>[WINNER!]</strong> Rainbow Gradient 텍스트가 <strong>통통 튀는 텐션 연출</strong>.</span></div>
+        <div class="ani-row"><span class="ani-label">글자 효과</span><span class="ani-value">각 글자 개별 translateY bounce, delay 차등 (0.05s 간격)</span></div>
+        <div class="ani-row"><span class="ani-label">배경</span><span class="ani-value">폭죽 터지는 FX 파티클 (confetti_burst)</span></div>
+        <div class="ani-row"><span class="ani-label">사운드</span><span class="ani-value">폭죽 터지는 FX (jackpot_fanfare.mp3)</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-purple">안티그래비티</span></span></div>
+      </div>
+      <div class="ani-demo"><div class="demo-bounce-text">WINNER!</div></div>
+    </div>
+
+    <div class="ani-card">
+      <div class="ani-card-head"><span class="ani-card-id">PD-ANI-006</span><span class="ani-card-name">마일스톤 Liquid Fill</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">드롭 후 milestone_delta 반영</span></div>
+        <div class="ani-row"><span class="ani-value">하단 마일스톤 바 <strong>Liquid Fill 애니</strong>. 달성 시 해당 아이콘 팝업 + 아이템 날아감.</span></div>
+        <div class="ani-row"><span class="ani-label">달성 연출</span><span class="ani-value">아이콘 scale 0→1.3→1 팝, 팝업 텍스트 플로트업, 사운드</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-purple">안티그래비티</span></span></div>
+      </div>
+      <div class="ani-demo"><div class="demo-liquid"><div class="demo-liquid-fill"></div></div></div>
+    </div>
+
+    <div class="ani-card">
+      <div class="ani-card-head"><span class="ani-card-id">PD-ANI-007</span><span class="ani-card-name">충돌 z축 흔들림</span></div>
+      <div class="ani-card-body">
+        <div class="ani-row"><span class="ani-label">트리거</span><span class="ani-value">핀 충돌 이벤트 (keyframe 타이밍)</span></div>
+        <div class="ani-row"><span class="ani-value">z ±3 sin 감쇄. <strong>물리 계산과 완전 분리된 연출 전용 레이어.</strong></span></div>
+        <div class="ani-row"><span class="ani-label">duration</span><span class="ani-value">0.25s, ease-out 감쇄</span></div>
+        <div class="ani-row"><span class="ani-label">⚠️ 금지</span><span class="ani-value">Matter.js z축 연산 절대 금지</span></div>
+        <div class="ani-row"><span class="ani-label">담당</span><span class="ani-value"><span class="badge badge-sky">커서</span></span></div>
+      </div>
+      <div class="ani-demo">
+        <div style="width:14px;height:14px;border-radius:50%;background:#b0d8ff;border:1.5px solid #4a90d9;animation:zbounce .4s ease-in-out infinite alternate;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 4단계 연출 시퀀스 -->
+  <div class="section-title">4단계 연출 시퀀스 (연출 기획서 기준)</div>
+  <table class="spec-table">
+    <thead><tr><th>#</th><th>단계</th><th>ANI ID</th><th>시각 연출</th><th>사운드</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>구슬판 팝업</td><td><span class="badge badge-sky">PD-ANI-001</span></td><td>나무 보드 아래→위 슬라이드인, 구슬 주머니 수 UI 노출</td><td>둔탁한 나무 소리</td></tr>
+      <tr><td>2</td><td>조준 가이드</td><td><span class="badge badge-sky">PD-ANI-002</span></td><td>Cyan 점선 화살표 물결, [PUSH!] 깜빡임</td><td>스윽 가죽 마찰음</td></tr>
+      <tr><td>3</td><td>발사 + 물리</td><td><span class="badge badge-sky">PD-ANI-003</span> <span class="badge badge-sky">PD-ANI-007</span></td><td>핀 충돌마다 빛 파동 + z축 흔들림</td><td>통! 탱! 플라스틱</td></tr>
+      <tr><td>4</td><td>골인 + 축하</td><td><span class="badge badge-sky">PD-ANI-004</span> <span class="badge badge-sky">PD-ANI-005</span></td><td>무지개 하이라이트 진동 / WINNER! 텐션 텍스트</td><td>폭죽 FX</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ══════════════════════
+     탭4: CSV
+══════════════════════ -->
+<div class="tab-panel" id="tab-3">
+
+  <div class="csv-section">
+    <div class="csv-filename">📄 01_slot_lightning.csv</div>
+    <div class="csv-table-wrap">
+      <table class="csv-table col-spec">
+        <thead><tr><th>컬럼명</th><th>타입</th><th>설명</th><th>제약</th></tr></thead>
+        <tbody>
+          <tr><td>slot_index</td><td class="csv-type">int</td><td>슬롯 인덱스 (0~6, 좌→우)</td><td>PK, 7개 고정</td></tr>
+          <tr><td>reward_lightning</td><td class="csv-type">int</td><td>번개 보상량</td><td>좌우 대칭</td></tr>
+          <tr><td>is_jackpot</td><td class="csv-type">bool</td><td>잭팟 슬롯 여부 (중앙 ⚡100)</td><td>index 3만 true</td></tr>
+          <tr><td>weight</td><td class="csv-type">int</td><td>서버 Weighted Random 가중치</td><td>합계 무관</td></tr>
+          <tr><td>slot_color</td><td class="csv-type">string</td><td>슬롯 강조 색상</td><td>#a0ff60 or #ffd700</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:2px;"><div class="csv-table-wrap">
+      <table class="csv-table">
+        <thead><tr><th>slot_index</th><th>reward_lightning</th><th>is_jackpot</th><th>weight</th><th>slot_color</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>1</td><td>false</td><td>400</td><td>#a0ff60</td></tr>
+          <tr><td>1</td><td>10</td><td>false</td><td>300</td><td>#a0ff60</td></tr>
+          <tr><td>2</td><td>20</td><td>false</td><td>200</td><td>#a0ff60</td></tr>
+          <tr><td>3</td><td>100</td><td>true</td><td>10</td><td>#ffd700</td></tr>
+          <tr><td>4</td><td>20</td><td>false</td><td>200</td><td>#a0ff60</td></tr>
+          <tr><td>5</td><td>10</td><td>false</td><td>300</td><td>#a0ff60</td></tr>
+          <tr><td>6</td><td>1</td><td>false</td><td>400</td><td>#a0ff60</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="csv-section">
+    <div class="csv-filename">📄 02_multiplier.csv</div>
+    <div style="margin-top:2px;"><div class="csv-table-wrap">
+      <table class="csv-table">
+        <thead><tr><th>level</th><th>value</th><th>visual_style</th><th>token_cost</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>1</td><td>default (gold circle)</td><td>1</td></tr>
+          <tr><td>2</td><td>5</td><td>default</td><td>5</td></tr>
+          <tr><td>3</td><td>10</td><td>aura_blue</td><td>10</td></tr>
+          <tr><td>4</td><td>50</td><td>aura_blue</td><td>50</td></tr>
+          <tr><td>5</td><td>100</td><td>aura_purple + scale_up</td><td>100</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="csv-section">
+    <div class="csv-filename">📄 03_milestone.csv</div>
+    <div style="margin-top:2px;"><div class="csv-table-wrap">
+      <table class="csv-table">
+        <thead><tr><th>step</th><th>threshold_lightning</th><th>reward_type</th><th>reward_amount</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>80</td><td>Dice</td><td>-</td></tr>
+          <tr><td>2</td><td>100</td><td>Dice</td><td>-</td></tr>
+          <tr><td>3</td><td>120</td><td>Dice</td><td>-</td></tr>
+          <tr><td>4</td><td>140</td><td>Dice</td><td>-</td></tr>
+          <tr><td>5</td><td>800</td><td>Dice (Grand)</td><td>-</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="csv-section">
+    <div class="csv-filename">📄 04_board_obstacle.csv — 장애물 좌표 (수동 배치 대신 CSV 관리)</div>
+    <div class="csv-table-wrap">
+      <table class="csv-table col-spec">
+        <thead><tr><th>컬럼명</th><th>타입</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>obstacle_id</td><td class="csv-type">string</td><td>장애물 고유 ID</td></tr>
+          <tr><td>type</td><td class="csv-type">enum</td><td>circle_center | arrow_left | arrow_right | diamond | reward_circle_left | reward_circle_right | reward_circle_center</td></tr>
+          <tr><td>cx</td><td class="csv-type">float</td><td>중심 X (논리 좌표 0~360)</td></tr>
+          <tr><td>cy</td><td class="csv-type">float</td><td>중심 Y (논리 좌표 0~540)</td></tr>
+          <tr><td>radius</td><td class="csv-type">float</td><td>충돌 반경</td></tr>
+          <tr><td>reward_type</td><td class="csv-type">string</td><td>보상 원형의 경우 Coin|Dice, 나머지 null</td></tr>
+          <tr><td>reward_amount</td><td class="csv-type">string</td><td>보상량 표시 텍스트 (1.66M, 20 등)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════
+     탭5: 시뮬 뱅크
+══════════════════════ -->
+<div class="tab-panel" id="tab-4">
+
+  <div class="section-title">시뮬 뱅크 구조</div>
+  <div class="note-box info">이전 실패 원인: 실시간 Magnet 보정 → 해결: 사전 생성 뱅크 재생 방식.</div>
+
+  <div class="bank-step"><div class="bank-step-num">1</div><div class="bank-step-body"><div class="bank-step-title">순수 물리 완성 (Matter.js)</div><div class="bank-step-desc">원형 장애물 + 핀 링 + 좌우 반사벽 + 다이아몬드 포함한 완전한 물리 보드. Three.js 불필요.</div></div></div>
+  <div class="bank-step-arrow"></div>
+  <div class="bank-step"><div class="bank-step-num">2</div><div class="bank-step-body"><div class="bank-step-title">simulationRunner.ts 실행</div><div class="bank-step-desc">drop_position(0~4) × seed N 반복. keyframe = 핀/장애물 충돌 + 방향전환 순간만 추출.</div></div></div>
+  <div class="bank-step-arrow"></div>
+  <div class="bank-step"><div class="bank-step-num">3</div><div class="bank-step-body"><div class="bank-step-title">JSON 저장</div><div class="bank-step-desc">bank_slot{0~6}_drop{0~4}.json 35개 파일. 초기 20개/조합 (~700개), 최종 200개 (~7,000개).</div></div></div>
+  <div class="bank-step-arrow"></div>
+  <div class="bank-step"><div class="bank-step-num">4</div><div class="bank-step-body"><div class="bank-step-title">서버 결과 → 재생</div><div class="bank-step-desc">target_slot + drop_position 매칭 → bankPlayer.ts lerp 보간 재생.</div></div></div>
+
+  <div class="section-title" style="margin-top:28px;">keyframe JSON 포맷</div>
+  <div class="code-block">{
+  "drop_position": 2,
+  "target_slot": 3,       // 3 = ⚡100 잭팟
+  "duration_ms": 2600,
+  "keyframes": [
+    { "x": 180, "y": 40,  "t": 0    },  // 투하 시작
+    { "x": 175, "y": 115, "t": 280  },  // 핀 링 충돌 #1
+    { "x": 140, "y": 165, "t": 580  },  // 중앙 원형 장애물 접촉
+    { "x": 112, "y": 195, "t": 920  },  // 핀 링 충돌 #2
+    { "x": 118, "y": 260, "t": 1280 },  // 다이아몬드 충돌
+    { "x": 112, "y": 350, "t": 1680 },  // 하단 핀 통과
+    { "x": 112, "y": 460, "t": 2600 }   // ⚡100 슬롯 착지
+  ]
+}</div>
+
+  <div class="section-title">뱅크 파일 매트릭스</div>
+  <div class="bank-matrix">
+    <div class="bank-cell header">—</div>
+    <div class="bank-cell header">drop 0</div><div class="bank-cell header">drop 1</div><div class="bank-cell header">drop 2</div>
+    <div class="bank-cell header">drop 3</div><div class="bank-cell header">drop 4</div>
+    <div class="bank-cell header">초기</div><div class="bank-cell header">최종</div>
+    <div class="bank-cell header">⚡1</div><div class="bank-cell">s0d0</div><div class="bank-cell">s0d1</div><div class="bank-cell">s0d2</div><div class="bank-cell">s0d3</div><div class="bank-cell">s0d4</div><div class="bank-cell">20개</div><div class="bank-cell">200개</div>
+    <div class="bank-cell header">⚡10</div><div class="bank-cell">s1d0</div><div class="bank-cell">s1d1</div><div class="bank-cell">s1d2</div><div class="bank-cell">s1d3</div><div class="bank-cell">s1d4</div><div class="bank-cell">20개</div><div class="bank-cell">200개</div>
+    <div class="bank-cell header">⚡20</div><div class="bank-cell">s2d0</div><div class="bank-cell">s2d1</div><div class="bank-cell">s2d2</div><div class="bank-cell">s2d3</div><div class="bank-cell">s2d4</div><div class="bank-cell">20개</div><div class="bank-cell">200개</div>
+    <div class="bank-cell header jackpot">⚡100🏆</div><div class="bank-cell jackpot">s3d0</div><div class="bank-cell jackpot">s3d1</div><div class="bank-cell jackpot">s3d2</div><div class="bank-cell jackpot">s3d3</div><div class="bank-cell jackpot">s3d4</div><div class="bank-cell jackpot">20개</div><div class="bank-cell jackpot">200개</div>
+    <div class="bank-cell header">⚡20</div><div class="bank-cell">s4d0</div><div class="bank-cell">s4d1</div><div class="bank-cell">s4d2</div><div class="bank-cell">s4d3</div><div class="bank-cell">s4d4</div><div class="bank-cell">20개</div><div class="bank-cell">200개</div>
+    <div class="bank-cell header">⚡10</div><div class="bank-cell">s5d0</div><div class="bank-cell">s5d1</div><div class="bank-cell">s5d2</div><div class="bank-cell">s5d3</div><div class="bank-cell">s5d4</div><div class="bank-cell">20개</div><div class="bank-cell">200개</div>
+    <div class="bank-cell header">⚡1</div><div class="bank-cell">s6d0</div><div class="bank-cell">s6d1</div><div class="bank-cell">s6d2</div><div class="bank-cell">s6d3</div><div class="bank-cell">s6d4</div><div class="bank-cell">20개</div><div class="bank-cell">200개</div>
+  </div>
+
+  <div class="section-title">Anti-Patterns</div>
+  <table class="spec-table">
+    <thead><tr><th>ID</th><th>패턴</th><th>해결</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-red">PH-003</span></td><td>프레임별 x/y 전체 저장</td><td>이벤트 기반 keyframe만. lerp 보간은 bankPlayer.ts.</td></tr>
+      <tr><td><span class="badge badge-red">PH-004</span></td><td>실시간 Magnet 보정</td><td>사전 생성 뱅크만. 실시간 보정 절대 금지.</td></tr>
+      <tr><td><span class="badge badge-red">PH-005</span></td><td>drop_position 무시</td><td>target_slot + drop_position 동시 매칭 필수.</td></tr>
+      <tr><td><span class="badge badge-red">PH-008</span></td><td>중앙 원형 장애물 Matter.js Circle 단순 처리</td><td>Compound body 또는 내부 반사 로직 별도 구현. 단순 Circle 충돌 시 구슬 흡수 현상.</td></tr>
+      <tr><td><span class="badge badge-red">PH-009</span></td><td>격자형 핀 공식 그대로 적용</td><td>이 게임은 원형 트랙 배치. 격자 공식 금지. board_obstacle.csv 기준으로 좌표 관리.</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<style>
+@keyframes zbounce{from{transform:translateZ(0)scale(1)}to{transform:translateZ(10px)scale(1.08);box-shadow:3px 3px 6px rgba(0,0,0,.2)}}
+</style>
+
+<script>
+function switchTab(idx){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+}
+</script>
+</body>
+</html>

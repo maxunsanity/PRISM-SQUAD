@@ -96,12 +96,12 @@ CSV 경로는 `src/game/data.ts`의 `CSV_PATHS` 상수에서만 관리.
 
 | 계층 | 이벤트 | 방식 | 코어 연동 |
 |------|--------|------|-----------|
-| ① iframe | lava / prize / archery | iframe + postMessage | 입장권 차감(`/lobby/lavaTickets`·`prizeBalls`·활대), 보상 `event:grant`→`grantReward` |
+| ① iframe | lava / prize / archery | iframe + postMessage | **입장 차감 없음**(`ticket_cost=0`). 퍼즐·양궁은 **지갑 계약**(`host:walletSync`/`*:walletChanged`)으로 게임이 자체 소비. 라바는 단독 플레이(코어 전투 진입). 보상 `event:grant`→`grantReward` |
 | ② 세일 | mallMarvels / driversJoy | 인앱 React 오버레이(SalesHostBridge) | `getWallet`/`trySpend*`/`grantSalesRewards` |
 | ③ 타이쿤·시즌 | tycoonSeason | 인앱 React HUD(EventBridge) | 인게임 킬→`onEnemyKilled(id,mult)` 적립, 결과창 `getTycoonPoints()` pull |
 
 ### 재화/아이템 흐름 (요약)
-- **코어→이벤트**: 킬(`onEnemyKilled(enemyId, ticketMultiplier)`), 틱(`tick(dt)`). 30킬마다 lava/prize 입장권 +1, 보스/클리어 보너스 +1, 100킬마다 양궁 활대 +1.
+- **코어→이벤트(미니게임 재화 적립)**: `MinigameCurrencyService.onEnemyKilled(enemyId, ticketMultiplier)` — **퍼즐·양궁만**(라바는 단독 플레이라 **제외**). `event_minigame_acquire_config.csv` 기준 누적식: 퍼즐 일반 **300킬→퍼즐볼 +1**(보스 10킬→+1), 양궁 일반 **200킬→발 +1**(보스 2킬→+1), 스테이지 클리어 보너스, `×ticketMultiplier`. 소비는 각 iframe이 **지갑 계약**으로 자체 처리 후 `*:walletChanged`로 잔액 저장. (타이쿤·시즌 적립은 `EventBridge.onEnemyKilled` 별도.)
 - **타이쿤 적립**: EventBridge 부착 시 `getTycoonPoints()`(킬 누적×배수, `event_kill_reward_config.csv` 기반). **미부착(코어 단독) 시에만** 결과창 폴백 `(killCount + result_clear_bonus_kills(50)) × ticketMultiplier`.
 - **이벤트→코어 보상**: ① iframe `event:grant`(gold/gem/lightning/equip — `equip`은 `equipment_config.slot_id`, 예 `prize_crown`) ② 세일 `grantSalesRewards(lines)`(energy/meta_gold/gems/supply_key/dna/open_box/equip_lv).
 

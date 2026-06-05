@@ -74,7 +74,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 | `lq:start_attempt` | 라바 호스트 전투 진입 |
 | `event:grant` | 보상 지급 (라바·퍼즐·양궁 번들) |
 | `event:showRewardDetail` | `RewardDetailOverlay` |
-| `aa:ready` / `aa:consumeBow` / `aa:claimed` | 양궁 전용 (`App.tsx`) |
+| `pd:ready`·`pd:walletChanged` / `aa:ready`·`aa:walletChanged`·`aa:claimed` | 퍼즐·양궁 **지갑 계약**(`host:walletSync` 회신) (`App.tsx`) |
 
 ### 3-C. 세일 (`mall_marvels` + `drivers_joy`)
 

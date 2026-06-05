@@ -465,23 +465,30 @@ installHostBridge(() => {
 
 ---
 
-## R-13. runFiveBowRound + autoAdvance
+## R-13. runRound(n) + autoAdvance (1발=1재화, 1~5발 선택)
 
 ```javascript
-async function runFiveBowRound() {
-  // … host:bowConsumed 후 호출
-  for (let i = 0; i < SHOTS_PER_BOW; i++) {
+// 선택 발수 n(1~5)만큼 발사. 소비는 requestConsumeBow(n)이 선행(지갑 계약).
+async function runRound(shots) {
+  const n = Math.max(1, Math.floor(shots) || 1);
+  let totalGain = 0;
+  for (let i = 0; i < n; i++) {
     player.combo_count += 1;
     const result = calculateScore(attemptRow, player.combo_count, eventRow);
     totalGain += result.score;
     await runShootingScene(result, rankBefore, rankBefore, {
       autoAdvance: true,
       shotIndex: i + 1,
-      shotTotal: SHOTS_PER_BOW,
+      shotTotal: n,
     });
   }
   player.target_score += totalGain;
   // … persistRanking, toast, goLobby
+}
+
+// btn-attempt: balance 충분 시 N발 소비 후 라운드
+if (getHostBowStands() >= selectedShots && requestConsumeBow(selectedShots)) {
+  // requestConsumeBow → balance -= N + aa:walletChanged{balance} → onConsumed(N) → runRound(N)
 }
 ```
 

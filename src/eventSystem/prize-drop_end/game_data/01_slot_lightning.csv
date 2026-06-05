@@ -1,0 +1,8 @@
+slot_index,reward_lightning,is_jackpot,weight,slot_color,sprite_url
+0,1,false,30,#a0ff60,
+1,10,false,100,#a0ff60,
+2,20,false,60,#a0ff60,
+3,100,true,10,#ffd700,
+4,20,false,60,#a0ff60,
+5,10,false,100,#a0ff60,
+6,1,false,30,#a0ff60,
