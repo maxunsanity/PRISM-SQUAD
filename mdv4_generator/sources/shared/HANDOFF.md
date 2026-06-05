@@ -19,7 +19,7 @@
 |------|------|-----------|
 | **①** | [`src/eventSystem/GAME.md`](src/eventSystem/GAME.md) | **이벤트 기획 SSoT** — 타이쿤·시즌 2축, UI 슬롯, CSV 목록, 로드맵 |
 | **②** | [`src/eventSystem/EVENT_SYSTEM.md`](src/eventSystem/EVENT_SYSTEM.md) | **개발 연동** — EventBridge, App 슬롯, jsonRender 3종 세트 |
-| **③** | [`src/GAME.md`](src/GAME.md) | **본편 게임** — 전투·로비·장비·상점; 하단 「연동 모듈 — 스퀘어 이벤트」 참고 |
+| **③** | [`mdv4_generator/sources/core/GAME.md`](mdv4_generator/sources/core/GAME.md) | **본편 게임** — 전투·로비·장비·상점; 하단 「연동 모듈 — 스퀘어 이벤트」 참고 |
 | ④ | [`src/eventSystem/HANDOFF.md`](src/eventSystem/HANDOFF.md) | 이벤트 모듈만 짧게 보는 요약 (이 파일 §4 링크) |
 | ⑤ | `CURSOR_DEV_LOG.md` / `CLAUDE_DEV_LOG.md` | (있으면) 타 에이전트 작업 이력 |
 

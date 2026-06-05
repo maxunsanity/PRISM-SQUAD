@@ -1,0 +1,13 @@
+key,value,note
+initial_gems,500,신규/리셋 테스트 보석
+initial_dna,100,특수진화 DNA
+initial_gold,12400,메타 골드 기본값(저장 없을 때)
+initial_energy,500,입장 번개
+max_energy,60,번개 상한
+energy_per_mult,5,배수×1당 번개 소모
+armor_cap,0.8,진화 피해감소 상한
+predator_heal_ratio,0.02,포식자 회복(최대HP 비율)
+first_purchase_double,1,보석 첫구매 2배(1=on)
+item_drop_chance,0.03,인게임 아이템 드롭 확률
+cooldown_mult_min,0.2,각성 쿨감 하한
+avatar_profile_limit,16,캐릭터 선택 슬롯 수(4×4)

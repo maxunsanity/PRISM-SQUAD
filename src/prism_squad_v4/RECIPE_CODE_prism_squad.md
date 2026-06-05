@@ -102,6 +102,8 @@ export { EVENT_MINIGAMES, EVENT_MINIGAME_ORDER };
 ```typescript
 import type { EventData } from '../data';
 import { EventController } from '../core/EventController';
+import { hudStore } from '../../../game/hudExternalStore';
+import { eventStore } from '../store/eventExternalStore';
 
 /**
  * 스퀘어(탕탕) 호스트 ↔ 이벤트 모듈 얇은 연결층.
@@ -116,7 +118,8 @@ export class EventBridge {
     this.ctrl.onRewardGranted = (bundleId) => {
       this.onRewardGranted?.(bundleId);
     };
-    const onCloseMilestone = () => this.ctrl.dismissMilestonePopup();
+    const onCloseTycoon = () => this.ctrl.dismissTycoonMilestonePopup();
+    const onCloseSeason = () => this.ctrl.dismissSeasonMilestonePopup();
     const onToggleMilestoneList = () => this.ctrl.toggleMilestoneList();
     const onToggleTournament = () => this.ctrl.toggleTournamentPanel();
     const onCloseTournament = () => this.ctrl.dismissTournamentPanel();
@@ -126,10 +129,34 @@ export class EventBridge {
       if (kind === 'tycoon' || kind === 'season') this.ctrl.openHelp(kind);
     };
     const onCloseHelp = () => this.ctrl.dismissHelp();
-    const onToggleExpress = () => this.ctrl.toggleExpressPanel();
-    const onCloseExpress = () => this.ctrl.dismissExpressPanel();
+    const onToggleExpress = () => {
+      const open = !eventStore.get('/event/expressVisible');
+      hudStore.setMany({
+        '/scene/transitionText': open ? 'SEASON EXPRESS' : 'RETURN TO LOBBY',
+        '/scene/transitionVisible': true,
+      });
+      window.setTimeout(() => {
+        this.ctrl.toggleExpressPanel();
+      }, 850);
+      window.setTimeout(() => {
+        hudStore.set('/scene/transitionVisible', false);
+      }, 2650);
+    };
+    const onCloseExpress = () => {
+      hudStore.setMany({
+        '/scene/transitionText': 'RETURN TO LOBBY',
+        '/scene/transitionVisible': true,
+      });
+      window.setTimeout(() => {
+        this.ctrl.dismissExpressPanel();
+      }, 850);
+      window.setTimeout(() => {
+        hudStore.set('/scene/transitionVisible', false);
+      }, 2650);
+    };
 
-    window.addEventListener('event:closeMilestonePopup', onCloseMilestone);
+    window.addEventListener('event:closeTycoonMilestonePopup', onCloseTycoon);
+    window.addEventListener('event:closeSeasonMilestonePopup', onCloseSeason);
     window.addEventListener('event:toggleMilestoneList', onToggleMilestoneList);
     window.addEventListener('event:toggleTournamentPanel', onToggleTournament);
     window.addEventListener('event:closeTournamentPanel', onCloseTournament);
@@ -140,7 +167,8 @@ export class EventBridge {
     window.addEventListener('event:closeExpress', onCloseExpress);
 
     this.unbind = () => {
-      window.removeEventListener('event:closeMilestonePopup', onCloseMilestone);
+      window.removeEventListener('event:closeTycoonMilestonePopup', onCloseTycoon);
+      window.removeEventListener('event:closeSeasonMilestonePopup', onCloseSeason);
       window.removeEventListener('event:toggleMilestoneList', onToggleMilestoneList);
       window.removeEventListener('event:toggleTournamentPanel', onToggleTournament);
       window.removeEventListener('event:closeTournamentPanel', onCloseTournament);
@@ -334,7 +362,7 @@ export class EventBridge {
       this._setGameState('PLAYING');
       focusPrismGameShell();
       this.transitionTimer = null;
-    }, this._ct('scene_transition_ms', 850));
+    }, this._ct('scene_transition_ms', 3400));
   }
 ```
 
@@ -670,6 +698,14 @@ import {
   EVENT_MINIGAMES,
   type EventMinigameId,
 } from './eventMinigameRegistry';
+import { markRedDotSeen } from './redDot/redDotSeen';
+import { refreshRedDots } from './redDot/RedDotService';
+
+const MINIGAME_NEW_DOT: Record<EventMinigameId, string> = {
+  lava: 'lava_new',
+  prize: 'prize_new',
+  archery: 'archery_new',
+};
 
 export { EVENT_MINIGAMES, EVENT_MINIGAME_ORDER, type EventMinigameId } from './eventMinigameRegistry';
 
@@ -730,19 +766,31 @@ export function isEventMinigameOpen(): boolean {
 
 export function closeEventMinigame() {
   window.dispatchEvent(new CustomEvent('host:closeRewardDetail'));
-  const id = getActiveMinigameId();
-  if (id) disposeMinigameSession(id);
+  
   hudStore.setMany({
-    '/event/minigame/activeId': '',
-    '/event/minigame/visible': false,
-    '/event/minigame/suspended': false,
-    '/event/minigame/mountKey': Number(hudStore.getSnapshot()['/event/minigame/mountKey'] ?? 0),
+    '/scene/transitionText': 'RETURN TO LOBBY',
+    '/scene/transitionVisible': true,
   });
-  syncLegacyIframeFields({
-    '/event/minigame/activeId': '',
-    '/event/minigame/visible': false,
-    '/event/minigame/mountKey': hudStore.getSnapshot()['/event/minigame/mountKey'],
-  });
+
+  window.setTimeout(() => {
+    const id = getActiveMinigameId();
+    if (id) disposeMinigameSession(id);
+    hudStore.setMany({
+      '/event/minigame/activeId': '',
+      '/event/minigame/visible': false,
+      '/event/minigame/suspended': false,
+      '/event/minigame/mountKey': Number(hudStore.getSnapshot()['/event/minigame/mountKey'] ?? 0),
+    });
+    syncLegacyIframeFields({
+      '/event/minigame/activeId': '',
+      '/event/minigame/visible': false,
+      '/event/minigame/mountKey': hudStore.getSnapshot()['/event/minigame/mountKey'],
+    });
+  }, 850);
+
+  window.setTimeout(() => {
+    hudStore.set('/scene/transitionVisible', false);
+  }, 2650);
 }
 
 /** 쇼핑몰·드라이버 등 다른 풀스크린 UI 진입 시 */
@@ -756,6 +804,8 @@ export function hideEventMinigameForOverlay() {
  */
 export function openEventMinigame(id: EventMinigameId) {
   const cfg = EVENT_MINIGAMES[id];
+  markRedDotSeen(MINIGAME_NEW_DOT[id]);
+  refreshRedDots();
   const snap = hudStore.getSnapshot();
   if (cfg.ticketCost > 0) {
     const ticketKey = cfg.ticketPath as keyof HudState;
@@ -767,28 +817,34 @@ export function openEventMinigame(id: EventMinigameId) {
     hudStore.set(ticketKey, (tickets - cfg.ticketCost) as HudState[typeof ticketKey]);
   }
 
-  const prev = getActiveMinigameId();
-  if (prev) disposeMinigameSession(prev);
-
-  window.dispatchEvent(new CustomEvent('host:closeRewardDetail'));
-
-  const mountKey = Number(snap['/event/minigame/mountKey'] ?? 0) + 1;
   hudStore.setMany({
-    '/event/minigame/activeId': id,
-    '/event/minigame/visible': false,
-    '/event/minigame/suspended': false,
-    '/event/minigame/mountKey': mountKey,
-  });
-  syncLegacyIframeFields({
-    '/event/minigame/activeId': id,
-    '/event/minigame/visible': false,
-    '/event/minigame/mountKey': mountKey,
+    '/scene/transitionText': id === 'lava' ? 'LAVA QUEST' : id === 'prize' ? 'PUZZLE DROP' : 'ARCHERY ARENA',
+    '/scene/transitionVisible': true,
   });
 
-  requestAnimationFrame(() => {
-    hudStore.set('/event/minigame/visible', true);
-    syncLegacyIframeFields({ '/event/minigame/activeId': id, '/event/minigame/visible': true });
-  });
+  window.setTimeout(() => {
+    const prev = getActiveMinigameId();
+    if (prev) disposeMinigameSession(prev);
+
+    window.dispatchEvent(new CustomEvent('host:closeRewardDetail'));
+
+    const mountKey = Number(snap['/event/minigame/mountKey'] ?? 0) + 1;
+    hudStore.setMany({
+      '/event/minigame/activeId': id,
+      '/event/minigame/visible': true,
+      '/event/minigame/suspended': false,
+      '/event/minigame/mountKey': mountKey,
+    });
+    syncLegacyIframeFields({
+      '/event/minigame/activeId': id,
+      '/event/minigame/visible': true,
+      '/event/minigame/mountKey': mountKey,
+    });
+  }, 850);
+
+  window.setTimeout(() => {
+    hudStore.set('/scene/transitionVisible', false);
+  }, 2650);
 }
 
 /** 라바 — 스퀘어 전투 진입 (iframe DOM 유지, 세션 유지) */
@@ -888,6 +944,44 @@ type HudState = {
   '/event/redDot/archery': boolean;
   '/event/redDot/tycoon': boolean;
   '/event/redDot/season': boolean;
+  '/event/redDot/express': boolean;
+  '/event/redDot/mall': boolean;
+  '/event/redDot/drivers': boolean;
+  /** CSV red_dot_config → hud_path (claim/action/new) */
+  '/redDot/tycoon/claim': boolean;
+  '/redDot/tycoon/action': boolean;
+  '/redDot/tycoon/new': boolean;
+  '/redDot/season/claim': boolean;
+  '/redDot/season/action': boolean;
+  '/redDot/season/new': boolean;
+  '/redDot/express/claim': boolean;
+  '/redDot/express/action': boolean;
+  '/redDot/lava/claim': boolean;
+  '/redDot/lava/action': boolean;
+  '/redDot/lava/new': boolean;
+  '/redDot/prize/claim': boolean;
+  '/redDot/prize/action': boolean;
+  '/redDot/prize/new': boolean;
+  '/redDot/archery/claim': boolean;
+  '/redDot/archery/action': boolean;
+  '/redDot/archery/new': boolean;
+  '/redDot/event_stack/any': boolean;
+  '/redDot/mall/claim': boolean;
+  '/redDot/mall/new': boolean;
+  '/redDot/drivers/action': boolean;
+  '/redDot/drivers/new': boolean;
+  '/redDot/nav/shop': boolean;
+  '/redDot/nav/shop/new': boolean;
+  '/redDot/nav/equip': boolean;
+  '/redDot/nav/equip/new': boolean;
+  '/redDot/nav/equip/action': boolean;
+  '/redDot/nav/challenge': boolean;
+  '/redDot/nav/challenge/new': boolean;
+  '/redDot/nav/challenge/action': boolean;
+  '/redDot/nav/evolution': boolean;
+  '/redDot/nav/evolution/new': boolean;
+  '/redDot/nav/evolution/action': boolean;
+  '/redDot/nav/battle': boolean;
   '/lobby/showMallMarvels': boolean;   // 쇼핑몰의 경이로움 사이드 탭
   '/lobby/showDriversJoy': boolean;    // 드라이버의 기쁨 사이드 탭
   '/lobby/menuOpen': boolean;          // 햄버거 메뉴 (App z55 레이어)
@@ -1162,6 +1256,43 @@ class HudExternalStore {
     '/event/redDot/archery': false,
     '/event/redDot/tycoon': false,
     '/event/redDot/season': false,
+    '/event/redDot/express': false,
+    '/event/redDot/mall': false,
+    '/event/redDot/drivers': false,
+    '/redDot/tycoon/claim': false,
+    '/redDot/tycoon/action': false,
+    '/redDot/tycoon/new': false,
+    '/redDot/season/claim': false,
+    '/redDot/season/action': false,
+    '/redDot/season/new': false,
+    '/redDot/express/claim': false,
+    '/redDot/express/action': false,
+    '/redDot/lava/claim': false,
+    '/redDot/lava/action': false,
+    '/redDot/lava/new': false,
+    '/redDot/prize/claim': false,
+    '/redDot/prize/action': false,
+    '/redDot/prize/new': false,
+    '/redDot/archery/claim': false,
+    '/redDot/archery/action': false,
+    '/redDot/archery/new': false,
+    '/redDot/event_stack/any': false,
+    '/redDot/mall/claim': false,
+    '/redDot/mall/new': false,
+    '/redDot/drivers/action': false,
+    '/redDot/drivers/new': false,
+    '/redDot/nav/shop': false,
+    '/redDot/nav/shop/new': false,
+    '/redDot/nav/equip': false,
+    '/redDot/nav/equip/new': false,
+    '/redDot/nav/equip/action': false,
+    '/redDot/nav/challenge': false,
+    '/redDot/nav/challenge/new': false,
+    '/redDot/nav/challenge/action': false,
+    '/redDot/nav/evolution': false,
+    '/redDot/nav/evolution/new': false,
+    '/redDot/nav/evolution/action': false,
+    '/redDot/nav/battle': false,
     '/lobby/showMallMarvels': true,
     '/lobby/showDriversJoy': true,
     '/lobby/menuOpen': false,

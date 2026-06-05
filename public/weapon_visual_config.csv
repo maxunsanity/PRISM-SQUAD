@@ -1,0 +1,4 @@
+skill_id,weapon_kind,scale,offset_x,offset_y
+kunai,revolver,1.0,0.72,0
+shotgun,shotgun,1.0,0.72,0
+drill_shot,drill,1.0,0.72,0

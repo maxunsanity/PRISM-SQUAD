@@ -1,0 +1,4 @@
+pack_id,sort_order,label,sublabel,gold,gem_cost,is_free,enabled
+gold_free,1,2시간 순찰 골드,무료,12000,0,1,1
+gold_6h,2,6시간 순찰 골드,💎 90,36000,90,0,1
+gold_24h,3,24시간 순찰 골드,💎 288,144000,288,0,1

@@ -306,6 +306,112 @@ getWallet:      () => core.getSalesWallet()               // {cashKrw,gems,gold,
 
 ---
 
+## 9-A. 에셋 교체 시스템 (그래픽 리소스 규칙) — 재현 필수
+
+> **목적:** 코드 수정 없이 게임의 모든 그래픽(적·플레이어·보스·투사체·드롭·VFX·배경 + UI)을 **CSV/에셋 경로 + 이미지 파일 교체만으로** 바꾼다. 유니티 프리팹+Inspector를 웹(Three.js + CSV)으로 옮긴 구조. 설계 원문: 노션 "서비스 버전 에셋 시스템 — 설계 원칙".
+> **이유:** 지금의 그래픽(게임월드 네온·도형 / UI 2D 스케치)은 **기본(base)** 이고, 나중에 에셋만 갈아끼워 **다양한 디자인/스킨을 붙이기** 위함(`?skin=cyber` 식 테마 전환까지 확장 가능). 그래서 AI가 다시 만들 때도 **이 규칙대로** 만들어야 한다.
+
+### 9-A.1 핵심 원칙 (4개)
+1. **CSV/에셋 설정이 SSoT** — 모든 시각 설정은 CSV(또는 `event_asset_config.csv`)에. 코드는 읽어 렌더만 하고 모양/색/이미지를 직접 결정하지 않는다.
+2. **폴백 보존 (절대 손상 금지)** — `sprite_url`이 비어있으면 기존 절차적 도형/색(또는 손그림 SVG)으로 폴백. 기본 연출은 절대 깨지지 않는다.
+3. **`public/assets/` 가 리소스 루트** — 카테고리 폴더(enemies/player/boss/skills/drops/fx/bg + (UI 확장 시) ui/). Vite가 `dist/`로 복사 → `/assets/...` 직접 접근.
+4. **마크다운/이모지 금지** — 텍스트 이모지 대신 **컨셉에 맞게 그린 그래픽(SVG / Three.js)**. 교체 기준점이 되는 **플레이스홀더 PNG**를 `scripts/gen_sprites.mjs`로 생성해 둔다.
+
+### 9-A.2 코드 패턴 (Three.js)
+```typescript
+// Config 인터페이스: sprite_url 필드
+export interface XxxConfig { /* ... */ sprite_url: string; } // 비면 절차적 폴백
+// 파서:  sprite_url: r['sprite_url'] ?? '',
+// 렌더러 분기:
+if (cfg.sprite_url) {
+  const tex = new THREE.TextureLoader().load(cfg.sprite_url);
+  geo = new THREE.PlaneGeometry(radius * 2.2, radius * 2.2);
+  mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.1 });
+} else { /* 기존 절차적 도형 코드 그대로 */ }
+```
+주의: InstancedMesh `frustumCulled=false` 필수 / 배경 텍스처 `wrapS=wrapT=ClampToEdgeWrapping` / VFX `depthWrite:false`+`AdditiveBlending` / 진화·파생 스킬은 `baseIdMap`으로 base 스킬의 sprite_url 상속.
+
+### 9-A.3 적용 대상 + 현재 구현 현황 (코드 검증 기준)
+
+**레이어 B (게임 월드) — ✅ 구현 완료:**
+
+| 오브젝트 | CSV 컬럼 | 렌더러 | 상태 |
+|---|---|---|---|
+| 적 | `sprite_url` | EnemyMesh.ts | ✅ InstancedMesh, 타입별 공유 |
+| 플레이어 | `sprite_url` | PlayerMesh.ts | ✅ |
+| 보스 | `sprite_url` | EnemyMesh.ts | ✅ |
+| 투사체/스킬 | `projectile_sprite_url` | SkillSystem.ts | ✅ baseIdMap 상속 |
+| 드롭 아이템 | `sprite_url` | DropSystem.ts | ✅ |
+| VFX 파티클 | `particle_sprite_url` | VfxSystem.ts | ✅ 색상도 CSV |
+| 배경 | `bg_sprite_url` | Renderer3D.ts | ✅ 없으면 스타디움 플로어 |
+
+→ `scripts/gen_sprites.mjs`가 위 카테고리 플레이스홀더 PNG 생성(현재 `public/assets/` 7폴더·PNG 배포됨). CSV의 sprite_url은 **현재 전부 비어 있음** → 원래 연출 그대로.
+
+**이벤트 — ✅ 자체 에셋 시스템 보유:** 퍼즐/라바/양궁(iframe)은 각자 CSV `sprite_url`/`*_sprite_url` + 전용 `assets/`. 타이쿤/시즌은 `public/event/tycoonSeason/event_asset_config.csv`(`asset_key,asset_type,url,fallback_text`)로 url 있으면 `<img>`, 없으면 fallback 텍스트.
+
+### 9-A.4 ★ UI 확장 규칙 (레이어 A — 아직 미구현, 재현 시 적용)
+> **현 상태:** UI 크롬(HUD·상점·장비·로비·모달)은 2D 스케치 SVG가 **코드에 인라인 하드코딩**돼 있고, **에셋 교체 컬럼이 없다**(특히 상점·장비·코어 HUD). 일부 화면엔 생 이모지도 잔존(🌋🎰🚗, 😈 등). 디자인 토큰(`#F4EFE6`/검정테두리/`3px 3px 0 #000`)도 공통 변수가 아니라 40+곳 복붙.
+> **재현 시 규칙 (이렇게 만들 것):**
+> 1. **디자인 토큰 단일화** — `#F4EFE6`·`2~3px solid #000`·`3px 3px 0 #000`·등급색을 `:root --bps-*`(또는 TS 상수) 한곳에 두고 참조.
+> 2. **스케치 아이콘 함수 공통 모듈화** — `getCommonSketchIcon`·`getResourceSketchIcon`·`renderEquipIcon` 등을 한 모듈로, 중복 제거.
+> 3. **UI 에셋 교체 도입** — 타이쿤의 `event_asset_config.csv`(`asset_key,url,fallback_text`) 패턴을 UI(상점·장비·HUD 아이콘)로 이식. url 있으면 이미지, 없으면 손그림 SVG 폴백. `gen_sprites.mjs`에 `ui/` 아이콘 생성 분기 추가.
+> 4. **이모지 0** — 잔존 이모지는 전부 스케치 SVG로.
+> 5. **레이어 경계 유지** — UI(레이어 A, 2D 스케치 베이지)와 게임월드(레이어 B, 네온·도형)는 토큰·에셋을 섞지 않는다.
+
+### 9-A.5 교체 플로우 (사용자 관점)
+```
+1) AI로 PNG 생성 (적/투사체 64×64, 보스 128×128, 배경 512×512, PNG 투명)
+2) public/assets/[카테고리]/ 에 저장
+3) CSV의 sprite_url(또는 event_asset_config url)에 경로 입력 (예: assets/enemies/basic.png)
+4) 새로고침 → 즉시 반영
+```
+
+---
+
+## 9-B. 레드닷(빨간 점) 전역 시스템 — 재현 필수
+
+> 모든 메뉴·이벤트·하단 탭의 "알림 점"을 **CSV 규칙으로 일괄 관리**. AI 재현 시 아래 구조 그대로.
+
+### 9-B.1 3축 분류 (우선순위 **claim > action > new** — UI는 하나만 표시)
+| 축 | 의미 | 표시 |
+|----|------|------|
+| `claim` | 받을 보상 있음 | 빨간 점 `#FF3B30` |
+| `action` | 재화·티켓 보유로 지금 콘텐츠 사용 가능 | 주황 점 `#FF9500` |
+| `new` | 한 번도 안 열어봄 | 하늘색 N 뱃지 `#4FC3F7` |
+
+### 9-B.2 아키텍처
+```
+public/red_dot_config.csv (규칙)
+  → src/game/redDot/ {types, redDotConfig, resolvers, redDotSeen, RedDotService, redDotUi}.ts
+  → hudStore `/redDot/{scope}/{category}`
+  → 레거시 호환 `/event/redDot/{scope}` (= claim || action || new OR)
+  → UI: EventRedDot / NavTabBar / EventMiniCards / SalesEventOverlay / eventMonopolyUi
+```
+
+### 9-B.3 CSV 스키마 (`public/red_dot_config.csv`)
+`dot_id, category, enabled, hud_path, resolver_key, min_int, bubble_to, note`
+- `dot_id`: seen 저장 키(`markRedDotSeen`). `resolver_key`: `resolvers.ts` 함수명과 **1:1**. `hud_path`: 결과 쓸 store 경로. `min_int`: action 임계값(티켓≥1·번개≥1). `aggregate_*` resolver는 2차 패스에서 `partial` 참조.
+- 등록 규칙(현재): 이벤트(tycoon/season/express/lava/prize/archery의 claim·action·new), `event_minigame_stack` 합산, 세일(mall/drivers), 하단 탭(shop/equip/challenge/evolution의 new + action) + `aggregate_nav_*`, 전투 탭 버블업.
+
+### 9-B.4 집계 흐름 (`refreshRedDots()`)
+1) CSV 1차 패스 — 개별 resolver 실행 → 2) 2차 패스 — `aggregate_*`(partial 참조) → 3) 레거시 OR(`/event/redDot/*` 자동 생성) → 4) 후처리(전투 탭 버블업·세일 레거시·시즌+익스프레스 OR).
+
+### 9-B.5 seen 해제
+`markRedDotSeen(dot_id)` 또는 `window.dispatchEvent(new CustomEvent('redDot:markSeen', { detail: dotId }))`. 저장: localStorage `prism_red_dot_seen_v1`. 트리거: iframe 첫 입장(eventMinigameHost)·이벤트 패널 오픈(EventController)·하단 탭 진입(GameCore)·장비 강화·진화 해금·몰 claim·드라이버 구매.
+
+### 9-B.6 UI 헬퍼 (`src/game/redDot/redDotUi.ts`)
+- `pickScopeRedDot(hud, scope)` — claim > action > new 중 하나.
+- `hasNavTabRedDot(hud, tab)` / `pickNavTabRedDot(hud, tab)` — `/redDot/nav/{tab}` 집계.
+- 공통 컴포넌트: `<EventRedDot category={'claim'|'action'|'new'|null} />` (`src/jsonRender/eventRedDot.tsx`). 활성 탭엔 점 숨김.
+
+### 9-B.7 refresh 트리거
+`App.tsx` `preloadRedDotConfig()` 후 초기 1회 + `eventStore`/`mallMarvelsStore`/`driversJoyStore` subscribe + 5초 interval + `redDot:markSeen` 이벤트 + GameCore 탭 오픈·장비 강화·진화 해금.
+
+### 9-B.8 신규 레드닷 추가 절차
+1) CSV 행 추가(dot_id·category·hud_path·resolver_key) → 2) `resolvers.ts`에 동명 함수 → 3) `hudExternalStore`(이벤트는 `eventExternalStore`)에 경로 + default false → 4) 집계면 `aggregate_*` + 2차 패스 partial → 5) 레거시 필요 시 `RedDotService` OR → 6) UI `pickScopeRedDot` + `<EventRedDot>` → 7) seen 해제 지점 + `refreshRedDots()` → 8) `npm run build`.
+
+---
+
 ## 10. 빌드 & 배포
 
 ```bash
@@ -511,13 +617,23 @@ boss_intro_phase1_ms,1300,BOSS_INTRO Phase1 WARNING(ms)
 boss_intro_phase2_ms,1000,BOSS_INTRO Phase2 암전~스폰(ms)
 boss_intro_phase3_ms,800,BOSS_INTRO Phase3 종료(ms)
 boss_death_result_delay_ms,3500,보스 사망 후 결과창(ms)
-scene_transition_ms,850,스테이지/라바 전환 오버레이(ms)
+scene_transition_ms,3400,스테이지/라바 전환 오버레이(ms)
 kill_per_event_ticket,30,적 처치 N마다 라바티켓+퍼즐볼 +1
 result_clear_bonus_kills,50,스테이지 클리어 타이쿤 보너스 킬 수
 rush_column_col_spacing,30,러시 종대 열 간격(px)
 rush_column_row_spacing,26,러시 종대 행 간격(px)
 rush_column_count_min,10,종대 formation 최소 마릿수
 rush_column_count_max,20,종대 formation 최대 마릿수
+chase_basic_direct_pct,30,basic 직추적 비율(%)
+chase_basic_intercept_pct,40,basic 요격 비율(%)
+chase_bloater_direct_pct,50,bloater 직추적 비율(%)
+chase_bloater_intercept_pct,30,bloater 요격 비율(%)
+chase_intercept_lead_sec,0.45,요격 예측 시간(초)
+chase_intercept_player_speed,180,요격 예측 기준 이동속도(px/s)
+chase_flank_offset_px,70,측면 우회 목표 오프셋(px)
+spawn_move_behind_weight,0.55,이동 중 스폰 뒤쪽 비율
+spawn_move_side_weight,0.30,이동 중 스폰 측면 비율
+spawn_move_speed_threshold,0.12,방향성 스폰·요격 최소 입력
 ```
 
 ### `public/control_config.csv`
@@ -855,6 +971,43 @@ p_auto_basic,sphere,#AAAAFF,0.7,1.2,1.8,0,0,0,0,0.0,0
 p_auto_revolver,sphere,#FFDD88,1.4,1.0,2.2,0,0,0,0,0.06,0
 p_auto_shotgun,sphere,#FFB347,0.8,1.1,1.4,0,0,0,0,0.0,0
 p_auto_drill,cone,#00DDFF,1.6,0.9,2.5,1,0,0,0,0.0,0
+```
+
+### `public/red_dot_config.csv`
+
+```csv
+dot_id,category,enabled,hud_path,resolver_key,min_int,bubble_to,note
+tycoon_claim,claim,1,/redDot/tycoon/claim,tycoon_milestone_pending,0,,타이쿤 마일스톤 보상 큐 대기
+tycoon_lap_guide,action,1,/redDot/tycoon/action,tycoon_lap_complete_pending,0,,10단계 완료·이벤트 창 유도
+season_settlement,claim,1,/redDot/season/claim,season_settlement_pending,0,,시즌 토너먼트 정산 미수령
+express_claim,claim,1,/redDot/express/claim,express_milestone_pending,0,,익스프레스 마일스톤 보상 큐
+express_lap_guide,action,1,/redDot/express/action,express_lap_complete_pending,0,,익스프레스 10단계 완료 유도
+lava_claim,claim,1,/redDot/lava/claim,lava_claim_pending,0,,라바 퀘스트 보상 수령 대기
+lava_play,action,1,/redDot/lava/action,lava_ticket_ready,1,,라바 티켓 보유·입장 가능
+lava_new,new,1,/redDot/lava/new,lava_first_visit,0,,라바 퀘스트 미방문
+prize_claim,claim,1,/redDot/prize/claim,prize_claim_pending,0,,프라이즈 드롭 마일스톤 수령
+prize_play,action,1,/redDot/prize/action,prize_ball_ready,1,,퍼즐볼 보유·플레이 가능
+prize_new,new,1,/redDot/prize/new,prize_first_visit,0,,프라이즈 드롭 미방문
+archery_claim,claim,1,/redDot/archery/claim,archery_claim_pending,0,,양궁 라운드 보상 수령 대기
+archery_play,action,1,/redDot/archery/action,archery_bow_ready,1,,활대 보유·도전 가능(수령 대기 아님)
+archery_new,new,1,/redDot/archery/new,archery_first_visit,0,,양궁 아레나 미방문
+event_minigame_stack,action,1,/redDot/event_stack/any,aggregate_event_stack,0,,우측 이벤트 스택 — claim+action+new 합산
+mall_claim,claim,1,/redDot/mall/claim,mall_free_claim,0,,쇼핑몰 무료 스텝 수령 가능
+mall_new,new,1,/redDot/mall/new,mall_first_visit,0,,쇼핑몰 탭 미방문
+drivers_action,action,1,/redDot/drivers/action,drivers_purchase_available,0,,드라이버 구매 가능
+drivers_new,new,1,/redDot/drivers/new,drivers_first_visit,0,,드라이버 탭 미방문
+express_tab,action,1,/event/redDot/express,aggregate_express_tab,0,,익스프레스 사이드탭 집계
+nav_shop_new,new,1,/redDot/nav/shop/new,nav_shop_first_visit,0,,상점 탭 미방문
+nav_equip_new,new,1,/redDot/nav/equip/new,nav_equip_first_visit,0,,장비 탭 미방문
+nav_equip_upgrade,action,1,/redDot/nav/equip/action,equip_upgrade_available,0,,장비 강화 가능
+nav_challenge_new,new,1,/redDot/nav/challenge/new,nav_challenge_first_visit,0,,도전 탭 미방문
+nav_challenge_energy,action,1,/redDot/nav/challenge/action,challenge_energy_ready,1,,번개 보유·도전 가능
+nav_evolution_new,new,1,/redDot/nav/evolution/new,nav_evolution_first_visit,0,,진화 탭 미방문
+nav_evolution_unlock,action,1,/redDot/nav/evolution/action,evolution_unlock_available,0,,진화 해금 가능
+nav_shop,action,1,/redDot/nav/shop,aggregate_nav_shop,0,,상점 탭 집계
+nav_equip,action,1,/redDot/nav/equip,aggregate_nav_equip,0,,장비 탭 집계
+nav_challenge,action,1,/redDot/nav/challenge,aggregate_nav_challenge,0,,도전 탭 집계
+nav_evolution,action,1,/redDot/nav/evolution,aggregate_nav_evolution,0,,진화 탭 집계
 ```
 
 ### `public/renderer_config.csv`
@@ -1434,7 +1587,7 @@ event_id,event_name,duration_hours,reward_asset_key,icon_key
 
 ```csv
 event_kind,target_type,row_title,kills_required,reward_label,left_icon_key,reward_icon_key,sort_order
-TYCOON_MILEAGE,normal,일반 몬스터,30,1장,enemy_normal,tycoon_coin,1
+TYCOON_MILEAGE,normal,일반 몬스터,10,1장,enemy_normal,tycoon_coin,1
 TYCOON_MILEAGE,boss,중간 보스,1,1장,enemy_mini_boss,tycoon_coin,2
 SEASON_TOURNAMENT,normal,일반 몬스터,50,1장,enemy_normal,season_coin,1
 SEASON_TOURNAMENT,boss,최종 보스,2,1장,enemy_boss,season_coin,2
@@ -1455,13 +1608,13 @@ express_help,SEASON_EXPRESS,시즌 익스프레스,스프린트 익스프레스,
 
 ```csv
 enemy_id,tycoon_point_base,season_point_base,is_boss
-basic,1,2,false
-dog,1,2,false
-bloater,2,3,false
-spitter,2,3,false
-mini_boss,8,0,false
-crusher,10,0,false
-nexus,10,0,false
+basic,3,2,false
+dog,3,2,false
+bloater,4,3,false
+spitter,4,3,false
+mini_boss,15,0,false
+crusher,15,0,false
+nexus,15,0,false
 final_boss,0,25,true
 ```
 
@@ -1469,26 +1622,26 @@ final_boss,0,25,true
 
 ```csv
 milestone_group_id,step,required_point,reward_bundle_id,reward_asset_key,reward_qty_label
-mg_ty_01,1,1500,reward_energy_25,reward_energy,×25
-mg_ty_01,2,3600,reward_gold_500,reward_gold,×500
-mg_ty_01,3,7200,reward_energy_40,reward_energy,×40
-mg_ty_01,4,12600,reward_dna_1,reward_dna,×1
-mg_ty_01,5,19500,reward_gem_50,reward_gem,×50
-mg_ty_01,6,28000,reward_gold_1000,reward_gold,×1000
-mg_ty_01,7,38000,reward_energy_60,reward_energy,×60
-mg_ty_01,8,50000,reward_dna_3,reward_dna,×3
-mg_ty_01,9,65000,reward_gem_150,reward_gem,×150
-mg_ty_01,10,85000,reward_gem_300_gold_3000,reward_gem,×300
-mg_se_01,1,1000,reward_energy_20,reward_energy,×20
-mg_se_01,2,2500,reward_gold_300,reward_gold,×300
-mg_se_01,3,5000,reward_energy_30,reward_energy,×30
-mg_se_01,4,9000,reward_dna_1,reward_dna,×1
-mg_se_01,5,15000,reward_gem_30,reward_gem,×30
-mg_se_01,6,22000,reward_gold_800,reward_gold,×800
-mg_se_01,7,30000,reward_energy_50,reward_energy,×50
-mg_se_01,8,40000,reward_dna_2,reward_dna,×2
-mg_se_01,9,52000,reward_gem_100,reward_gem,×100
-mg_se_01,10,70000,reward_gem_200_gold_2000,reward_gem,×200
+mg_ty_01,1,400,reward_energy_25,reward_energy,×25
+mg_ty_01,2,1200,reward_gold_500,reward_gold,×500
+mg_ty_01,3,2400,reward_energy_40,reward_energy,×40
+mg_ty_01,4,4000,reward_dna_1,reward_dna,×1
+mg_ty_01,5,6000,reward_gem_50,reward_gem,×50
+mg_ty_01,6,8400,reward_gold_1000,reward_gold,×1000
+mg_ty_01,7,11200,reward_energy_60,reward_energy,×60
+mg_ty_01,8,14400,reward_dna_3,reward_dna,×3
+mg_ty_01,9,18000,reward_gem_150,reward_gem,×150
+mg_ty_01,10,22000,reward_gem_300_gold_3000,reward_gem,×300
+mg_se_01,1,400,reward_energy_20,reward_energy,×20
+mg_se_01,2,1200,reward_gold_300,reward_gold,×300
+mg_se_01,3,2400,reward_energy_30,reward_energy,×30
+mg_se_01,4,4000,reward_dna_1,reward_dna,×1
+mg_se_01,5,6000,reward_gem_30,reward_gem,×30
+mg_se_01,6,8400,reward_gold_800,reward_gold,×800
+mg_se_01,7,11200,reward_energy_50,reward_energy,×50
+mg_se_01,8,14400,reward_dna_2,reward_dna,×2
+mg_se_01,9,18000,reward_gem_100,reward_gem,×100
+mg_se_01,10,22000,reward_gem_200_gold_2000,reward_gem,×200
 ```
 
 ### `public/event/tycoonSeason/event_ui_theme_config.csv`
@@ -2008,8 +2161,8 @@ visual_config_id,event_id,arrow_flight_ms,trail_fade_ms,hit_ring_pulse_ms,score_
 ### `public/event/mallMarvels/mm_event_config.csv`
 
 ```csv
-event_id,title,intro_tip,duration_hours,hero_image,enabled
-mall_marvels_01,쇼핑몰의 경이로움,각각의 팩을 잠금 해제하면 더 많은 보상을 받을 수 있습니다.,34,,1
+event_id,title,intro_tip,duration_hours,duration_minutes,hero_image,enabled
+mall_marvels_01,쇼핑몰의 경이로움,각각의 팩을 잠금 해제하면 더 많은 보상을 받을 수 있습니다.,34,10,,1
 ```
 
 ### `public/event/mallMarvels/mm_step_config.csv`
@@ -2040,8 +2193,8 @@ step_id,reward_type,reward_qty,reward_param,icon_asset_key,label
 ### `public/event/driversJoy/dj_event_config.csv`
 
 ```csv
-event_id,title,duration_hours,max_purchase_per_player,price_krw,side_tab_label,banner_image,enabled
-drivers_joy_01,드라이버의 기쁨,10.6,2,4400,드라이버,,1
+event_id,title,duration_hours,duration_minutes,max_purchase_per_player,price_krw,side_tab_label,banner_image,enabled
+drivers_joy_01,드라이버의 기쁨,10.6,10,2,4400,드라이버,,1
 ```
 
 ### `public/event/driversJoy/dj_reward_config.csv`

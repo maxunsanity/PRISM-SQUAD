@@ -1,0 +1,32 @@
+dot_id,category,enabled,hud_path,resolver_key,min_int,bubble_to,note
+tycoon_claim,claim,1,/redDot/tycoon/claim,tycoon_milestone_pending,0,,타이쿤 마일스톤 보상 큐 대기
+tycoon_lap_guide,action,1,/redDot/tycoon/action,tycoon_lap_complete_pending,0,,10단계 완료·이벤트 창 유도
+season_settlement,claim,1,/redDot/season/claim,season_settlement_pending,0,,시즌 토너먼트 정산 미수령
+express_claim,claim,1,/redDot/express/claim,express_milestone_pending,0,,익스프레스 마일스톤 보상 큐
+express_lap_guide,action,1,/redDot/express/action,express_lap_complete_pending,0,,익스프레스 10단계 완료 유도
+lava_claim,claim,1,/redDot/lava/claim,lava_claim_pending,0,,라바 퀘스트 보상 수령 대기
+lava_play,action,1,/redDot/lava/action,lava_ticket_ready,1,,라바 티켓 보유·입장 가능
+lava_new,new,1,/redDot/lava/new,lava_first_visit,0,,라바 퀘스트 미방문
+prize_claim,claim,1,/redDot/prize/claim,prize_claim_pending,0,,프라이즈 드롭 마일스톤 수령
+prize_play,action,1,/redDot/prize/action,prize_ball_ready,1,,퍼즐볼 보유·플레이 가능
+prize_new,new,1,/redDot/prize/new,prize_first_visit,0,,프라이즈 드롭 미방문
+archery_claim,claim,1,/redDot/archery/claim,archery_claim_pending,0,,양궁 라운드 보상 수령 대기
+archery_play,action,1,/redDot/archery/action,archery_bow_ready,1,,활대 보유·도전 가능(수령 대기 아님)
+archery_new,new,1,/redDot/archery/new,archery_first_visit,0,,양궁 아레나 미방문
+event_minigame_stack,action,1,/redDot/event_stack/any,aggregate_event_stack,0,,우측 이벤트 스택 — claim+action+new 합산
+mall_claim,claim,1,/redDot/mall/claim,mall_free_claim,0,,쇼핑몰 무료 스텝 수령 가능
+mall_new,new,1,/redDot/mall/new,mall_first_visit,0,,쇼핑몰 탭 미방문
+drivers_action,action,1,/redDot/drivers/action,drivers_purchase_available,0,,드라이버 구매 가능
+drivers_new,new,1,/redDot/drivers/new,drivers_first_visit,0,,드라이버 탭 미방문
+express_tab,action,1,/event/redDot/express,aggregate_express_tab,0,,익스프레스 사이드탭 집계
+nav_shop_new,new,1,/redDot/nav/shop/new,nav_shop_first_visit,0,,상점 탭 미방문
+nav_equip_new,new,1,/redDot/nav/equip/new,nav_equip_first_visit,0,,장비 탭 미방문
+nav_equip_upgrade,action,1,/redDot/nav/equip/action,equip_upgrade_available,0,,장비 강화 가능
+nav_challenge_new,new,1,/redDot/nav/challenge/new,nav_challenge_first_visit,0,,도전 탭 미방문
+nav_challenge_energy,action,1,/redDot/nav/challenge/action,challenge_energy_ready,1,,번개 보유·도전 가능
+nav_evolution_new,new,1,/redDot/nav/evolution/new,nav_evolution_first_visit,0,,진화 탭 미방문
+nav_evolution_unlock,action,1,/redDot/nav/evolution/action,evolution_unlock_available,0,,진화 해금 가능
+nav_shop,action,1,/redDot/nav/shop,aggregate_nav_shop,0,,상점 탭 집계
+nav_equip,action,1,/redDot/nav/equip,aggregate_nav_equip,0,,장비 탭 집계
+nav_challenge,action,1,/redDot/nav/challenge,aggregate_nav_challenge,0,,도전 탭 집계
+nav_evolution,action,1,/redDot/nav/evolution,aggregate_nav_evolution,0,,진화 탭 집계

@@ -1,0 +1,4 @@
+level_min,level_max,boss_id,boss_spawn_sec_override,note
+1,2,crusher,50,라바 호스트 전투 — 보스 선택·등장 초
+3,4,nexus,50,
+5,7,titan,50,

@@ -1,0 +1,6 @@
+event_id,rank_from,rank_to,bundle_id,season_coins,dice_label,cash_label,pack_asset_key,token_label
+10002,1,1,bundle_rank_1,20,1600,33.2M,reward_sticker,20
+10002,2,3,bundle_rank_2_3,15,900,16.6M,reward_dice,18
+10002,4,10,bundle_rank_4_10,10,700,12.5M,reward_gold,16
+10002,11,25,bundle_rank_11_25,5,400,8.0M,reward_dice,10
+10002,26,50,bundle_rank_26_50,1,200,3.0M,reward_gold,5

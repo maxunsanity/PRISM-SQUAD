@@ -13,6 +13,8 @@ export class Renderer3D {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene: THREE.Scene;
   readonly camera: THREE.OrthographicCamera;
+  private hudTopPx = 52;
+  private readonly rendererCfg: Map<string, number>;
   private composer: EffectComposer;
   private bloomPass: UnrealBloomPass;
   private animId = 0;
@@ -26,7 +28,7 @@ export class Renderer3D {
   private dirLight: THREE.DirectionalLight;
   private ambientTween: { from: THREE.Color; to: THREE.Color; t: number; dur: number } | null = null;
   private usePostFx = false;
-  private readonly viewScale = 4.0; // 현재 대비 2배 추가 줌아웃
+  private viewScale = 4.0;
   private baseCameraHalfHeight = 60;
   private floorMeshes: THREE.Object3D[] = [];
 
@@ -40,14 +42,18 @@ export class Renderer3D {
     vfxCfg: VfxConfig,
     initialW?: number,
     initialH?: number,
+    rendererCfg: Map<string, number> = new Map(),
   ) {
+    this.rendererCfg = rendererCfg;
+    this.hudTopPx = this._rc('hud_top_px', 52);
+    this.viewScale = this._rc('view_scale', 4);
     this.mapHalfW = mapCfg.map_width / 2;
     this.mapHalfH = mapCfg.map_height / 2;
     this.baseCameraHalfHeight = Math.max(1, mapCfg.camera_zoom);
 
     /* ── WebGLRenderer ── */
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this._rc('pixel_ratio_cap', 2)));
     this.renderer.setClearColor(parseInt(mapCfg.floor_color_hex.slice(1), 16), 1);
 
     const { w, h } = this._resolveViewportSize(canvas, initialW, initialH);
@@ -89,8 +95,12 @@ export class Renderer3D {
     this.dirLight.position.set(0, 1, 1);
     this.scene.add(this.dirLight);
 
-    /* ── 올림픽 스타디움 테마 바닥 레이아웃 ── */
-    this._buildStadiumFloor(mapCfg);
+    /* ── 바닥 레이아웃 ── */
+    if (mapCfg.bg_sprite_url) {
+      this._buildSpriteFloor(mapCfg);
+    } else {
+      this._buildStadiumFloor(mapCfg);
+    }
 
     /* ── 맵 경계 ── */
     this._buildBoundary(mapCfg);
@@ -101,6 +111,15 @@ export class Renderer3D {
       this.resizeObserver.observe(canvas);
     }
     window.addEventListener('resize', this.onWindowResize);
+  }
+
+  private _rc(key: string, def: number): number {
+    const v = this.rendererCfg.get(key);
+    return v === undefined ? def : v;
+  }
+
+  maxFrameDt(): number {
+    return this._rc('max_frame_dt_sec', 0.05);
   }
 
   /** App.tsx에서 레이아웃 직후 명시적 크기 주입 */
@@ -128,11 +147,27 @@ export class Renderer3D {
     this.bloomPass?.setSize(w, h);
     const halfH = this.baseCameraHalfHeight * this.viewScale;
     const halfW = halfH * (w / h);
+    /* hudTopPx만큼 카메라 프러스텀을 위로 올림 → 플레이어가 가시 영역 중앙에 위치 */
+    const hudOffsetWorld = (this.hudTopPx / h) * halfH * 2 * 0.5;
     this.camera.left   = -halfW;
     this.camera.right  =  halfW;
-    this.camera.top    =  halfH;
-    this.camera.bottom = -halfH;
+    this.camera.top    =  halfH + hudOffsetWorld;
+    this.camera.bottom = -halfH + hudOffsetWorld;
     this.camera.updateProjectionMatrix();
+  }
+
+  /* ── 스프라이트 배경 (bg_sprite_url 있을 때) ── */
+  private _buildSpriteFloor(cfg: MapConfig) {
+    const hw = this.mapHalfW;
+    const hh = this.mapHalfH;
+    const tex = new THREE.TextureLoader().load(cfg.bg_sprite_url);
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    const geo = new THREE.PlaneGeometry(hw * 2, hh * 2);
+    const mat = new THREE.MeshBasicMaterial({ map: tex });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(0, 0, -2.0);
+    this.scene.add(mesh);
+    this.floorMeshes.push(mesh);
   }
 
   /* ── 올림픽 스타디움 테마 바닥 레이아웃 ── */
@@ -181,7 +216,7 @@ export class Renderer3D {
     this.floorMeshes.push(fieldMesh);
 
     // ── 4. 인필드 촘촘한 격자 (간격 30으로 촘촘하게)
-    const interval = 30;
+    const interval = this._rc('grid_spacing', 30);
     const gridColor = new THREE.Color(cfg.grid_color_hex);
     const gridPts: number[] = [];
     for (let x = -innerRX; x <= innerRX; x += interval) {
@@ -195,13 +230,14 @@ export class Renderer3D {
     const gridMat = new THREE.LineBasicMaterial({
       color: gridColor,
       transparent: true,
-      opacity: 0.18
+      opacity: this._rc('grid_opacity', 0.18),
     });
     const fieldGrid = new THREE.LineSegments(gridGeo, gridMat);
     this.scene.add(fieldGrid);
     this.floorMeshes.push(fieldGrid);
 
-    // ── 5. 인필드 장식 — 공용 라인 머티리얼
+    // ── 5. 인필드 장식 — 데코레이션 가이드라인 삭제 (큐브 캐릭터와의 겹침 방지)
+    /*
     const decoMat = new THREE.LineBasicMaterial({
       color: 0x6A7588,
       transparent: true,
@@ -260,6 +296,7 @@ export class Renderer3D {
     const spotLine = new THREE.LineLoop(spotGeo, decoMat);
     this.scene.add(spotLine);
     this.floorMeshes.push(spotLine);
+    */
   }
 
   /* ── 맵 경계 사각형 ── */
@@ -316,7 +353,7 @@ export class Renderer3D {
     this.lastTime = performance.now();
     const loop = (now: number) => {
       this.animId = requestAnimationFrame(loop);
-      const dt = Math.min((now - this.lastTime) / 1000, 0.05); // max 50ms
+      const dt = Math.min((now - this.lastTime) / 1000, this.maxFrameDt());
       this.lastTime = now;
 
       /* 조명 트윈 */

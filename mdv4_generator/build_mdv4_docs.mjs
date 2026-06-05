@@ -117,7 +117,7 @@ function buildCoreMdv4() {
     ['DEV.md', 'DEV_prism_squad_v4.md'],
   ];
   for (const [srcName, dstName] of pairs) {
-    let body = read(path.join(ROOT, 'src', srcName));
+    let body = read(path.join(SOURCES, 'core', srcName));
     body = V4_BANNER + body;
     if (dstName.startsWith('DEV_')) {
       body += csvAppendix('14. Host Core CSV Full Contents (public/*.csv)', coreCsvs);
@@ -137,12 +137,12 @@ function buildCoreMdv4() {
 
   // RECIPE stub from GAME anti-patterns + DEV json-render
   let recipe = V4_BANNER + `# PRISM SQUAD Host — RECIPE.md (v4)\n\n`;
-  recipe += read(path.join(ROOT, 'src/GAME.md')).split('## Anti-Patterns')[1] || '';
+  recipe += read(path.join(SOURCES, 'core/GAME.md')).split('## Anti-Patterns')[1] || '';
   recipe += '\n\n---\n\n## json-render 3종 세트 (호스트 HUD)\n\n';
-  recipe += read(path.join(ROOT, 'src/DEV.md')).split('## 3. json-render')[1]?.split('## 4.')[0] || '';
+  recipe += read(path.join(SOURCES, 'core/DEV.md')).split('## 3. json-render')[1]?.split('## 4.')[0] || '';
   write(path.join(dst, 'RECIPE_prism_squad.md'), recipe);
 
-  write(path.join(dst, 'RECIPE_CODE_prism_squad.md'), V4_BANNER + `# PRISM SQUAD Host — RECIPE_CODE.md (v4)\n\n> 구현 스니펫은 \`src/game/GameCore.ts\`, \`src/jsonRender/registry.tsx\`, \`src/App.tsx\` 를 SSoT로 복사. v4 DEV §9 EventBridge 참조.\n\n` + read(path.join(ROOT, 'src/DEV.md')).split('## 9. EventBridge')[1]?.split('## 10.')[0] || '');
+  write(path.join(dst, 'RECIPE_CODE_prism_squad.md'), V4_BANNER + `# PRISM SQUAD Host — RECIPE_CODE.md (v4)\n\n> 구현 스니펫은 \`src/game/GameCore.ts\`, \`src/jsonRender/registry.tsx\`, \`src/App.tsx\` 를 SSoT로 복사. v4 DEV §9 EventBridge 참조.\n\n` + read(path.join(SOURCES, 'core/DEV.md')).split('## 9. EventBridge')[1]?.split('## 10.')[0] || '');
 }
 
 function buildModuleFromLegacy(folder, slug, files, csvPublicDir, extra = {}) {
@@ -191,8 +191,9 @@ buildModuleFromLegacy('driversJoy', 'drivers_joy', [
   ['DEV.md', 'DEV_drivers_joy_event_v4.md'],
 ], 'public/event/driversJoy');
 
-console.log('mdv4 build done — entry: .cursor/skills/prism-squad-v4/SKILL.md');
+console.log('mdv4 build done — entry: .cursor/skills/prism-squad-v4/SKILL_v4.md');
 // 코어 CSS·RECIPE_CODE·ATTACH 보강
 spawnSync('node', ['mdv4_generator/enrich_core_mdv4.mjs'], { cwd: ROOT, stdio: 'inherit' });
 spawnSync('node', ['mdv4_generator/enrich_events_mdv4.mjs'], { cwd: ROOT, stdio: 'inherit' });
-spawnSync('node', ['mdv4_generator/write_mdv4_indexes.mjs'], { cwd: ROOT, stdio: 'inherit' });
+// README_v4 per-folder index 생성 제거됨 — 진입점은 .cursor/skills/prism-squad-v4/SKILL_v4.md 단일
+// 각 v4 폴더의 SKILL_<게임>_v4.md = 게임별 전용 진입점(손작성, 재생성 비대상 — 생성기가 건드리지 않음)

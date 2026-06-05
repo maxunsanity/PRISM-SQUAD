@@ -1,0 +1,105 @@
+key,value,note
+skill_fx_vis_scale,0.6666667,지뢰·폭발 FX 반경 배율(2/3)
+shotgun_extra_spread_rad,0.18,산탄 추가 스프레드(rad)
+homing_speed_cap,22,유도탄 속도 상한(px/s)
+homing_accel_per_sec,18,유도탄 가속(px/s²)
+homing_mesh_rot_speed,18,유도 메시 회전(rad/s)
+drone_active_sec,3,드론 활성 페이즈(초)
+drone_rest_sec_max,7,드론 휴식 최대(초) Lv1
+drone_rest_sec_per_level,1,레벨당 휴식 감소(초)
+drone_burst_interval,0.18,드론 연사 간격(초)
+skill_dmg_scale,10,스킬 base_dmg_mult × level 배율 후 곱
+meteor_start_offset_y,300,메테오 시작 Y 오프셋(px)
+meteor_speed,420,메테오 낙하 속도(px/s)
+mine_spawn_dist_min,40,지뢰 스폰 거리 최소
+mine_spawn_dist_rand,60,지뢰 스폰 거리 랜덤
+molotov_expand_ratio,0.35,화염존 팽창 비율(수명 대비)
+lightning_pick_range,360,번개 1차 타겟 선정 반경(px)
+lightning_chain_radius_mult,6,연쇄 반경 = r×배율
+lightning_chain_max,3,연쇄 최대 타겟
+lightning_chain_dmg_ratio,0.6,연쇄 메테오 dmg 배율
+lightning_chain_hit_radius_ratio,0.75,연쇄 hitRadius = r×비율
+meteor_warn_ring_inner_ratio,0.6,착지 경고 링 내경 비율
+meteor_warn_opacity,0.6,경고 링 불투명
+meteor_impact_life_pad,0.3,낙하 수명 +패딩(초)
+debuff_aura_life_sec,1.5,디버프 오라 지속(초)
+debuff_aura_tick_init,0.1,오라 초기 tickTimer
+debuff_aura_scale_min,0.4,오라 스케일 min
+debuff_aura_scale_range,0.6,오라 스케일 추가(1-ratio)×
+debuff_aura_rot_speed,3,오라 회전 rad/s
+debuff_aura_dmg_tick_sec,0.15,오라 피해 틱(초)
+debuff_aura_dmg_ratio,0.15,오라 틱 dmg×비율
+flame_tick_sec,0.5,화염/나팜 장판 dmg 틱(초)
+mine_life_sec,12,지뢰 수명(초)
+expire_burst_life_sec,0.28,사거리 소멸 링 VFX(초)
+cluster_child_count,3,클러스터 폭발 자식 로켓 수
+cluster_child_speed,10,자식 로켓 속도
+cluster_child_radius,4,자식 반경
+cluster_child_life_mult,1.4,자식 수명 배율
+cluster_explosion_flame_life,0.5,클러스터/로켓 폭발 화염 life
+cluster_explosion_dmg_ratio,0.8,폭발 화염 dmg×비율
+cluster_pending_dmg_ratio,0.45,클러스터 pending dmg×비율
+rocket_explosion_radius_mult,3,로켓 폭발 반경×
+ghost_spawn_offset,18,고스트 쿠나이 스폰 오프셋
+ghost_spread_rad,0.392699,고스트 ±스프레드(rad,≈22.5°)
+ghost_speed_mult,1.3,고스트 속도×
+ghost_dmg_ratio,0.8,고스트 dmg×
+ghost_life_mult,3,고스트 수명×
+twin_speed_mult,1.6,트윈 부메랑 속도×
+twin_life_mult,1.6,트윈 수명×
+napalm_radius_mult,2,나팜 반경×(projectile_radius)
+napalm_life_mult,9,나팜 지속×
+napalm_dmg_ratio,0.6,나팜 dmg×
+napalm_target_jitter,30,나팜 목표 위치 랜덤
+napalm_fallback_spread,200,적 없을 때 랜덤 범위
+cluster_rocket_life_mult,3.5,클러스터 로켓 수명×
+dimensional_speed,5.5,차원검 속도
+dimensional_angle_offsets,-0.22|0|0.22,차원검 각 오프셋(rad)
+dimensional_radius_mult,2.2,차원검 Ring R×
+dimensional_blade_width,2,차원검 링 두께
+dimensional_dmg_ratio,0.85,차원검 dmg×
+dimensional_hit_radius_ratio,0.8,차원검 hit r×
+dimensional_life_mult,0.45,차원검 수명×
+quantum_speed_mult,1.5,퀀텀볼 속도×
+quantum_dmg_ratio,1.1,퀀텀 dmg×
+quantum_radius_mult,1.1,퀀텀 반경×
+quantum_life_mult,5,퀀텀 수명×
+quantum_bounce_count,9,퀀텀 볼 바운스
+quantum_mini_spawn_count,2,퀀텀 분열 미니 수
+quantum_mini_bounce_count,3,미니 바운스
+quantum_mini_dmg_ratio,0.45,미니 dmg×
+quantum_mini_speed_mult,1.15,미니 속도×
+quantum_mini_radius_ratio,0.55,미니 반경×
+quantum_mini_life_mult,2.5,미니 수명×
+whistling_speed_mult,1.4,휘파람 화살 속도×
+whistling_dmg_ratio,0.9,휘파람 dmg×
+whistling_radius_mult,1.3,휘파람 반경×
+whistling_life_mult,6,휘파람 수명×
+whistling_turn_rate,0.22,휘파람 유도 turn
+void_slash_count,12,보이드 참격 발수
+void_slash_speed,3.2,보이드 속도
+void_slash_angle_jitter,0.15,보이드 각 랜덤
+void_slash_radius_mult,3.5,보이드 Ring R×
+void_slash_width,3.2,보이드 링 두께
+void_slash_dmg_ratio,1.35,보이드 dmg×
+void_slash_hit_radius_ratio,0.6,보이드 hit r×
+void_slash_life_mult,0.8,보이드 수명×
+drill_shot_offsets,-0.16|0.16,드릴 좌우 오프셋(rad)
+drill_speed_mult,0.5,드릴 속도×
+drill_radius_mult,2.8,드릴 반경×
+drill_life_mult,5,드릴 수명×
+drone_offset_x,16,드론 A offsetX (B=-값)
+drone_offset_y,14,드론 offsetY
+drone_mesh_size,18,드론 PlaneGeometry
+drone_bob_speed,4,드론 bob 각속도
+drone_bob_amplitude,1.2,드론 bob Z 진폭
+drone_tilt,0.1,드론 기울기
+drone_tilt_wobble,0.08,드론 흔들림
+drone_tilt_wobble_freq,0.6,드론 wobble sin 배율
+molotov_arc_rot_speed,12,나팜 포물선 투사체 자전(rad/s)
+flame_napalm_rot_speed,0.6,나팜 장판 회전(rad/s)
+flame_fire_rot_speed,2.2,화염 장판 회전(rad/s)
+flame_napalm_pulse_freq,4,나팜 맥박 sin 배율
+blade_ring_rot_speed,7.5,차원검/보이드 링 회전(rad/s)
+whistling_arrow_spin_y,14,휘파람 화살 Y 스핀(rad/s)
+meteor_fall_rot_speed,8,메테오 낙하 메시 회전(rad/s)

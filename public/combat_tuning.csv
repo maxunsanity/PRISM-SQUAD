@@ -1,0 +1,46 @@
+key,value,note
+bomb_damage,10,폭탄 아이템 고정 데미지
+player_debuff_sec,2.0,피격 디버프 지속(초)
+debuff_speed_mult,0.6,디버프 중 이동속도 배율
+boss_spawn_invuln_sec,1.2,최종보스 등장 무적(초)
+boss_death_invuln_sec,4.0,보스 사망 연출 무적(초)
+spitter_fire_range,260,스피터 사격 사거리(px)
+spitter_fire_interval_sec,2.0,스피터 발사 주기(초)
+spitter_keep_distance,120,스피터 근접 유지 거리(px)
+spitter_init_delay_min,0.3,스피터 초기 발사 쿨 최소(초)
+spitter_init_delay_max,1.0,스피터 초기 발사 쿨 최대(초)
+spitter_missile_speed,3.5,스피터 미사일 속도
+spitter_missile_radius,4.5,스피터 미사일 반경(px)
+spitter_missile_dmg,3,스피터 미사일 데미지
+spitter_missile_life_sec,3.0,스피터 미사일 수명(초)
+poison_dps_per_stack,1.5,독 스택당 DOT 데미지
+poison_tick_sec,0.5,독 DOT 틱 주기(초)
+poison_max_stacks,5,독 최대 스택
+fire_tick_sec,0.5,화염 DOT 틱 주기(초)
+cold_slow_mult,0.5,냉기 둔화 배율
+mini_boss_cycle_sec,100,미니보스 주기(초)
+rush_cycle_sec,50,대규모 러시 주기(초)
+rush_overlap_delay_sec,20,미니보스와 겹칠 때 러시 지연(초)
+boss_rush_block_before_sec,40,최종보스 전 러시 차단 구간(초)
+boss_rush_block_after_sec,20,최종보스 후 러시 차단 구간(초)
+boss_intro_phase1_ms,1300,BOSS_INTRO Phase1 WARNING(ms)
+boss_intro_phase2_ms,1000,BOSS_INTRO Phase2 암전~스폰(ms)
+boss_intro_phase3_ms,800,BOSS_INTRO Phase3 종료(ms)
+boss_death_result_delay_ms,3500,보스 사망 후 결과창(ms)
+scene_transition_ms,3400,스테이지/라바 전환 오버레이(ms)
+kill_per_event_ticket,30,적 처치 N마다 라바티켓+퍼즐볼 +1
+result_clear_bonus_kills,50,스테이지 클리어 타이쿤 보너스 킬 수
+rush_column_col_spacing,30,러시 종대 열 간격(px)
+rush_column_row_spacing,26,러시 종대 행 간격(px)
+rush_column_count_min,10,종대 formation 최소 마릿수
+rush_column_count_max,20,종대 formation 최대 마릿수
+chase_basic_direct_pct,30,basic 직추적 비율(%)
+chase_basic_intercept_pct,40,basic 요격 비율(%)
+chase_bloater_direct_pct,50,bloater 직추적 비율(%)
+chase_bloater_intercept_pct,30,bloater 요격 비율(%)
+chase_intercept_lead_sec,0.45,요격 예측 시간(초)
+chase_intercept_player_speed,180,요격 예측 기준 이동속도(px/s)
+chase_flank_offset_px,70,측면 우회 목표 오프셋(px)
+spawn_move_behind_weight,0.55,이동 중 스폰 뒤쪽 비율
+spawn_move_side_weight,0.30,이동 중 스폰 측면 비율
+spawn_move_speed_threshold,0.12,방향성 스폰·요격 최소 입력

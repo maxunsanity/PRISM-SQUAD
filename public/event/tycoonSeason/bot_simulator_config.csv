@@ -1,0 +1,9 @@
+key,value,note
+tick_sec_cap,15,봇 틱 상한(초) — tournament tick_sec와 min
+bot_init_rank_mult,250,초기 TP = rankFactor×이값 + bot_init_base + random×bot_init_rand
+bot_init_base,10,
+bot_init_rand,40,
+bot_effective_points_floor,300,플레이어 0점일 때 봇 성장 기준 하한
+bot_growth_rank_top,1.6,상위 봇 growth ratioFactor 상한
+bot_growth_rank_span,1.3,상위−하위 ratioFactor 스팬
+bot_cap_ratio_top_mult,1.6,상위 봇 capRatio 배율

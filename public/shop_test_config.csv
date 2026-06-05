@@ -1,0 +1,4 @@
+key,value,note
+test_cash_krw,1000000,구매 테스트 캐시(미저장)
+test_reset_gems,500,리셋 시 보석
+show_reset_button,1,상점 리셋 버튼 표시

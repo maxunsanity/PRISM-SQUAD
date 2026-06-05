@@ -242,6 +242,7 @@ goals:
 ### 플레이어 인게임 표현 (PlayerMesh)
 - **HP 바**: 캐릭터 **위쪽**(y +0.9s). 그 아래 **노란 탄창 핍 5개** = 기본 공격 쿨타임 게이지.
 - **바닥 그림자**: 라디얼 그라데이션(가장자리 투명), 발밑에 납작한 타원.
+- **사각형 잔상 컷팅(아티팩트 제거)**: 몸체 `bodyMat`·실루엣 그림자 `silMat`에 `alphaTest: 0.02` → 캔버스 외곽 미세 알파 잔상(사각형 테두리 선) 컷팅. 외골격(`exoskeleton`) 껍데기 `exoShell` 텍스처는 `createRadialGradient`(원형 그라데이션) → 사각형 선 대신 부드러운 둥근 오라. (PlayerMesh.ts)
 - **손에 든 총**: 무기 그룹 장착 시 표시. 캐릭터 옆(피벗)에 붙어 **발사 방향으로 조준 회전**(`setWeaponAngle` ← `skillSystem.lastFireAngle`), 왼쪽 조준 시 상하 미러로 총대 정상화. 무기 종류별 모양(`setWeaponType`).
 
 ### 스킬 슬롯 상한
@@ -252,6 +253,13 @@ goals:
 
 ### 대각선 이동
 W+D 동시: vx=+1, vy=-1 → 실제 이동거리 = speed × sqrt(2). 정규화 안 함. 수정 금지.
+
+### 기본 몬스터 추적 AI (ChaseMode — basic / bloater)
+- `ChaseMode = 'direct' | 'intercept' | 'flank'` (`EnemySystem.ts`). **스폰 순간 고정**(리스폰마다 랜덤이 아니라 스폰 시 1회 결정 — `GameCore._chaseSpawnMeta`). basic/bloater에만 적용, 그 외 적은 `direct`.
+- **direct**: 플레이어로 직추적. **intercept**: 플레이어 입력(`input.vx/vy`)을 받아 `chase_intercept_lead_sec`(0.45초)·`chase_intercept_player_speed`(180px/s)로 미래 위치 예측 요격. **flank**: `chase_flank_offset_px`(70) 만큼 측면 우회(`flankSign ±1`).
+- **모드 비율** (`combat_tuning.csv`): basic = direct `chase_basic_direct_pct`(30) / intercept `chase_basic_intercept_pct`(40) / flank(나머지 30). bloater = direct `chase_bloater_direct_pct`(50) / intercept `chase_bloater_intercept_pct`(30) / flank(나머지 20).
+- **스폰 위치 비율**(이동형): 뒤 `spawn_move_behind_weight`(0.55) / 측면 `spawn_move_side_weight`(0.30) / 앞(나머지 0.15).
+- 적용 경로: `GameCore`가 `input.vx/vy`를 `EnemySystem`에 전달 → 고정된 `chaseMode` 기준으로 매 프레임 추적 벡터 계산.
 
 ## Content Guidelines
 

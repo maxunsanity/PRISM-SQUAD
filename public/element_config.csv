@@ -1,0 +1,6 @@
+element,element_name,icon,color_hex,effect_type,duration_sec,magnitude,tick_interval_sec,max_stacks
+fire,화염,🔥,#FF5522,dot,3.0,6,0.5,0
+ice,냉기,💙,#55CCFF,slow,2.0,0.45,0,0
+poison,독,☠️,#88DD44,poison_stack,4.0,3,0.5,5
+beam,광선,✨,#66FFFF,pierce,0,0,0,0
+electric,전기,⚡,#CC88FF,chain,0,0,0,0

@@ -160,10 +160,11 @@ registry.tsx          ← React 컴포넌트 구현 + eventRegistry 등록
 | `/event/lastTpGain` | number | 직전 처치 TP (파티클 연출용) |
 | `/event/milestoneRows` | MilestoneRow[] | 마일스톤 목록 |
 | `/event/milestoneListVisible` | boolean | 마일스톤 목록 팝업 표시 |
-| `/event/milestonePopupVisible` | boolean | 보상 팝업 표시 |
-| `/event/milestonePopupTitle` | string | 보상 팝업 제목 |
-| `/event/milestonePopupAssetKey` | string | 보상 팝업 아이콘 |
-| `/event/milestonePopupLabel` | string | 보상 팝업 라벨 |
+| `/event/tycoonMilestonePopupVisible` · `…/seasonMilestonePopupVisible` | boolean | 타이쿤/시즌 보상 팝업 표시 (**독립 2채널**, 서로 안 막음) |
+| `/event/{tycoon,season}MilestonePopupTitle` | string | 보상 팝업 제목(이벤트명 포함) |
+| `/event/{tycoon,season}MilestonePopupAssetKey` | string | 보상 팝업 아이콘 |
+| `/event/{tycoon,season}MilestonePopupLabel` | string | 보상 팝업 라벨 |
+| `/event/{tycoon,season}MilestonePopup{Lap,Step}` | number | 회차·단계 |
 
 ### 시즌 토너먼트
 
@@ -258,7 +259,7 @@ UI 컴포넌트 간 통신은 `window.dispatchEvent(new CustomEvent(...))`:
 | 이벤트명 | 설명 |
 |----------|------|
 | `event:toggleMilestoneList` | 마일스톤 목록 토글 |
-| `event:closeMilestonePopup` | 보상 팝업 닫기 |
+| `event:closeTycoonMilestonePopup` / `event:closeSeasonMilestonePopup` | 보상 팝업 닫기 (채널별 — 타이쿤/시즌 독립) |
 | `event:toggleTournamentPanel` | 순위판 토글 |
 | `event:closeTournamentPanel` | 순위판 닫기 |
 | `event:closeSettlement` | 정산 팝업 닫기 |

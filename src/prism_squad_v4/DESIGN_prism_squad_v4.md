@@ -20,16 +20,33 @@ identity:
 
 ---
 
-## 1. Visual Theme & Atmosphere
+## 0. 두 비주얼 레이어 (반드시 먼저 읽을 것 — 재현 SSoT)
+
+> 이 게임의 비주얼은 **명확히 분리된 두 레이어**다. 한 덩어리로 묶지 말 것. (구버전 문서가 전체를 "네온"으로 적었던 것은 오류 — 아래로 정정한다. 기존 §1 표는 **레이어 B(게임 월드)** 설명으로 보존한다.)
+
+| 레이어 | 대상 | 컨셉 | 구현 |
+|--------|------|------|------|
+| **A. UI 크롬** | HUD·로비·메뉴·버튼·모달·상점·장비·도전·진화·특성·결과·씬전환 | **2D 스케치 베이지** — 손그림 펜 느낌 | 배경 `#F4EFE6`, 검정 실선 테두리 `2~3px solid #000`, **흐림 없는 플랫 그림자 `3px 3px 0 #000`**, 그라데이션·네온 글로우 **금지**, 강조색 노랑/주황 `#FFB347`·`#FFE45C`·`#FF8A2A` |
+| **B. 게임 월드** | 적·플레이어·보스·스킬 투사체·드롭·VFX 파티클·배경(3D 캔버스) | 그린 그래픽 / 네온·발광 | Three.js `MeshBasicMaterial`, z레이어 체계, sprite_url 에셋(§에셋 교체) |
+
+**핵심 원칙 (단아 컨셉):** UI는 **이모지/마크다운을 쓰지 않고** 컨셉에 맞는 **손그림 그래픽(SVG / Three.js)** 으로 그린다. 그리고 그래픽은 **에셋 교체 시스템**(DEV "에셋 교체 시스템" 절)을 통해 코드 수정 없이 이미지 교체로 리스킨 가능해야 한다. 지금의 2D 스케치는 **기본(base) UI**이며, 나중에 에셋만 갈아끼워 다양한 디자인을 붙인다.
+
+**등급 색상(장비/아이템 공통 — 레이어 A):** 전설 `#FF8A2A` / 에픽 `#FFE45C` / 레어 `#6BD5E8` / 일반 `#D4CFC5` / 빈 슬롯 `#E2D9C8`.
+
+---
+
+## 1. Visual Theme & Atmosphere — 레이어 B (게임 월드)
+
+> 아래 네온·남보라 팔레트는 **레이어 B(게임 월드: 적·스킬·VFX·3D 배경)** 에 적용된다. **UI 크롬(레이어 A)은 §0의 2D 스케치 베이지를 따른다 — 이 표를 UI에 적용하지 말 것.**
 
 | 항목 | 값 |
 |------|-----|
-| 장르 무드 | 네온 사이버펑크 + 탑뷰 슈터 |
-| 배경 기조 | 짙은 남보라 (`#1a1a2e`) — 우주·심해 느낌 |
+| 장르 무드 | 네온 사이버펑크 + 탑뷰 슈터 (게임 월드) |
+| 배경 기조 | 짙은 남보라 (`#1a1a2e`) — 3D 캔버스/게임 월드 |
 | 강조 기조 | 형광 청록 (`#7BE8F4`) — 사이버 에너지 |
 | 위험/데미지 | 형광 빨강-분홍 (`#FF6680`) |
 | 골드/보상 | 금색 (`#FFD600`, `#FFB347`) |
-| 전체 분위기 | 어둡고 빠름. 글로우·네온 효과 우선. 파스텔·밝은 배경 금지 |
+| 전체 분위기 (게임 월드) | 어둡고 빠름. 글로우·네온 효과 우선 |
 
 ---
 
@@ -323,8 +340,29 @@ hover: scale(1.05)
 - **보스 WARNING(`HudBossWarningImpl`, bar)**: `top:80; 중앙; z20`, "⚠️ BOSS WARNING ⚠️". `/hud/bossWarningVisible`.
 - **러시 경고(`RushWarningImpl`, bar)**: `top:120; 중앙; z25`, "⚠️ RUSH INCOMING ⚠️". `/rushWave/visible`.
 
-### 10.4 씬 전환 — `SceneTransitionImpl` (modal slot)
-- 트리거 `/scene/transitionVisible`. `inset:0; z60; pointerEvents:none`. 줄무늬 4개 슬라이드 + "Ready... / {text} / GO SQUAD! 🚀"(z61). `/scene/transitionText`.
+### 10.4 화면 전환 연출 — `SceneTransitionImpl` (사선 블라인드, 2D 스케치) — **공유 오버레이**
+
+> **개요:** 화면 최상단에서 **굵은 검정 대각선 사선 띠 4가닥**이 순차로 떨어져 화면을 완전히 덮고, 씬이 안전하게 바뀐 뒤 아래로 스무스하게 빠져나가는 2D 툰/스케치 전환. **전투 진입 씬**에서는 화면 흔들림 + 팝업 상자가 함께 뜨고, **그 외 씬(로비 복귀·패널 개폐·이벤트 진입/이탈)** 에서는 **팝업 없이 사선 띠만**.
+
+- **레이어 최상단 보장 (Portal):** `react-dom`의 `createPortal`로 `document.body` 하위에 직접 주입하고 **`zIndex: 99999`** 부여 → 부모 스택·iframe(z500) 한계를 돌파해 절대 최상단. (구버전 z60 인라인 → 폐기)
+- **트리거/데이터:** `/scene/transitionVisible`, 텍스트 `/scene/transitionText`. 애니메이션은 컴포넌트 내부 인라인 `<style>`(`registry.tsx` SceneTransitionImpl). 
+- **분기 규칙 (텍스트 필터):** `isStageStart = transitionText에 'STAGE' 또는 'LV.' 포함`. **참이면(전투 진입)** 팝업 상자(`.transition-box`)+화면 흔들림(`.shake-container`) 렌더, **거짓이면**(`RETURN TO LOBBY`/`VICTORY`/`DEFEAT`/이벤트 전환) **사선 띠만**.
+
+- **CSS 스펙 (코드 그대로):**
+  1. **사선 줄무늬 4가닥**(`.transition-stripe`): width 35%, left −10%/20%/50%/80%, 배경 `#000`, 좌우 테두리 `4px solid #FFE45C`(노랑), `box-shadow 0 0 10px rgba(0,0,0,0.5)`, `skewX(-15deg)`. **진입** `stripeSlideIn 0.7s`(스태거 0/0.1/0.2/0.3s) → **퇴장** `stripeSlideOut 0.8s` at 1.85/1.95/2.05/2.15s, easing `cubic-bezier(0.76,0,0.24,1)`. (덮인 상태 약 1초 유지하는 느린 템포)
+  2. **스크린 셰이크**(`.shake-container`): `screenShake 0.3s` 1회 at 0.6s (±4px).
+  3. **팝업 상자**(`.transition-box`, z99999): 배경 `#F4EFE6`, 테두리 `4px solid #000`, radius 16, 그림자 `6px 6px 0 #000`. `boxPop 0.8s`(0.3s 지연) 등장 후 유지 → **`boxScaleDown 0.35s`(3.0s 지연 → 3.0~3.35s 축소 소멸)**. 내용: "Ready…"(`#FF8A2A`) / `{text}`(26px `#000`) / 노랑 배지.
+- **타이밍 라이프사이클 (뚝 끊김 방지):**
+  - **상태 변경(은밀히 씬 교체)**: 전환 시작 후 **850ms** 에 실제 게임 리셋 / iframe 마운트·언마운트 / 로비 복원 실행(줄무늬가 덮인 구간).
+  - **게임 시작(PLAYING) 싱크**: Ready 팝업이 **3.0~3.35s 에 축소 소멸**한 직후 전투(PLAYING) 시작 — 팝업 사라짐과 동시에 게임 시작되도록 싱크.
+  - **전환 해제**: 전환 시작 후 **3400ms** 에 `/scene/transitionVisible=false`.
+  - **CSV 연동**: `combat_tuning.csv` `scene_transition_ms = 3400` (코드 타이머와 매치, 엔진이 이 값으로 오버라이드 — 뚝 끊김 방지).
+- 2D 스케치 컨셉(베이지/검정/노랑·플랫 그림자) 그대로. (구버전 0.35s·z60·"GO SQUAD 🚀"는 폐기됨.)
+
+### 10.4-b 적용 범위 — **인게임 + 라바·퍼즐·양궁 (팝업은 인게임만)**
+- **적용 대상 (확정):** ① **인게임 전투 진입**(STAGE/LV. → 팝업+셰이크 포함) ② **라바·퍼즐·양궁** 이벤트 **진입(open)·이탈(close)** — 동일 `SceneTransition` 공유, **팝업 없음**(텍스트가 STAGE/LV.가 아니므로 사선 띠만).
+- **시즌은 제외**: 시즌은 전투 중 상시 표시 HUD라 진입/이탈 오버레이가 없음(§A 타이쿤·시즌 HUD 참조).
+- 이벤트 전환도 850ms 시점에 iframe 마운트/언마운트가 일어나고 3400ms에 해제 — 코어와 동일 라이프사이클.
 
 ### 10.5 레벨업 카드 선택 — `SkillModalImpl` (modal slot)
 - 트리거 `/modal/visible`. gameState=`LEVELUP`. `inset:0; z40`, 배경 `rgba(5,10,20,0.72)` blur, 폭<440px 시 scale 축소.
@@ -555,7 +593,7 @@ button {
 }
 
 .event-mileage-bar-fill {
-  transition: width 0.95s cubic-bezier(0.34, 1.45, 0.64, 1);
+  transition: width 0.45s ease-out;
 }
 .event-fly-particle-wrap {
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
@@ -618,10 +656,10 @@ button {
   100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 .event-reward-badge-swap-out {
-  animation: eventRewardSwapOut 0.48s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+  animation: eventRewardSwapOut 0.26s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
 }
 .event-reward-badge-swap-in {
-  animation: eventRewardSwapIn 0.62s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+  animation: eventRewardSwapIn 0.38s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
 }
 
 /* ── 보스 출현 연출 ── */

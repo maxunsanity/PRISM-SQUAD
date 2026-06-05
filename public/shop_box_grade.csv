@@ -1,0 +1,6 @@
+box_id,equipment_grade,weight,grant_fallback_gold
+resource,COMMON,50,800
+resource,RARE,50,1200
+defense,RARE,35,1500
+defense,EPIC,40,2500
+defense,LEGEND,25,4000

@@ -1,0 +1,6 @@
+key,value,note
+card_count,3,레벨업 선택 카드 수
+max_evo_cards,1,진화 카드 최대 노출 장수
+evo_random_pick,1,1=진화 후보 중 랜덤 1장
+evo_first_in_list,1,1=진화 카드를 목록 맨 앞에 배치
+normal_shuffle,1,1=일반 스킬 후보 셔플

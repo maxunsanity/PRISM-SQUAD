@@ -1,0 +1,3 @@
+box_id,sort_order,label,subtitle,gem_cost,key_cost,pity_max,pity_force_grade,key_bonus_chance,banner_title,banner_desc,enabled
+resource,1,군 자원상자,일반·우수 장비,80,0,0,,0,,,1
+defense,2,지구 방위 보급품,10회 내 엘리트,80,1,10,EPIC,0.08,S급 군 지원품,10회 내 반드시 엘리트 장비 · 천장 시 EPIC,1

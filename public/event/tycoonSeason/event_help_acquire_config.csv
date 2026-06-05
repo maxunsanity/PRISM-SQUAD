@@ -1,0 +1,7 @@
+event_kind,target_type,row_title,kills_required,reward_label,left_icon_key,reward_icon_key,sort_order
+TYCOON_MILEAGE,normal,일반 몬스터,10,1장,enemy_normal,tycoon_coin,1
+TYCOON_MILEAGE,boss,중간 보스,1,1장,enemy_mini_boss,tycoon_coin,2
+SEASON_TOURNAMENT,normal,일반 몬스터,50,1장,enemy_normal,season_coin,1
+SEASON_TOURNAMENT,boss,최종 보스,2,1장,enemy_boss,season_coin,2
+SEASON_EXPRESS,normal,일반 몬스터,50,1장,enemy_normal,season_coin,1
+SEASON_EXPRESS,boss,최종 보스,2,1장,enemy_boss,season_coin,2

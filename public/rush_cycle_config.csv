@@ -1,0 +1,2 @@
+rush_id,warning_sec,spawn_count_base,spawn_count_per_stage,spawn_count_max,ring_radius,ring_radius_jitter,rate_dog,rate_basic,rate_spitter,formation,respect_max_enemies,enabled,note
+0,1,48,6,120,320,80,0.6,0.25,0.15,ring,0,1,주기형 러시(GameCore._buildCycleRushWave) — start_time은 런타임

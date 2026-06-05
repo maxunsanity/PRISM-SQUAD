@@ -92,7 +92,7 @@ design_rules:
 
 > **대상**: 게임 기획 · 밸런스 · 운영  
 > **코드/연동 요약**: 같은 폴더 `EVENT_SYSTEM.md`  
-> **호스트 게임**: 스퀘어(탕탕류). PRISM 본편 `src/GAME.md`와 별도 문서.
+> **호스트 게임**: 스퀘어(탕탕류). PRISM 본편 `mdv4_generator/sources/core/GAME.md`와 별도 문서.
 
 ## 1. 이 모듈이 하는 일
 
@@ -159,6 +159,11 @@ CSV: `event_help_acquire_config.csv` + `event_help_config.csv` (`acquire_section
 | 배너 색·높이 | `event_asset_config`(색) + `event_ui_theme_config`(크기) |
 
 **레퍼런스**: 모노폴리 GO 「식은 죽 먹기」 상단 캡슐.
+
+### 2-1-b. 보상 아이콘 스왑 + 보상 팝업 연쇄 (구현 주의 — 최종 튜닝)
+- **다음 보상 아이콘 스왑**(`eventMonopolyUi.tsx` + `style.css`): 마일스톤 달성 시 우측 보상 아이콘이 다음 단계로 교체. `.event-reward-badge-swap-out` **0.26s** → `.event-reward-badge-swap-in` **0.38s**. `eventMonopolyUi.tsx` 3중 중첩 `setTimeout` 지연 **300ms / 260ms / 380ms**(총 ~0.94s)로 버벅임 제거.
+- **보상 획득 팝업 가속**(`registry.tsx`): 팝업 카드 축소 `cardClaimDisappear` + 오버레이 `bgFadeOut` 모두 **0.15s**, 언마운트 대기 `setTimeout` **150ms**. 불필요한 파티클 없이 빠르게 소멸(연속 수령 시인성·반응성).
+- **[CRITICAL] 타이쿤·시즌 보상 팝업 채널 완전 분리**: 두 이벤트가 **독립 큐**(`pendingTycoonPopups`/`pendingSeasonPopups`) + **독립 상태**(`/event/tycoonMilestonePopup*`/`/event/seasonMilestonePopup*`)를 가져 서로 막지 않음. **게임(전투) 중엔 안 뜨고**, 타이쿤 창(마일스톤 리스트)·시즌 창(익스프레스/토너먼트)이 **열릴 때만** 대기 보상이 표시된다(`showNext*`가 해당 창 visible일 때만, 창 닫으면 닫힘). 제목·카드 헤더에 **이벤트명** 포함(혼동 방지). 닫을 때 채널별 `dismissTycoonMilestonePopup()`/`dismissSeasonMilestonePopup()` → 같은 채널 `setTimeout 50ms` 후 다음(React 배칭 stuck 방지). close 이벤트도 채널별 `event:closeTycoonMilestonePopup`/`event:closeSeasonMilestonePopup`. (구: 단일 공유 큐·채널 → 시즌이 타이쿤을 막고 제목이 `N회차 N단계`로 동일해 "보상이 같다"고 오인되던 버그 → 채널 분리로 해결.)
 
 ### 2-2. 우측 — 토너먼트 탭 (`EventTournamentLeaderboard`)
 
@@ -470,7 +475,7 @@ CSV: `event_help_acquire_config.csv` + `event_help_config.csv` (`acquire_section
 
 ## 11. PRISM 본편과의 관계
 
-| | PRISM `src/GAME.md` | 이 문서 |
+| | PRISM `mdv4_generator/sources/core/GAME.md` | 이 문서 |
 |--|---------------------|---------|
 | 범위 | 서바이버 전투·로비·장비 | **이벤트만** |
 | 데이터 | `public/*.csv` | `public/event/*.csv` |

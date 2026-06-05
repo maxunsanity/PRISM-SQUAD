@@ -1,0 +1,6 @@
+class_level,class_name,required_coins,tournament_reward_rate,instant_bundle_id
+1,타이쿤 클래스,0,1.0,bundle_class_1
+2,퍼스트 클래스,15,1.05,bundle_class_2
+3,프리미어 클래스,35,1.10,bundle_class_3
+4,디럭스 클래스,60,1.15,bundle_class_4
+5,엘리트 클래스,90,1.20,bundle_class_5

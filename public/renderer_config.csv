@@ -1,0 +1,7 @@
+key,value,note
+view_scale,4,카메라 줌 배율(map camera_zoom에 곱함)
+hud_top_px,52,TopBar 높이(px) 카메라 Y 오프셋
+grid_spacing,30,인필드 격자 간격(px)
+grid_opacity,0.18,격자 선 투명도
+max_frame_dt_sec,0.05,프레임 dt 상한(초)
+pixel_ratio_cap,2,devicePixelRatio 상한

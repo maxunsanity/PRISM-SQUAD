@@ -20,7 +20,7 @@ interface Particle {
   maxLife: number;
 }
 
-/** VFX 재생 시 사용할 색상 매핑 (vfx_id → hex number) */
+/** VFX 재생 시 사용할 기본 색상 (CSV particle_color_hex 없을 때 폴백) */
 const VFX_COLORS: Record<string, number> = {
   enemy_death:  0xFFCC88,
   player_hit:   0xFF4455,
@@ -54,21 +54,28 @@ export class VfxSystem {
   }
 
   /* ── 이펙트 재생 ── */
-  play(id: string, x: number, y: number, colorOverride?: number): void {
+  play(id: string, x: number, y: number, colorOverride?: number, sizeScale = 1): void {
     const cfg = this.vfxMap.get(id);
     if (!cfg) return;
 
-    const color = colorOverride ?? (VFX_COLORS[id] ?? 0xffffff);
+    const csvColor = cfg.particle_color_hex ? parseInt(cfg.particle_color_hex.replace('#', ''), 16) : 0;
+    const color = colorOverride ?? (csvColor !== 0 ? csvColor : (VFX_COLORS[id] ?? 0xffffff));
 
     /* 파티클 스폰 */
+    const spriteUrl = cfg.particle_sprite_url ?? '';
+    const spriteTex = spriteUrl ? new THREE.TextureLoader().load(spriteUrl) : null;
+
     for (let i = 0; i < cfg.particle_count; i++) {
-      const size = cfg.particle_size_min + Math.random() * (cfg.particle_size_max - cfg.particle_size_min);
-      const geo = new THREE.SphereGeometry(Math.max(0.5, size * 0.5), 4, 4);
-      const mat = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 1,
-      });
+      const size = (cfg.particle_size_min + Math.random() * (cfg.particle_size_max - cfg.particle_size_min)) * sizeScale;
+      let geo: THREE.BufferGeometry;
+      let mat: THREE.MeshBasicMaterial;
+      if (spriteTex) {
+        geo = new THREE.PlaneGeometry(size * 2, size * 2);
+        mat = new THREE.MeshBasicMaterial({ map: spriteTex, transparent: true, alphaTest: 0.05, depthWrite: false });
+      } else {
+        geo = new THREE.SphereGeometry(Math.max(0.5, size * 0.5), 4, 4);
+        mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 });
+      }
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(x, y, 2 + Math.random() * 2);
       this.scene.add(mesh);

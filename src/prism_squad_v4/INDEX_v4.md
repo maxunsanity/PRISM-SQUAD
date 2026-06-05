@@ -5,7 +5,7 @@ condense_policy: forbidden
 
 # PRISM SQUAD v2 — v4 백화점 색인 (INDEX)
 
-> **SKILL** = 공통 읽기 순서 (`.cursor/skills/prism-squad-v4/SKILL.md`)  
+> **SKILL** = 공통 읽기 순서 (`.cursor/skills/prism-squad-v4/SKILL_v4.md`)  
 > **이 파일** = 모듈별 **어떤 v4 폴더에 뭐가 들어있는지** 색인  
 > **CSV 정책** = [`CSV_v4.md`](./CSV_v4.md)
 
@@ -30,9 +30,9 @@ condense_policy: forbidden
 
 | 파일 | 출처·비고 |
 |------|-----------|
-| `GAME_prism_squad_v4.md` | `src/GAME.md` |
-| `DESIGN_prism_squad_v4.md` | `src/DESIGN.md` + `src/style.css` 전문 |
-| `DEV_prism_squad_v4.md` | `src/DEV.md` + `public/*.csv` + `public/event/*` |
+| `GAME_prism_squad_v4.md` | `mdv4_generator/sources/core/GAME.md` |
+| `DESIGN_prism_squad_v4.md` | `mdv4_generator/sources/core/DESIGN.md` + `src/style.css` 전문 |
+| `DEV_prism_squad_v4.md` | `mdv4_generator/sources/core/DEV.md` + `public/*.csv` + `public/event/*` |
 | `ATTACH_MODULES_v4.md` | 조립 계약 (신규) |
 | `RECIPE_prism_squad.md` | Anti-Pattern·json-render |
 | `RECIPE_CODE_prism_squad.md` | 샘플: registry·Bridge·App·GameCore 발췌 |

@@ -1,0 +1,20 @@
+key,value,note
+guardian_orbit_speed,2.5,공전 각속도(rad/s)
+guardian_hit_tick_sec,0.3,타격 판정 주기(초)
+guardian_hit_radius_pad,8,적 radius + 패딩 충돌
+guardian_count_min,2,일반 최소 블레이드 수
+guardian_count_max,5,일반 최대 블레이드 수
+guardian_count_per_level,1,레벨당 +1 (min~max 클램프)
+guardian_dmg_mult,8,일반 dmg = base×level×이값
+guardian_orbit_base,52,일반 궤도 기본 반경
+guardian_orbit_per_level,3,일반 레벨당 궤도 +
+guardian_orbit_scale,1.1,궤도 최종 배율
+guardian_blade_w,14,블레이드 BoxGeometry W
+guardian_blade_h,5,블레이드 H
+guardian_blade_d,2.5,블레이드 D
+guardian_color,16750848,블레이드 색(0xFFD600 10진)
+eternal_count,5,진화 eternal 최대 블레이드
+eternal_dmg_mult,14,eternal dmg 배율
+eternal_orbit_base,74,eternal 궤도 기본
+eternal_orbit_per_level,4,eternal 레벨당 궤도 +
+eternal_blade_w,19,eternal 블레이드 W

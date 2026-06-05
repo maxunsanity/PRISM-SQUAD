@@ -1,0 +1,7 @@
+step_id,event_id,sort_order,prereq_step_id,cost_type,gem_cost,price_krw,card_color,button_label_override
+1,mall_marvels_01,1,0,FREE,0,0,#FFE8F0,
+2,mall_marvels_01,2,1,FREE,0,0,#FFF0E8,
+3,mall_marvels_01,3,2,GEMS,90,0,#E8F4FF,
+4,mall_marvels_01,4,3,CASH_KRW,0,4400,#F0FFE8,
+5,mall_marvels_01,5,4,GEMS,120,0,#FFF8E8,
+6,mall_marvels_01,6,5,CASH_KRW,0,7000,#F8E8FF,

@@ -1,16 +1,26 @@
-skill_id,skill_name,skill_type,icon,description,base_cooldown_frames,base_dmg_mult,projectile_speed,projectile_radius,max_level,projectile_sprite_url
-kunai,쿠나이,ACTIVE,🔪,가장 가까운 적에게 유도 수리검 사격,60,1.5,8.5,5,5,
-boomerang,부메랑,ACTIVE,🪃,조이스틱 방향으로 발사 후 귀환 관통,70,1.5,5.5,7,5,
-molotov,화염병,ACTIVE,🧪,랜덤 위치에 화염 장판 생성,90,0.5,0,40,5,
-guardian,수호자,ACTIVE,⚙️,플레이어 주위 공전 블레이드,0,0.9,0,8,5,
-rocket,로켓발사기,ACTIVE,🚀,최근접 적에게 폭발 로켓 발사,60,2.0,7.0,6,5,
-drone,미사일 드론,ACTIVE,🛰️,우상단 드론이 유도 미사일 연사(공격3초/휴식7초, 레벨업 시 휴식 감소),20,1.4,8.0,5,5,
-ninjaScroll,닌자 스크롤,PASSIVE,📜,EXP 획득량 증가,0,0,0,0,5,
-elasticShoes,탄성 신발,PASSIVE,👟,이동속도 증가,0,0,0,0,5,
-highFuel,고성능 연료,PASSIVE,⛽,폭발 및 화염 반경 증가,0,0,0,0,5,
-exoskeleton,외골격 갑옷,PASSIVE,🛡️,투사체 지속시간 증가,0,0,0,0,5,
-soccer_ball,축구공,ACTIVE,⚽,적과 벽에 튕기며 물리 피해,160,1.2,6.0,8,5,
-drill_shot,드릴샷,ACTIVE,🌀,적을 관통하며 튕기는 드릴 발사,150,1.0,7.5,6,5,
-dimensional_blade,차원 검기,ACTIVE,⚔️,전방 부채꼴 구역에 참격 방출,180,1.5,0,24,5,
-debuff_aura,감쇄 오라,ACTIVE,🟣,주변 적들의 공격력과 이동속도를 감소시킴,120,0.5,0,35,5,
-
+skill_id,skill_name,skill_type,icon,description,base_cooldown_frames,base_dmg_mult,projectile_speed,projectile_radius,max_level,max_range,element,projectile_sprite_url,fire_pattern,target_mode,projectile_count,spread_deg,explode_radius,projectile_id,magazine_capacity,burst_interval_frames,reload_frames
+kunai,쿠나이,ACTIVE,🔪,가장 가까운 적에게 유도 수리검 사격,60,1.5,8.5,5,5,280,beam,,homing,nearest,1,0,0,p_kunai,0,0,0
+boomerang,부메랑,ACTIVE,🪃,조이스틱 방향으로 발사 후 귀환 관통,70,1.5,5.5,7,5,0,,,boomerang,joystick,1,0,0,p_boomerang,0,0,0
+molotov,화염병,ACTIVE,🧪,포물선으로 던져 바닥에 화염 장판 생성,90,0.5,6.5,40,5,180,fire,,parabola,random_enemy,2,0,40,p_flask,0,0,0
+guardian,수호자,ACTIVE,⚙️,플레이어 주위 공전 블레이드,0,0.9,0,8,5,0,,,orbit,self,1,0,0,,0,0,0
+rocket,로켓발사기,ACTIVE,🚀,최근접 적에게 폭발 로켓 발사,60,2.0,7.0,6,5,380,fire,,homing,nearest,1,0,18,p_rocket,0,0,0
+drone,미사일 드론 A,ACTIVE,🛸,"우상단 큐브 드론 — 유도 미사일 연사 (공격3초/휴식7초)",20,1.4,8.0,5,5,170,,,drone,nearest,2,15,0,p_drone,0,0,0
+drone_b,미사일 드론 B,ACTIVE,🛸,"좌상단 큐브 드론 — 유도 미사일 연사 (공격3초/휴식7초)",20,1.4,8.0,5,5,170,,,drone,nearest,2,15,0,p_drone,0,0,0
+ninjaScroll,닌자 스크롤,PASSIVE,📜,EXP 획득량 증가,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+elasticShoes,탄성 신발,PASSIVE,👟,이동속도 증가,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+highFuel,고성능 연료,PASSIVE,⛽,폭발 및 화염 반경 증가,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+exoskeleton,외골격 갑옷,PASSIVE,🛡️,투사체 지속시간 증가,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+soccer_ball,축구공,ACTIVE,⚽,적과 벽에 튕기며 물리 피해,160,1.2,6.0,8,5,0,,,directional,joystick,2,21,0,p_soccer,0,0,0
+drill_shot,드릴샷,ACTIVE,🌀,적을 관통하며 튕기는 드릴 발사,150,1.0,7.5,6,5,0,beam,,directional,joystick,2,18,0,p_drill,0,0,0
+dimensional_blade,차원 검기,ACTIVE,⚔️,전방 부채꼴 구역에 참격 방출,180,1.5,0,24,5,0,beam,,blade,joystick,3,44,0,,0,0,0
+debuff_aura,감쇄 오라,ACTIVE,🟣,주변 적들의 공격력과 이동속도를 감소시킴,120,0.5,0,35,5,0,ice,,aura,self,1,0,0,,0,0,0
+lightning,번개 발사기,ACTIVE,⚡,랜덤 적에게 낙뢰 — 주변 적에게 전기 연쇄,80,1.3,0,18,5,360,electric,,chain,random_enemy,1,0,0,,0,0,0
+mine,지뢰,ACTIVE,💣,플레이어 주변에 지뢰 설치 — 접촉 시 폭발,110,2.2,0,30,5,0,fire,,ground_self,self,1,0,0,,0,0,0
+shotgun,샷건,ACTIVE,🔫,전방으로 산탄 5발 발사,100,0.9,7.0,5,5,220,,,spread,nearest,5,30,0,p_shotgun,0,0,0
+energyCube,에너지 큐브,PASSIVE,🔋,모든 스킬 쿨타임 감소,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+fitnessGuide,피트니스 가이드,PASSIVE,💪,최대 HP 증가,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+ammoBooster,탄약 추진기,PASSIVE,🔩,기본 무기 재장전 속도 증가,0,0,0,0,5,0,,,passive,self,0,0,0,,0,0,0
+auto_basic,기본 공격,AUTO,🎯,기본 공격 — 가장 가까운 적에게 소형 총알,45,0.8,9.0,3,1,300,,,auto,nearest,1,0,0,p_auto_basic,6,11,108
+auto_revolver,리볼버,AUTO,🔫,장전된 대구경 총알 — 크고 묵직한 발사,55,1.2,8.0,5,1,320,,,auto,nearest,1,0,0,p_auto_revolver,6,18,162
+auto_shotgun,샷건,AUTO,💥,전방 3방향 산탄 — 근거리 범위 공격,75,0.7,8.5,4,1,200,,,auto_spread,joystick,3,40,0,p_auto_shotgun,4,15,135
+auto_drill,드릴건,AUTO,🌀,직진 관통 드릴 — 튕김 없이 앞으로만,65,1.0,7.5,5,1,280,,,auto,nearest,1,0,0,p_auto_drill,5,14,126

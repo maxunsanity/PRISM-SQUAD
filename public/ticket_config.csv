@@ -1,0 +1,5 @@
+ticket_id,ticket_name,ticket_tier,multiplier,gem_cost,daily_free_count,icon,acquire_label
+basic_ticket,기본권,1,5,0,5,🎫,무료 지급
+silver_ticket,실버권,2,15,0,0,🥈,마일스톤 보상
+gold_ticket,골드권,3,25,200,0,🥇,상위 보상 / 구매
+diamond_ticket,다이아권,4,50,500,0,💎,💎 500 구매

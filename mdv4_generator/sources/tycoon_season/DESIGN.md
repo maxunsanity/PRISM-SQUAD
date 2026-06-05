@@ -117,6 +117,15 @@ boxShadow -3px 3px 0 #000 (오른쪽) / 3px 3px 0 #000 (왼쪽)
 - 탭 → `window.dispatchEvent('event:toggleMilestoneList')` → `EventMilestoneListPopup`(z60).
 - 흰 카드 본체 최소 높이 `EVENT_CAPSULE_BODY_MIN_H = 74`.
 
+**★ 마일리지/시즌 게이지 표시 규칙 (버그 방지 — 타이쿤·시즌 동일, 캡슐·익스프레스 탭·토너먼트 패널 공통):**
+- **숫자 N/M = 바와 동일하게 "구간" 기준** `gaugePoints / gaugeTarget`(시즌=`seasonGaugePoints/seasonGaugeTarget`). 단계 넘으면 **0부터** 다시 셈. 예: 누적 1650(임계 1500→1900 구간)이면 화면 표기는 **150/400**(1650/1900 아님).
+- **바 채움**도 동일 **구간** `gaugePoints / gaugeTarget`. `EventController.milestoneGaugeSegment`: `base = 이전 단계 임계값`, `target = 다음 − base`, `gaugePoints = points − base` → **단계 넘으면 바·숫자 모두 0부터** 다시 채워짐.
+- (참고) `/event/points`·`/event/nextMilestonePoint`는 누적값 store이지만 **마일리지 표시(숫자·바)에는 쓰지 않는다** — 표시는 전부 구간 게이지.
+- 임계값(`event_milestone_config.required_point`)은 누적: 1500/1900/2300… (구간 크기 = 다음−이전).
+- ⚠️ **[CRITICAL] 누적값(points/nextMilestone)으로 바를 그리면 안 됨** — 단계 넘을 때 0%가 아니라 이전 누적부터 시작하는 버그(예: 1500 도달 → 다음 구간이 0%가 아닌 1500/1900=79%부터). 캡슐·익스프레스 사이드탭·**토너먼트 패널** 모두 반드시 구간 게이지(`gaugePoints/gaugeTarget`) 사용. (과거 토너먼트 패널이 누적으로 그려 게이지가 왔다갔다하던 버그 — 구간 게이지로 수정 완료.)
+- 단계 미수령(claim 전)에도 게이지는 다음 구간으로 진행: `next = 미claim & points<required` 첫 단계, base=그 직전 임계값.
+- 바 transition `0.45s`(`style.css` `.event-mileage-bar-fill`) — `displayPct` 다중 갱신 + 긴 transition 겹침 금지(왔다갔다 원인).
+
 ### 4-2. `EventTournamentLeaderboard` / `SeasonExpressSideTab` (tournament 슬롯, 우측)
 
 | 요소 | $state |
@@ -135,23 +144,33 @@ boxShadow -3px 3px 0 #000 (오른쪽) / 3px 3px 0 #000 (왼쪽)
 
 | 컴포넌트 | 표시 $state | 트리거 이벤트 |
 |----------|-------------|---------------|
-| `EventMilestoneListPopup` | `/event/milestoneListVisible` | `event:toggleMilestoneList` / `event:closeMilestonePopup` |
-| `EventMilestoneRewardPopup` | `/event/milestonePopupVisible` | `event:closeMilestonePopup` — **백드롭 z80** |
+| `EventMilestoneListPopup` | `/event/milestoneListVisible` | `event:toggleMilestoneList` |
+| `EventMilestoneRewardPopup` (타이쿤·시즌 2채널 독립) | `/event/tycoonMilestonePopupVisible` · `/event/seasonMilestonePopupVisible` | `event:closeTycoonMilestonePopup` / `event:closeSeasonMilestonePopup` — **백드롭 z80** |
 | `EventTournamentPanel` | `/event/tournamentPanelVisible` | `event:toggleTournamentPanel` / `event:closeTournamentPanel` |
 | `SeasonExpressPanel` | `/event/expressVisible` | `event:toggleExpressPanel` / `event:closeExpress` |
 | `EventTournamentSettlementPopup` | (정산) | **현재 `return null` 껍데기** — 정산은 `EventTournamentPanel` + `/event/tournamentEnded`로 렌더 |
 
 - 보상 팝업 백드롭: `position:absolute, inset:0, zIndex:80, background:rgba(0,0,0,0.65)`.
 - 메인 모달 3종(`milestoneListVisible`/`tournamentPanelVisible`/`expressVisible`)은 **상호 배타** — 하나 열면 나머지 닫힘.
-- 보상 팝업은 **메인 모달이 열려 있을 때만** 대기열에서 순차 표시(`flushPendingMilestonePopups`).
+- 보상 팝업은 **타이쿤·시즌 독립 채널**(`/event/tycoonMilestonePopup*` / `/event/seasonMilestonePopup*`). **게임(전투) 중엔 안 뜸.** 타이쿤 창(마일스톤 리스트)·시즌 창(익스프레스/토너먼트)이 **열릴 때** 대기 중 보상이 표시된다. 두 채널은 서로 막지 않음.
 
 ### 4-4. 마일스톤 보상 팝업 (`EventMilestoneRewardPopup`)
 
 | 요소 | $state |
 |------|--------|
-| 제목 | `/event/milestonePopupTitle` (`N단계 달성!`) |
-| 보상 아이콘 | `/event/milestonePopupAssetKey` |
-| 보상 라벨 | `/event/milestonePopupLabel` (배수 스케일 적용된 `×N`) |
+| 제목 | `/event/{tycoon,season}MilestonePopupTitle` (`{이벤트명} · N회차 N단계 달성!`) |
+| 보상 아이콘 | `/event/{tycoon,season}MilestonePopupAssetKey` |
+| 보상 라벨 | `/event/{tycoon,season}MilestonePopupLabel` (배수 스케일 `×N`) |
+| 회차·단계 | `/event/{tycoon,season}MilestonePopup{Lap,Step}` |
+
+**연출 (2D 스케치 — `tycoonSeason/jsonRender/registry.tsx`):**
+- **오버레이** `.reward-popup-overlay`: `inset:0`, `rgba(0,0,0,0.5)` + `backdrop-filter: blur(3px)`, flex center. (백드롭 z80 — §1)
+- **카드** `.reward-popup-card`: 배경 `#F4EFE6`, 테두리 `4px solid #000`, radius 20, 그림자 `8px 8px 0 #000`, min-width 280. **등장 = `popupOpenBounce 0.45s`** cubic-bezier 바운스(scale 0.7→1.08→0.97→1 + 미세 rotate). 데코: **sunburst glow**(주황 `radial-gradient`, `sunburstRotate`), 부유 데코(`floatDecor`), 보상 아이콘 펄스(`rewardIconPulse`).
+- **수령 소멸 (가속)**: 카드에 `.claiming` → 오버레이 `bgFadeOut 0.15s`(dim+blur 0), 카드 `cardClaimDisappear 0.15s`(scale 1→1.1→0, rotate −15°). 파티클 없이 빠르게. 언마운트 대기 `setTimeout 150ms`.
+- **표시 게이트(★게임 중 미표시)**: 마일스톤 달성 시엔 채널별 큐(`pendingTycoonPopups`/`pendingSeasonPopups`)에 **적재만** 한다. `showNextTycoonPopup`은 `/event/milestoneListVisible`, `showNextSeasonPopup`은 `/event/expressVisible || /event/tournamentPanelVisible`가 참일 때만 표시(아니면 no-op). 해당 창 **열림 시 flush**(대기분 표시), **닫힘 시 같은 채널 팝업 닫음**.
+- **연쇄(다음 보상)**: 닫을 때 `dismissTycoonMilestonePopup()`/`dismissSeasonMilestonePopup()` → **같은 채널 `setTimeout 50ms` 후 다음**(React 배칭 stuck 방지). 타이쿤·시즌 **완전 독립** — 하나가 다른 쪽을 막지 않음.
+- **제목에 이벤트명 포함**: `${이벤트명} · ${회차}회차 ${단계}단계 달성!` + 카드 상단에 이벤트명 헤더 → 타이쿤/시즌 혼동 방지.
+- **다음 보상 아이콘 스왑**(마일리지 바): `.event-reward-badge-swap-out 0.26s` → `.event-reward-badge-swap-in 0.38s`(`eventMonopolyUi.tsx` setTimeout 300/260/380ms).
 
 ### 4-5. 토너먼트 정산 (`settleTournament` → 패널)
 
@@ -177,7 +196,7 @@ boxShadow -3px 3px 0 #000 (오른쪽) / 3px 3px 0 #000 (왼쪽)
 `/event/points`, `/event/nextMilestonePoint`, `/event/nextRewardAssetKey`, `/event/nextRewardLabel`,
 `/event/timerText`, `/event/ticketMultiplier`, `/event/lastTpGain`,
 `/event/milestoneRows`, `/event/milestoneListVisible`,
-`/event/milestonePopupVisible`, `/event/milestonePopupTitle`, `/event/milestonePopupAssetKey`, `/event/milestonePopupLabel`,
+`/event/{tycoon,season}MilestonePopup{Visible,Title,Lap,Step,AssetKey,Label}` (타이쿤·시즌 독립 채널),
 `/event/tycoonBadgeLabel`('타이쿤')
 
 ### 시즌 토너먼트

@@ -1,0 +1,11 @@
+slot_id,slot_name,item_name,icon,grade,stat_type,effect_per_level,max_level,base_gold_cost,gold_cost_scale,description,skill_id
+weapon,WEAPON,레전드 리볼버,🔫,LEGEND,power,0.06,10,300,1.5,"가장 가까운 적을 유도 사격하는 권총",auto_revolver
+weapon_shotgun,WEAPON,스프레드 샷건,💥,EPIC,power,0.05,10,250,1.5,"전방으로 산탄 5발을 퍼붓는 샷건",auto_shotgun
+weapon_drill,WEAPON,파워 드릴건,🌀,EPIC,power,0.05,10,250,1.5,"적을 관통하고 벽에 튕기는 드릴 발사기",auto_drill
+necklace,NECKLACE,에픽 체인,📿,EPIC,power,0.04,10,250,1.5,착용 시 공격력이 증가하는 마력 목걸이,
+gloves,GLOVES,정밀 장갑,🧤,RARE,power,0.03,10,200,1.4,명중과 화력을 끌어올리는 정밀 장갑,
+armor,ARMOR,수호 갑옷,🛡️,EPIC,hp,20,10,250,1.5,최대 체력을 크게 늘려주는 견고한 갑옷,
+belt,BELT,강철 벨트,🎗️,RARE,hp,15,10,200,1.4,허리를 보호하며 체력을 더하는 강철 벨트,
+boots,BOOTS,쾌속 부츠,👟,RARE,speed,0.03,10,200,1.4,이동 속도를 높여 회피를 돕는 쾌속 부츠,
+lava_blade,WEAPON,용암 검,⚔️,LEGEND,power,0.07,10,300,1.5,"화염을 휘감은 전설의 검",auto_revolver
+prize_crown,NECKLACE,황금 왕관,👑,LEGEND,power,0.06,10,300,1.5,"부의 상징 황금 왕관",

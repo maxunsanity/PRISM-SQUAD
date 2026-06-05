@@ -1,0 +1,9 @@
+enemy_id,tycoon_point_base,season_point_base,is_boss
+basic,3,2,false
+dog,3,2,false
+bloater,4,3,false
+spitter,4,3,false
+mini_boss,15,0,false
+crusher,15,0,false
+nexus,15,0,false
+final_boss,0,25,true

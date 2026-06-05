@@ -1,0 +1,61 @@
+boss_id,key,value,note
+titan,phase2_hp_pct,0.7,페이즈2 전환 HP 비율
+titan,phase3_hp_pct,0.4,페이즈3 전환 HP 비율
+titan,phase3_speed_mult,1.5,페이즈3 추적 속도 배율
+titan,phase3_puddle_freq_mult,2,페이즈3 웅덩이 간격 ÷ 이값
+titan,charge_speed_mult,4,돌진 속도 배율(×cfg.speed×60×dt)
+titan,charge_end_sec,-0.35,돌진 종료 chargeTimer 임계
+titan,charge_prep_sec,-0.25,돌진 예비 chargeTimer 임계
+titan,charge_cool_min_sec,1.3,돌진 후 쿨 최소(음수 타이머)
+titan,charge_cool_rand_sec,1.4,돌진 후 쿨 랜덤
+titan,phase2_missile_interval_sec,2.8,페이즈2 미사일 주기
+titan,phase3_missile_interval_sec,1.7,페이즈3 미사일 주기
+titan,missile_volley_offsets,-0.25|0|0.25,3발 방사 각 오프셋(rad)
+titan,missile_speed,4.2,유도 미사일 속도
+titan,missile_turn_rate,2,유도 미사일 선회
+titan,missile_max_range,500,유도 미사일 사거리
+titan,missile_dmg_ratio,0.6,미사일 dmg = contact_dmg×비율
+titan,skill_spin_sec,0.35,웅덩이 후 스핀 연출(초)
+titan,missile_spin_sec,0.5,미사일 후 스핀 연출(초)
+titan,skill_spin_rate,4.2,스핀 tick 배율
+titan,puddle_target_player_chance,0.55,웅덩이 플레이어 추적 확률
+titan,puddle_dist_player_min,18,플레이어 주변 최소 거리
+titan,puddle_dist_player_rand,44,플레이어 주변 랜덤 거리
+titan,puddle_dist_boss_min,20,보스 주변 최소 거리
+titan,puddle_dist_boss_rand,40,보스 주변 랜덤 거리
+titan,phase2_flash_count,3,페이즈2 전환 플래시 횟수
+titan,phase2_flash_interval_ms,200,페이즈2 플래시 간격
+titan,phase3_flash_count,5,페이즈3 전환 플래시 횟수
+titan,phase3_flash_interval_ms,150,페이즈3 플래시 간격
+titan,phase2_intro_missile_delay_sec,2,페이즈2 진입 미사일 타이머
+titan,phase3_intro_charge_delay_sec,1.5,페이즈3 진입 돌진 타이머(음수)
+crusher,charge_speed_mult,4.5,돌진 속도 배율
+crusher,charge_end_sec,-0.4,돌진 종료
+crusher,charge_prep_sec,-0.3,돌진 예비
+crusher,charge_cool_min_sec,1.1,돌진 쿨 최소
+crusher,charge_cool_rand_sec,1.2,돌진 쿨 랜덤
+crusher,charge_contact_dmg_mult,1.5,돌진 중 접촉 dmg 배율
+crusher,charge_warn_spin_sec,0.3,돌진 예비 플래시 유지
+crusher,intro_charge_delay_sec,1.5,스폰 후 첫 돌진(음수)+rand
+nexus,missile_fallback_interval_sec,1.5,missile_interval_frames=0일 때
+nexus,missile_min_count,3,방사 최소 발수(cfg 미만 시)
+nexus,skill_spin_sec,0.4,발사 후 스핀
+nexus,skill_spin_rate,4.2,스핀 tick 배율
+nexus,contact_interval_sec,1,근접 접촉 간격(고정 포탑)
+nexus,miniboss_pattern_a_spread_mults,-2|-1|0|1|2,스테이지 NEXUS 패턴A spread 배수
+nexus,miniboss_pattern_a_speed_mult,1.1,패턴A 속도 배율
+nexus,miniboss_pattern_b_ray_count,12,패턴B 전방위 발수
+nexus,miniboss_pattern_b_speed_mult,0.85,패턴B 속도 배율
+nexus,miniboss_pattern_b_dmg_mult,0.65,패턴B dmg 배율
+nexus,miniboss_fallback_contact_dmg,5,contact_dmg=0 폴백
+arena_wall,wall_thickness,3,봉쇄 벽 두께
+arena_wall,wall_height,6,벽 높이(Z extrude)
+arena_wall,wall_z,1.5,벽 Z 위치
+arena_wall,fade_duration_sec,0.5,해제 페이드(초)
+arena_wall,wall_opacity,0.75,벽 불투명도
+host,miniboss_warning_visible_ms,2000,미니보스 등장 WARNING HUD 표시(ms)
+host,boss_death_vfx2_ms,200,사망 연출 2차 VFX
+host,boss_death_vfx3_ms,380,사망 연출 3차 VFX
+host,boss_death_vfx4_ms,550,사망 연출 4차 VFX
+host,boss_death_phase2_ms,700,VICTORY 텍스트
+host,boss_death_phase3_ms,2200,페이드아웃 시작

@@ -1,0 +1,43 @@
+key,value,note
+pip_count,5,탄창 핍 개수
+pip_width_scale,0.16,핍 너비(geometry_size 배율)
+pip_height_scale,0.11,핍 높이
+pip_gap_scale,0.06,핍 간격
+pip_y_scale,0.74,핍 Y(geometry_size 배율)
+weapon_offset_x_scale,0.72,총 피벗 X 오프셋
+hp_bar_low_pct,0.5,HP바 빨강 전환 임계
+hp_bar_y_scale,0.9,HP바 Y
+hp_bar_w_scale,1.1,HP바 너비
+glow_pulse_period_sec,3,글로우 펄스 주기
+glow_pulse_flash_sec,0.6,펄스 플래시 구간
+glow_pulse_mult_peak,3,펄스 피크 배율
+blink_interval_sec,0.15,무적 깜빡임 간격
+silhouette_opacity,0.52,그림자 불투명도
+silhouette_y_scale,-0.22,그림자 Y 오프셋
+silhouette_blur_px,14,실루엣 블러 반경
+aim_indicator_opacity,0.5,조준 지표 투명도
+body_sprite_scale,2.2,스프라이트 본체 스케일
+body_canvas_scale,1.8,캔버스 본체 스케일
+invinc_blink_low_opacity,0.3,무적 깜빡임 최소
+invinc_shadow_low_opacity,0.18,무적 시 그림자 최소
+move_speed_threshold,0.05,이동 판정 최소 속도
+hop_base_scale,0.04,점프 높이 기본(geometry_size 배율)
+hop_speed_scale,0.012,속도에 따른 추가 점프
+hop_phase_speed_base,8,점프 위상 속도 기본
+hop_phase_speed_per_move,5,이동속도당 위상 가속
+idle_float_freq,0.002,정지 부유 sin 주파수
+idle_float_amp_scale,0.008,정지 부유 진폭(geometry_size 배율)
+hop_squash_scale,0.03,착지 스쿼시 강도
+exo_shell_scale,1.16,엑소 쉘 크기(geometry_size 배율)
+exo_opacity_base,0.16,엑소 기본 투명도
+exo_opacity_per_level,0.05,엑소 레벨당 추가
+exo_pulse_mid,0.9,엑소 펄스 중심
+exo_pulse_amp,0.1,엑소 펄스 진폭
+exo_create_opacity,0.22,엑소 생성 시 투명도
+exo_depth_z_scale,0.05,엑소 Z(본체 width 배율)
+debuff_particle_count,5,디버프 공전 파티클 수
+debuff_particle_geo_scale,0.08,디버프 구체 반경(geometry_size 배율)
+debuff_particle_radius_base,0.35,공전 반경 기본
+debuff_particle_radius_step,0.08,파티클마다 반경 증가
+debuff_particle_orbit_speed_base,2.5,공전 속도 기본
+debuff_particle_orbit_speed_step,0.6,파티클마다 속도 증가

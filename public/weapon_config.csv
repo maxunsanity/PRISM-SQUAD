@@ -1,0 +1,4 @@
+weapon_id,item_name,icon,grade,skill_id,description
+revolver,레전드 리볼버,🔫,LEGEND,kunai,"가장 가까운 적을 유도 사격하는 권총"
+shotgun,스프레드 샷건,💥,EPIC,shotgun,"전방으로 산탄 5발을 퍼붓는 샷건"
+drill,파워 드릴건,🌀,EPIC,drill_shot,"적을 관통하고 벽에 튕기는 드릴 발사기"

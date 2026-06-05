@@ -1,0 +1,8 @@
+step_id,reward_type,reward_qty,reward_param,icon_asset_key,label
+1,energy,35,,bolt,⚡ 35
+2,meta_gold,35400,,coin,🪙 35.4K
+3,open_box,1,resource,box,📦 군자원상자
+4,meta_gold,80000,,coin,🪙 80K
+5,equip_lv,1,,equip,⚔️ 장비 Lv+1
+6,open_box,1,defense,box,🎁 지구방위
+6,energy,100,,bolt,⚡ 100

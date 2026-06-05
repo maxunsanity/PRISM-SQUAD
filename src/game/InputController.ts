@@ -221,6 +221,10 @@ export class InputController {
       window.dispatchEvent(new CustomEvent('prism:action', { detail: 'TOGGLE_PAUSE' }));
       return;
     }
+    if (e.code === 'Digit1' || e.code === 'Digit2' || e.code === 'Digit3') {
+      const slot = Number(e.code.slice(-1));
+      window.dispatchEvent(new CustomEvent('prism:quickSkill', { detail: slot }));
+    }
     if (!this._canMove()) return;
     if (this.touchActive) return; // 조이스틱 활성 중 키보드 무시
     this.keys.add(e.code);

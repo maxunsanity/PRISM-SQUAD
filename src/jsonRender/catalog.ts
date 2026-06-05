@@ -16,8 +16,22 @@ import {
   PrismHudBossWarning,
   PrismLobbyScreen,
   PrismSceneTransition,
+  PrismPauseScreen,
+  PrismRushWarning,
+  PrismBossIntro,
+  PrismBossDeath,
+  PrismTalentScreen,
+  PrismEquipScreen,
+  PrismShopScreen,
+  PrismChallengeScreen,
+  PrismEvolutionScreen,
+  PrismAdventureUp,
+  PrismBattlePopup,
+  PrismEnergyShop,
+  PrismLuckyTrain,
   PrismSkillModal,
   PrismResultScreen,
+  PrismAvatarSelect,
 } from './operationalUi';
 import { PrismStub_TalentScreen } from './stubsAndMaterials';
 
@@ -34,10 +48,26 @@ const allElements = z.discriminatedUnion('type', [
   PrismHudBossWarning,
   PrismLobbyScreen,
   PrismSceneTransition,
+  PrismPauseScreen,
+  PrismRushWarning,
+  PrismBossIntro,
+  PrismBossDeath,
+  PrismTalentScreen,
+  PrismEquipScreen,
+  PrismShopScreen,
+  PrismChallengeScreen,
+  PrismEvolutionScreen,
+  PrismAdventureUp,
+  PrismBattlePopup,
+  PrismEnergyShop,
+  PrismLuckyTrain,
   PrismSkillModal,
   PrismResultScreen,
+  PrismAvatarSelect,
   PrismStub_TalentScreen,
 ]);
+
+// 위에서 두 번 등록되는 것 방지용 체크 (discriminatedUnion은 중복 type 허용 안 함)
 
 export type CatalogElement = z.infer<typeof allElements>;
 

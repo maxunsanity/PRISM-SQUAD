@@ -1,0 +1,9 @@
+key,value,description
+group_size,50,토너먼트 고정 인원(본인+봇)
+tick_sec,200,봇 TP 갱신 간격(초) — event_board tick_min 우선, 기본 30분
+difficulty,low,봇 난이도 프로필
+player_cap_ratio,0.72,봇 TP 상한=플레이어×비율
+growth_ratio,0.45,틱당 성장 기준 비율
+variance_min,0.85,봇 랜덤 변동 하한
+variance_max,1.0,봇 랜덤 변동 상한
+bot_floor_ratio,0.25,봇 TP 하한=플레이어×비율

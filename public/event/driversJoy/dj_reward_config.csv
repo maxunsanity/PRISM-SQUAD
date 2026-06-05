@@ -1,0 +1,4 @@
+event_id,sort_order,reward_type,reward_qty,reward_param,icon_asset_key,label
+drivers_joy_01,1,energy,80,,bolt,⚡ 80
+drivers_joy_01,2,meta_gold,50000,,coin,🪙 50K
+drivers_joy_01,3,open_box,1,defense,box,🎁 지구방위 1회

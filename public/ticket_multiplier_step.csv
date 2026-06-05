@@ -1,0 +1,7 @@
+sort_order,multiplier,note
+1,1,입장 배수 단계(에너지 소모 = multiplier × energy_per_mult)
+2,2,
+3,5,
+4,10,
+5,50,
+6,100,

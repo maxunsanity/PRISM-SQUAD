@@ -38,3 +38,237 @@ canvas {
 button {
   font-family: inherit;
 }
+
+/* 장비 화면 캐릭터 idle 애니메이션 (위아래) */
+@keyframes prismIdleBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.prism-idle-char {
+  animation: prismIdleBob 1.6s ease-in-out infinite;
+}
+
+/* 장비 화면 총 idle 회전 — 5초마다 마지막 1초간 빠르게 2바퀴 */
+@keyframes prismGunSpin {
+  0%, 80%  { transform: rotate(0deg); }
+  100%     { transform: rotate(720deg); }
+}
+.prism-gun-spin {
+  animation: prismGunSpin 5s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+/* 장비 레벨업 팝업 VFX */
+@keyframes equipLvFlash {
+  0%   { opacity: 0;   transform: scale(0.5); }
+  20%  { opacity: 1;   transform: scale(1.2); }
+  100% { opacity: 0;   transform: scale(1.6); }
+}
+@keyframes equipLvRing {
+  0%   { opacity: 1;   transform: scale(0.4); }
+  100% { opacity: 0;   transform: scale(2.6); }
+}
+@keyframes equipLvParticle {
+  0%   { opacity: 1; transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(1.2); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(0.1); }
+}
+@keyframes equipLvStar {
+  0%   { opacity: 1; transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(0.3); }
+  40%  { opacity: 1; transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(-0.5 * var(--d))) scale(1.5); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(0.2); }
+}
+@keyframes equipLvFloatUp {
+  0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
+  18%  { opacity: 1; transform: translate(-50%, -6px) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1); }
+}
+@keyframes equipLvIconPop {
+  0%   { transform: scale(1);    filter: brightness(1); }
+  30%  { transform: scale(1.18); filter: brightness(1.6); }
+  65%  { transform: scale(0.96); filter: brightness(1.1); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+@keyframes equipLvModalPulse {
+  0%   { box-shadow: 0 4px 16px rgba(0,0,0,0.7); }
+  25%  { box-shadow: 0 0 50px rgba(255,214,0,0.75), 0 4px 24px rgba(0,0,0,0.7); }
+  100% { box-shadow: 0 4px 16px rgba(0,0,0,0.7); }
+}
+.equip-lv-vfx-root {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+.equip-lv-vfx-flash {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,230,100,0.95) 0%, rgba(255,180,0,0.4) 45%, transparent 70%);
+  animation: equipLvFlash 0.55s ease-out forwards;
+}
+.equip-lv-vfx-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,214,0,0.9);
+  box-shadow: 0 0 12px rgba(255,214,0,0.8);
+  animation: equipLvRing 0.65s ease-out forwards;
+}
+.equip-lv-vfx-ring--late {
+  animation-delay: 0.08s;
+  border-color: rgba(255,255,255,0.85);
+}
+.equip-lv-vfx-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: equipLvParticle 0.7s ease-out forwards;
+}
+.equip-lv-vfx-star {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: 14px;
+  line-height: 1;
+  animation: equipLvStar 0.75s ease-out forwards;
+}
+.equip-lv-vfx-label {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  font-size: 13px;
+  font-weight: 900;
+  color: #3d2800;
+  text-shadow: 0 0 8px #FFD600, 0 1px 0 #fff;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  animation: equipLvFloatUp 0.85s ease-out forwards;
+}
+.equip-lv-icon-pop {
+  animation: equipLvIconPop 0.5s ease-out;
+}
+.equip-lv-modal-pulse {
+  animation: equipLvModalPulse 0.55s ease-out;
+}
+
+.event-mileage-bar-fill {
+  transition: width 0.45s ease-out;
+}
+.event-fly-particle-wrap {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
+}
+.event-fly-amount {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+@keyframes eventGaugeTrackSuck {
+  0% { box-shadow: inset 0 0 0 0 rgba(61, 220, 132, 0); }
+  35% { box-shadow: inset 0 0 14px 3px rgba(61, 220, 132, 0.55); }
+  100% { box-shadow: inset 0 0 0 0 rgba(61, 220, 132, 0); }
+}
+.event-gauge-track-suck {
+  animation: eventGaugeTrackSuck 0.78s cubic-bezier(0.34, 1.25, 0.64, 1) forwards;
+}
+@keyframes eventCurrencyIconSuck {
+  0%, 100% { transform: scale(1); }
+  28% { transform: scale(1.14); }
+  52% { transform: scale(0.96); }
+  72% { transform: scale(1.05); }
+}
+.event-currency-icon-suck {
+  animation: eventCurrencyIconSuck 0.78s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+  transform-origin: center center;
+}
+@keyframes eventSeasonTabSuck {
+  0%, 100% { transform: scale(1); box-shadow: 1.5px 1.5px 0 #000000; }
+  30% { transform: scale(1.18); box-shadow: 0 0 12px 3px rgba(123, 232, 244, 0.75); }
+  55% { transform: scale(0.94); }
+  75% { transform: scale(1.06); }
+}
+.event-season-tab-suck {
+  animation: eventSeasonTabSuck 0.78s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+  transform-origin: center center;
+}
+@keyframes eventSeasonGainPop {
+  0% { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.8); }
+  18% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.08); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.92); }
+}
+.event-season-gain-pop {
+  animation: eventSeasonGainPop 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes eventTpGainPop {
+  0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+  18% { opacity: 1; transform: translateY(0) scale(1.08); }
+  100% { opacity: 0; transform: translateY(-14px) scale(0.92); }
+}
+.event-tp-gain-pop {
+  animation: eventTpGainPop 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes eventRewardSwapOut {
+  0% { opacity: 1; transform: scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: scale(0.15) rotate(-22deg); }
+}
+@keyframes eventRewardSwapIn {
+  0% { opacity: 0; transform: scale(0.3) rotate(14deg); }
+  55% { opacity: 1; transform: scale(1.12) rotate(-5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.event-reward-badge-swap-out {
+  animation: eventRewardSwapOut 0.26s cubic-bezier(0.55, 0.06, 0.68, 0.19) forwards;
+}
+.event-reward-badge-swap-in {
+  animation: eventRewardSwapIn 0.38s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+/* ── 보스 출현 연출 ── */
+@keyframes bossWarnPulse {
+  0%   { box-shadow: inset 0 0 140px 60px rgba(220,0,0,0.45); }
+  100% { box-shadow: inset 0 0 180px 80px rgba(255,0,0,0.7); }
+}
+@keyframes bossEyePulse {
+  0%   { transform: scale(1);    filter: drop-shadow(0 0 16px #CC00FF); }
+  100% { transform: scale(1.12); filter: drop-shadow(0 0 32px #FF44FF); }
+}
+@keyframes bossNameSlide {
+  0%   { opacity: 0; transform: translateY(24px) scale(0.85); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes bossShockFade {
+  0%   { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* ── 보스 사망 연출 ── */
+@keyframes bossDeathFlash {
+  0%   { opacity: 1; }
+  30%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@keyframes bossVictoryPop {
+  0%   { opacity: 0; transform: scale(0.6) translateY(20px); }
+  60%  { transform: scale(1.12) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes bossStarPop {
+  0%   { opacity: 0; transform: scale(0) rotate(-30deg); }
+  70%  { transform: scale(1.3) rotate(8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes bossDeathFadeOut {
+  0%   { background: rgba(0,0,0,0); }
+  100% { background: rgba(0,0,0,0.7); }
+}

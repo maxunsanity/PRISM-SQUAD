@@ -1,0 +1,6 @@
+step,threshold_lightning,reward_type,reward_amount,reward_icon,reward_label,reward_item_id
+1,100,gold,500,🪙,골드,
+2,200,lightning,5,⚡,번개,
+3,300,gem,10,💎,보석,
+4,400,gold,2000,🪙,골드,
+5,500,equip,1,👑,황금 왕관,prize_crown

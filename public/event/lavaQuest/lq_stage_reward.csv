@@ -1,0 +1,9 @@
+level,reward_type,reward_amount,reward_param,reward_icon,reward_label
+1,gold,500,,🪙,골드 500
+2,lightning,5,,🔋,번개 5
+3,gem,10,,💎,보석 10
+4,gold,1500,,🪙,골드 1.5K
+5,equip,1,lava_blade,⚔️,용암 검
+6,gem,30,,💎,보석 30
+7,gem,200,,💎,보석 200
+7,equip,1,prize_crown,👑,황금 왕관
