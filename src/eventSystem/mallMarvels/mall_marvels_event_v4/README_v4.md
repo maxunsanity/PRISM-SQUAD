@@ -12,12 +12,12 @@ doc_generation: mdv4
 
 ## 이 폴더 파일
 
-- `DESIGN_mall_marvels_v4.md`
-- `DEV_mall_marvels_v4.md`
-- `GAME_mall_marvels_v4.md`
+- `DESIGN_mall_marvels_event_v4.md`
+- `DEV_mall_marvels_event_v4.md`
+- `GAME_mall_marvels_event_v4.md`
 - `README_v4.md`
-- `RECIPE_CODE_mall_marvels.md`
-- `RECIPE_mall_marvels.md`
+- `RECIPE_CODE_mall_marvels_event.md`
+- `RECIPE_mall_marvels_event.md`
 
 ## 읽기 순서
 

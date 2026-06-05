@@ -41,31 +41,31 @@ condense_policy: forbidden
 
 ### B. 타이쿤·시즌 (선택)
 
-**경로:** `src/eventSystem/tycoonSeason/mdv4/`
+**경로:** `src/eventSystem/tycoonSeason/tycoon_season_event_v4/`
 
 | 파일 | 출처 |
 |------|------|
-| `GAME_tycoon_season_v4.md` | `tycoonSeason/GAME.md` |
-| `DEV_tycoon_season_v4.md` | `DEV.md` + CSV §14 |
-| `DESIGN_tycoon_season_v4.md` | HUD 슬롯 최소 |
-| `HANDOFF_tycoon_season_v4.md` | `HANDOFF.md` |
-| `RECIPE_tycoon_season.md` | 패턴 |
-| `RECIPE_CODE_tycoon_season.md` | EventBridge·EventController **전체** |
+| `GAME_tycoon_season_event_v4.md` | `tycoonSeason/GAME.md` |
+| `DEV_tycoon_season_event_v4.md` | `DEV.md` + CSV §14 |
+| `DESIGN_tycoon_season_event_v4.md` | HUD 슬롯 최소 |
+| `HANDOFF_tycoon_season_event_v4.md` | `HANDOFF.md` |
+| `RECIPE_tycoon_season_event.md` | 패턴 |
+| `RECIPE_CODE_tycoon_season_event.md` | EventBridge·EventController **전체** |
 
-### C. iframe 미니게임 (선택, mdv3→mdv4 복제)
+### C. iframe 미니게임 (선택, 원본→event_v4 복제)
 
 | 모듈 | v4 경로 | 세트 |
 |------|---------|------|
-| 라바 | `Lava Quest _game_end/mdv4/` | GAME·DESIGN·DEV·RECIPE·RECIPE_CODE + CSS |
-| 퍼즐 | `prize-drop_end/mdv4/` | 동일 |
-| 양궁 | `Archery Arena_game_end/mdv4/` | 동일 + HANDOFF |
+| 라바 | `Lava Quest _game_end/lava_quest_event_v4/` | GAME·DESIGN·DEV·RECIPE·RECIPE_CODE + CSS |
+| 퍼즐 | `prize-drop_end/prize_drop_event_v4/` | 동일 |
+| 양궁 | `Archery Arena_game_end/archery_arena_event_v4/` | 동일 + HANDOFF |
 
 ### D. 세일 (선택)
 
 | 모듈 | v4 경로 |
 |------|---------|
-| 마블 | `mallMarvels/mdv4/` |
-| 드라이버 | `driversJoy/mdv4/` |
+| 마블 | `mallMarvels/mall_marvels_event_v4/` |
+| 드라이버 | `driversJoy/drivers_joy_event_v4/` |
 
 GAME·DEV·DESIGN(최소)·RECIPE·RECIPE_CODE(Controller) + CSV §14
 

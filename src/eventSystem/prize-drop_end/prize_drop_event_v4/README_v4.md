@@ -12,12 +12,12 @@ doc_generation: mdv4
 
 ## 이 폴더 파일
 
-- `DESIGN_prize_drop_v4.md`
-- `DEV_prize_drop_v4.md`
-- `GAME_prize_drop_v4.md`
+- `DESIGN_prize_drop_event_v4.md`
+- `DEV_prize_drop_event_v4.md`
+- `GAME_prize_drop_event_v4.md`
 - `README_v4.md`
-- `RECIPE_CODE_prize_drop.md`
-- `RECIPE_prize_drop.md`
+- `RECIPE_CODE_prize_drop_event.md`
+- `RECIPE_prize_drop_event.md`
 
 ## 읽기 순서
 

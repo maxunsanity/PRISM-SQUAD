@@ -16,12 +16,12 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 | module_id | 유형 | v4 문서 (백화점) | 배포 CSV | 호스트 연결 | 없으면 |
 |-----------|------|------------------|----------|-------------|--------|
 | `core` | 필수 | `src/prism_squad_v4/` | `public/*.csv` | `App.tsx` · `GameCore` | — |
-| `tycoon_season` | 인게임 HUD | `src/eventSystem/tycoonSeason/mdv4/` | `public/event/tycoonSeason/` | `EventBridge` · `loadAllEventData` | `eventData=null` → HUD 없음 |
-| `lava` | iframe | `src/eventSystem/Lava Quest _game_end/mdv4/` | `public/event/lavaQuest/` | `eventMinigameHost` · `lq:start_attempt` | `showLavaQuest=false` 또는 미등록 |
-| `prize` | iframe | `src/eventSystem/prize-drop_end/mdv4/` | `public/event/prizeDrop/game_data/` | iframe · `event:grant` | `showPrizeDrop=false` |
-| `archery` | iframe | `src/eventSystem/Archery Arena_game_end/mdv4/` | `public/event/archeryArena/` | postMessage `aa:*` | `showArcheryArena=false` |
-| `mall_marvels` | 세일 React | `src/eventSystem/mallMarvels/mdv4/` | `public/event/mallMarvels/` | `SalesHostBridge` · `loadAllSalesEventData` | CSV 필수 (코드 폴백 없음) |
-| `drivers_joy` | 세일 React | `src/eventSystem/driversJoy/mdv4/` | `public/event/driversJoy/` | 동일 sales | 동일 |
+| `tycoon_season` | 인게임 HUD | `src/eventSystem/tycoonSeason/tycoon_season_event_v4/` | `public/event/tycoonSeason/` | `EventBridge` · `loadAllEventData` | `eventData=null` → HUD 없음 |
+| `lava` | iframe | `src/eventSystem/Lava Quest _game_end/lava_quest_event_v4/` | `public/event/lavaQuest/` | `eventMinigameHost` · `lq:start_attempt` | `showLavaQuest=false` 또는 미등록 |
+| `prize` | iframe | `src/eventSystem/prize-drop_end/prize_drop_event_v4/` | `public/event/prizeDrop/game_data/` | iframe · `event:grant` | `showPrizeDrop=false` |
+| `archery` | iframe | `src/eventSystem/Archery Arena_game_end/archery_arena_event_v4/` | `public/event/archeryArena/` | postMessage `aa:*` | `showArcheryArena=false` |
+| `mall_marvels` | 세일 React | `src/eventSystem/mallMarvels/mall_marvels_event_v4/` | `public/event/mallMarvels/` | `SalesHostBridge` · `loadAllSalesEventData` | CSV 필수 (코드 폴백 없음) |
+| `drivers_joy` | 세일 React | `src/eventSystem/driversJoy/drivers_joy_event_v4/` | `public/event/driversJoy/` | 동일 sales | 동일 |
 
 **성공 md (이벤트):** 라바·퍼즐·양궁 mdv3 → **mdv4에 전량 복제됨**. 코어는 **mdv4에서 처음 정리 중**.
 
@@ -46,7 +46,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 
 | 단계 | 작업 |
 |------|------|
-| 1 | `tycoonSeason/mdv4/` GAME·DEV·DESIGN·RECIPE·RECIPE_CODE 읽기 |
+| 1 | `tycoonSeason/tycoon_season_event_v4/` GAME·DEV·DESIGN·RECIPE·RECIPE_CODE 읽기 |
 | 2 | `App.tsx`: `loadAllEventData()` → `eventCatalog.validate(eventHudSpec)` → `setEventData` |
 | 3 | `useEffect`: `new EventBridge(eventData)` → `core.attachEventBridge(bridge)` |
 | 4 | JSX: `EventDataProvider` + `EventHudRenderer` slot=mileage/tournament/modal |
@@ -61,7 +61,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 
 | 단계 | 작업 |
 |------|------|
-| 1 | 해당 `…/mdv4/DEV_*` §4 json-render · §postMessage |
+| 1 | 해당 `…/<slug>_event_v4/DEV_*` §4 json-render · §postMessage |
 | 2 | `EventMinigameOverlay` + `openEventMinigame(id)` |
 | 3 | 로비 `EventMiniCards` — `EVENT_MINIGAME_ORDER` · `showFlag` hud 경로 |
 | 4 | 라바 전투: iframe `lq:start_attempt` → `suspendEventMinigame()` → `startLavaQuestMode()` |
@@ -80,7 +80,7 @@ scope: "코어 스퀘어에 선택 모듈을 붙이는 계약 — 있으면 붙�
 
 | 단계 | 작업 |
 |------|------|
-| 1 | `mallMarvels/mdv4/` · `driversJoy/mdv4/` 읽기 |
+| 1 | `mallMarvels/mall_marvels_event_v4/` · `driversJoy/drivers_joy_event_v4/` 읽기 |
 | 2 | `loadAllSalesEventData()` → `bindSalesToCore(core)` |
 | 3 | `SalesEventOverlay` — 좌측 탭 z48, 모달 z62 |
 | 4 | `SalesHostBridge`: gems · cash · `grantSalesRewards` |
@@ -120,7 +120,7 @@ PRISM 스퀘어 코어만 v4대로 구현해줘. (이벤트 md 읽지 마)
 ```
 
 ```
-PRISM 코어 구현 후, tycoonSeason/mdv4 문서 읽고 타이쿤 이벤트만 붙여줘.
+PRISM 코어 구현 후, tycoonSeason/tycoon_season_event_v4 문서 읽고 타이쿤 이벤트만 붙여줘.
 ```
 
 ```

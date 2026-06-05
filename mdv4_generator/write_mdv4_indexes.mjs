@@ -7,12 +7,12 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const FOLDERS = [
   { dir: 'src/prism_squad_v4', title: 'PRISM SQUAD Core', csv: 'public/*.csv (DEV §14·15)' },
-  { dir: 'src/eventSystem/tycoonSeason/mdv4', title: 'Tycoon Season', csv: 'public/event/tycoonSeason/' },
-  { dir: 'src/eventSystem/Lava Quest _game_end/mdv4', title: 'Lava Quest', csv: 'public/event/lavaQuest/' },
-  { dir: 'src/eventSystem/prize-drop_end/mdv4', title: 'Prize Drop', csv: 'public/event/prizeDrop/game_data/' },
-  { dir: 'src/eventSystem/Archery Arena_game_end/mdv4', title: 'Archery Arena', csv: 'public/event/archeryArena/' },
-  { dir: 'src/eventSystem/mallMarvels/mdv4', title: 'Mall Marvels', csv: 'public/event/mallMarvels/' },
-  { dir: 'src/eventSystem/driversJoy/mdv4', title: "Driver's Joy", csv: 'public/event/driversJoy/' },
+  { dir: 'src/eventSystem/tycoonSeason/tycoon_season_event_v4', title: 'Tycoon Season', csv: 'public/event/tycoonSeason/' },
+  { dir: 'src/eventSystem/Lava Quest _game_end/lava_quest_event_v4', title: 'Lava Quest', csv: 'public/event/lavaQuest/' },
+  { dir: 'src/eventSystem/prize-drop_end/prize_drop_event_v4', title: 'Prize Drop', csv: 'public/event/prizeDrop/game_data/' },
+  { dir: 'src/eventSystem/Archery Arena_game_end/archery_arena_event_v4', title: 'Archery Arena', csv: 'public/event/archeryArena/' },
+  { dir: 'src/eventSystem/mallMarvels/mall_marvels_event_v4', title: 'Mall Marvels', csv: 'public/event/mallMarvels/' },
+  { dir: 'src/eventSystem/driversJoy/drivers_joy_event_v4', title: "Driver's Joy", csv: 'public/event/driversJoy/' },
 ];
 
 for (const { dir, title, csv } of FOLDERS) {

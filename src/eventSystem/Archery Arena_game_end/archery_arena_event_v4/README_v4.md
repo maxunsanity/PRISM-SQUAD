@@ -2,23 +2,23 @@
 doc_generation: mdv4
 ---
 
-# Tycoon Season — mdv4 폴더 안내
+# Archery Arena — mdv4 폴더 안내
 
 | 항목 | 값 |
 |------|-----|
-| CSV SSoT | `public/event/tycoonSeason/` → **DEV §14** |
+| CSV SSoT | `public/event/archeryArena/` → **DEV §14** |
 | CSS | **DESIGN** 끝 Appendix (있는 모듈) |
 | 소스 | **RECIPE_CODE** = 추론 위험 구간 **샘플** (전 repo 아님) |
 
 ## 이 폴더 파일
 
-- `DESIGN_tycoon_season_v4.md`
-- `DEV_tycoon_season_v4.md`
-- `GAME_tycoon_season_v4.md`
-- `HANDOFF_tycoon_season_v4.md`
+- `DESIGN_archery_arena_event_v4.md`
+- `DEV_archery_arena_event_v4.md`
+- `GAME_archery_arena_event_v4.md`
+- `HANDOFF_archery_arena_event_v4.md`
 - `README_v4.md`
-- `RECIPE_CODE_tycoon_season.md`
-- `RECIPE_tycoon_season.md`
+- `RECIPE_CODE_archery_arena_event.md`
+- `RECIPE_archery_arena_event.md`
 
 ## 읽기 순서
 

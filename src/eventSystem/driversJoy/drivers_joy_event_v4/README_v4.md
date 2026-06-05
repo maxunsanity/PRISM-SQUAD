@@ -12,12 +12,12 @@ doc_generation: mdv4
 
 ## 이 폴더 파일
 
-- `DESIGN_drivers_joy_v4.md`
-- `DEV_drivers_joy_v4.md`
-- `GAME_drivers_joy_v4.md`
+- `DESIGN_drivers_joy_event_v4.md`
+- `DEV_drivers_joy_event_v4.md`
+- `GAME_drivers_joy_event_v4.md`
 - `README_v4.md`
-- `RECIPE_CODE_drivers_joy.md`
-- `RECIPE_drivers_joy.md`
+- `RECIPE_CODE_drivers_joy_event.md`
+- `RECIPE_drivers_joy_event.md`
 
 ## 읽기 순서
 

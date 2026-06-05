@@ -42,12 +42,12 @@ identity:
 
 | module_id | v4 폴더 |
 |-----------|---------|
-| tycoon_season | `src/eventSystem/tycoonSeason/mdv4/` |
-| lava | `src/eventSystem/Lava Quest _game_end/mdv4/` |
-| prize | `src/eventSystem/prize-drop_end/mdv4/` |
-| archery | `src/eventSystem/Archery Arena_game_end/mdv4/` |
-| mall_marvels | `src/eventSystem/mallMarvels/mdv4/` |
-| drivers_joy | `src/eventSystem/driversJoy/mdv4/` |
+| tycoon_season | `src/eventSystem/tycoonSeason/tycoon_season_event_v4/` |
+| lava | `src/eventSystem/Lava Quest _game_end/lava_quest_event_v4/` |
+| prize | `src/eventSystem/prize-drop_end/prize_drop_event_v4/` |
+| archery | `src/eventSystem/Archery Arena_game_end/archery_arena_event_v4/` |
+| mall_marvels | `src/eventSystem/mallMarvels/mall_marvels_event_v4/` |
+| drivers_joy | `src/eventSystem/driversJoy/drivers_joy_event_v4/` |
 
 ---
 

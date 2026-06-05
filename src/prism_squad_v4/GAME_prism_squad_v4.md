@@ -539,6 +539,6 @@ PRISM 본편과 **CSV·문서·코드가 분리**된 라이브 이벤트 모듈.
 | 문서 | 내용 |
 |------|------|
 | [`ATTACH_MODULES_v4.md`](./ATTACH_MODULES_v4.md) | 있으면 붙이는 이벤트·iframe·세일 절차 |
-| 각 이벤트 `mdv4/` | 검증된 이벤트 GAME·DEV·DESIGN·RECIPE·CSV |
+| 각 이벤트 `<slug>_event_v4/` | 검증된 이벤트 GAME·DEV·DESIGN·RECIPE·CSV |
 
 코어 단독 플레이 가능. 이벤트 md 없으면 해당 모듈 구현·연동 **생략**.

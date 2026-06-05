@@ -111,12 +111,12 @@ const attachInsert = `
 
 | module_id | v4 폴더 |
 |-----------|---------|
-| tycoon_season | \`src/eventSystem/tycoonSeason/mdv4/\` |
-| lava | \`src/eventSystem/Lava Quest _game_end/mdv4/\` |
-| prize | \`src/eventSystem/prize-drop_end/mdv4/\` |
-| archery | \`src/eventSystem/Archery Arena_game_end/mdv4/\` |
-| mall_marvels | \`src/eventSystem/mallMarvels/mdv4/\` |
-| drivers_joy | \`src/eventSystem/driversJoy/mdv4/\` |
+| tycoon_season | \`src/eventSystem/tycoonSeason/tycoon_season_event_v4/\` |
+| lava | \`src/eventSystem/Lava Quest _game_end/lava_quest_event_v4/\` |
+| prize | \`src/eventSystem/prize-drop_end/prize_drop_event_v4/\` |
+| archery | \`src/eventSystem/Archery Arena_game_end/archery_arena_event_v4/\` |
+| mall_marvels | \`src/eventSystem/mallMarvels/mall_marvels_event_v4/\` |
+| drivers_joy | \`src/eventSystem/driversJoy/drivers_joy_event_v4/\` |
 
 `;
 
@@ -140,7 +140,7 @@ if (!dev.includes('## 2. 선택 모듈 조립')) {
 const gamePath = path.join(MDV4, 'GAME_prism_squad_v4.md');
 let game = read(gamePath);
 if (!game.includes('ATTACH_MODULES_v4')) {
-  game += `\n\n---\n\n## 연동 모듈 (선택 — v4)\n\n| 문서 | 내용 |\n|------|------|\n| [\`ATTACH_MODULES_v4.md\`](./ATTACH_MODULES_v4.md) | 있으면 붙이는 이벤트·iframe·세일 절차 |\n| 각 이벤트 \`mdv4/\` | 검증된 이벤트 GAME·DEV·DESIGN·RECIPE·CSV |\n\n코어 단독 플레이 가능. 이벤트 md 없으면 해당 모듈 구현·연동 **생략**.\n`;
+  game += `\n\n---\n\n## 연동 모듈 (선택 — v4)\n\n| 문서 | 내용 |\n|------|------|\n| [\`ATTACH_MODULES_v4.md\`](./ATTACH_MODULES_v4.md) | 있으면 붙이는 이벤트·iframe·세일 절차 |\n| 각 이벤트 \`<slug>_event_v4/\` | 검증된 이벤트 GAME·DEV·DESIGN·RECIPE·CSV |\n\n코어 단독 플레이 가능. 이벤트 md 없으면 해당 모듈 구현·연동 **생략**.\n`;
   write(gamePath, game);
 }
 

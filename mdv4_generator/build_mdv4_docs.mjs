@@ -10,6 +10,18 @@ import { spawnSync } from 'child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ES = path.join(ROOT, 'src/eventSystem');
+const SOURCES = path.join(ROOT, 'mdv4_generator/sources');
+
+// 이벤트 출력 폴더명: <event>/<slug>_event_v4/
+function eventOutDir(folderName, slug) {
+  return path.join(ES, folderName, `${slug}_event_v4`);
+}
+// 파일명에 _event 삽입: *_v4.md→*_event_v4.md, README_v4.md 유지, 그 외 .md→_event.md
+function eventFileName(name) {
+  if (name === 'README_v4.md') return name;
+  if (/_v4\.md$/.test(name)) return name.replace(/_v4\.md$/, '_event_v4.md');
+  return name.replace(/\.md$/, '_event.md');
+}
 
 const V4_BANNER = `---
 doc_generation: mdv4
@@ -53,12 +65,11 @@ function csvAppendix(title, csvPaths) {
   return out;
 }
 
-function copyMdv3ToMdv4(folderName, csvPublicDir, extraCsvDirs = []) {
-  const base = path.join(ES, folderName);
-  const srcDir = path.join(base, 'mdv3');
-  const dstDir = path.join(base, 'mdv4');
+function copyMdv3ToMdv4(folderName, slug, csvPublicDir, extraCsvDirs = []) {
+  const srcDir = path.join(SOURCES, slug);
+  const dstDir = eventOutDir(folderName, slug);
   if (!fs.existsSync(srcDir)) {
-    console.warn('skip mdv3 missing', folderName);
+    console.warn('skip source missing', slug);
     return;
   }
   ensureDir(dstDir);
@@ -69,12 +80,8 @@ function copyMdv3ToMdv4(folderName, csvPublicDir, extraCsvDirs = []) {
   for (const name of fs.readdirSync(srcDir)) {
     if (!name.endsWith('.md')) continue;
     const src = path.join(srcDir, name);
-    const dstName = name.replace(/_v4\.md$/, '_v4.md').replace(/\.md$/, (m) => {
-      if (name.includes('_v4')) return m;
-      return '_v4.md';
-    });
-    // keep original filename in mdv4 (same as mdv3 names)
-    const dst = path.join(dstDir, name);
+    const dstName = eventFileName(name);
+    const dst = path.join(dstDir, dstName);
     let body = read(src);
     if (!body.startsWith('---\n')) body = V4_BANNER + body;
     else body = V4_BANNER + body.replace(/^---[\s\S]*?---\n\n?/, '');
@@ -115,17 +122,17 @@ function buildCoreMdv4() {
     if (dstName.startsWith('DEV_')) {
       body += csvAppendix('14. Host Core CSV Full Contents (public/*.csv)', coreCsvs);
       body += csvAppendix('15. Attached Event CSV Full Contents (public/event/*)', eventCsvs);
-      body += read(path.join(ROOT, 'src/eventSystem/SALES_EVENTS_PLAN.md'));
+      body += read(path.join(SOURCES, 'shared/SALES_EVENTS_PLAN.md'));
       body += '\n\n---\n\n';
-      body += read(path.join(ROOT, 'src/eventSystem/EVENT_MANAGEMENT.md'));
+      body += read(path.join(SOURCES, 'shared/EVENT_MANAGEMENT.md'));
     }
     write(path.join(dst, dstName), body);
   }
 
   // Host architecture doc
-  let hostArch = V4_BANNER + read(path.join(ROOT, 'HANDOFF.md'));
+  let hostArch = V4_BANNER + read(path.join(SOURCES, 'shared/HANDOFF.md'));
   hostArch += '\n\n---\n\n## Appendix. SALES_EVENTS_PLAN (full)\n\n';
-  hostArch += read(path.join(ROOT, 'src/eventSystem/SALES_EVENTS_PLAN.md'));
+  hostArch += read(path.join(SOURCES, 'shared/SALES_EVENTS_PLAN.md'));
   write(path.join(dst, 'HOST_ARCHITECTURE_v4.md'), hostArch);
 
   // RECIPE stub from GAME anti-patterns + DEV json-render
@@ -138,13 +145,13 @@ function buildCoreMdv4() {
   write(path.join(dst, 'RECIPE_CODE_prism_squad.md'), V4_BANNER + `# PRISM SQUAD Host — RECIPE_CODE.md (v4)\n\n> 구현 스니펫은 \`src/game/GameCore.ts\`, \`src/jsonRender/registry.tsx\`, \`src/App.tsx\` 를 SSoT로 복사. v4 DEV §9 EventBridge 참조.\n\n` + read(path.join(ROOT, 'src/DEV.md')).split('## 9. EventBridge')[1]?.split('## 10.')[0] || '');
 }
 
-function buildModuleFromLegacy(folder, prefix, files, csvPublicDir, extra = {}) {
-  const dst = path.join(ES, folder, 'mdv4');
+function buildModuleFromLegacy(folder, slug, files, csvPublicDir, extra = {}) {
+  const dst = eventOutDir(folder, slug);
   ensureDir(dst);
   const csvPaths = listCsv(path.join(ROOT, csvPublicDir));
 
   for (const [srcRel, dstName] of files) {
-    const srcPath = path.join(ROOT, srcRel);
+    const srcPath = path.join(SOURCES, slug, srcRel);
     let body = read(srcPath);
     if (!body) continue;
     body = V4_BANNER + body.replace(/^---[\s\S]*?---\n\n?/, '');
@@ -158,34 +165,34 @@ function buildModuleFromLegacy(folder, prefix, files, csvPublicDir, extra = {}) 
   }
 }
 
-// mdv3 clones
-copyMdv3ToMdv4('Lava Quest _game_end', 'public/event/lavaQuest');
-copyMdv3ToMdv4('prize-drop_end', 'public/event/prizeDrop/game_data', ['src/eventSystem/prize-drop_end/game_data']);
-copyMdv3ToMdv4('Archery Arena_game_end', 'public/event/archeryArena', ['src/eventSystem/Archery Arena_game_end']);
+// 이벤트 원본(mdv4_generator/sources/<slug>/) clones
+copyMdv3ToMdv4('Lava Quest _game_end', 'lava_quest', 'public/event/lavaQuest');
+copyMdv3ToMdv4('prize-drop_end', 'prize_drop', 'public/event/prizeDrop/game_data', ['src/eventSystem/prize-drop_end/game_data']);
+copyMdv3ToMdv4('Archery Arena_game_end', 'archery_arena', 'public/event/archeryArena', ['src/eventSystem/Archery Arena_game_end']);
 
 buildCoreMdv4();
 
-buildModuleFromLegacy('tycoonSeason', 'tycoon', [
-  ['src/eventSystem/tycoonSeason/GAME.md', 'GAME_tycoon_season_v4.md'],
-  ['src/eventSystem/tycoonSeason/DESIGN.md', 'DESIGN_tycoon_season_v4.md'],
-  ['src/eventSystem/tycoonSeason/DEV.md', 'DEV_tycoon_season_v4.md'],
-  ['src/eventSystem/tycoonSeason/HANDOFF.md', 'HANDOFF_tycoon_season_v4.md'],
+buildModuleFromLegacy('tycoonSeason', 'tycoon_season', [
+  ['GAME.md', 'GAME_tycoon_season_event_v4.md'],
+  ['DESIGN.md', 'DESIGN_tycoon_season_event_v4.md'],
+  ['DEV.md', 'DEV_tycoon_season_event_v4.md'],
+  ['HANDOFF.md', 'HANDOFF_tycoon_season_event_v4.md'],
 ], 'public/event/tycoonSeason');
 
-buildModuleFromLegacy('mallMarvels', 'mm', [
-  ['src/eventSystem/mallMarvels/GAME.md', 'GAME_mall_marvels_v4.md'],
-  ['src/eventSystem/mallMarvels/DESIGN.md', 'DESIGN_mall_marvels_v4.md'],
-  ['src/eventSystem/mallMarvels/DEV.md', 'DEV_mall_marvels_v4.md'],
+buildModuleFromLegacy('mallMarvels', 'mall_marvels', [
+  ['GAME.md', 'GAME_mall_marvels_event_v4.md'],
+  ['DESIGN.md', 'DESIGN_mall_marvels_event_v4.md'],
+  ['DEV.md', 'DEV_mall_marvels_event_v4.md'],
 ], 'public/event/mallMarvels');
 
-buildModuleFromLegacy('driversJoy', 'dj', [
-  ['src/eventSystem/driversJoy/GAME.md', 'GAME_drivers_joy_v4.md'],
-  ['src/eventSystem/driversJoy/DESIGN.md', 'DESIGN_drivers_joy_v4.md'],
-  ['src/eventSystem/driversJoy/DEV.md', 'DEV_drivers_joy_v4.md'],
+buildModuleFromLegacy('driversJoy', 'drivers_joy', [
+  ['GAME.md', 'GAME_drivers_joy_event_v4.md'],
+  ['DESIGN.md', 'DESIGN_drivers_joy_event_v4.md'],
+  ['DEV.md', 'DEV_drivers_joy_event_v4.md'],
 ], 'public/event/driversJoy');
 
 console.log('mdv4 build done — entry: .cursor/skills/prism-squad-v4/SKILL.md');
 // 코어 CSS·RECIPE_CODE·ATTACH 보강
-spawnSync('node', ['scripts/enrich_core_mdv4.mjs'], { cwd: ROOT, stdio: 'inherit' });
-spawnSync('node', ['scripts/enrich_events_mdv4.mjs'], { cwd: ROOT, stdio: 'inherit' });
-spawnSync('node', ['scripts/write_mdv4_indexes.mjs'], { cwd: ROOT, stdio: 'inherit' });
+spawnSync('node', ['mdv4_generator/enrich_core_mdv4.mjs'], { cwd: ROOT, stdio: 'inherit' });
+spawnSync('node', ['mdv4_generator/enrich_events_mdv4.mjs'], { cwd: ROOT, stdio: 'inherit' });
+spawnSync('node', ['mdv4_generator/write_mdv4_indexes.mjs'], { cwd: ROOT, stdio: 'inherit' });
