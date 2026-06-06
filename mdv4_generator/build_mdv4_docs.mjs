@@ -100,7 +100,7 @@ function buildCoreMdv4() {
   const dst = path.join(ROOT, 'src/prism_squad_v4');
   ensureDir(dst);
 
-  const coreCsvDir = path.join(ROOT, 'public');
+  const coreCsvDir = path.join(ROOT, 'public/tables');
   const coreCsvs = listCsv(coreCsvDir);
   const eventCsvs = [
     ...listCsv(path.join(ROOT, 'public/event/tycoonSeason')),
@@ -120,7 +120,7 @@ function buildCoreMdv4() {
     let body = read(path.join(SOURCES, 'core', srcName));
     body = V4_BANNER + body;
     if (dstName.startsWith('DEV_')) {
-      body += csvAppendix('14. Host Core CSV Full Contents (public/*.csv)', coreCsvs);
+      body += csvAppendix('14. Host Core CSV Full Contents (public/tables/*.csv)', coreCsvs);
       body += csvAppendix('15. Attached Event CSV Full Contents (public/event/*)', eventCsvs);
       body += read(path.join(SOURCES, 'shared/SALES_EVENTS_PLAN.md'));
       body += '\n\n---\n\n';

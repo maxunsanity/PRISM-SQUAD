@@ -494,10 +494,10 @@ event_id,event_name,group_size,min_level,event_duration_hours,daily_free_attempt
 config_key,config_value,description
 tournament_round_min,30,토너먼트 1라운드 길이(분). endMs = now + 이 값
 bot_tick_ms,60000,봇 점수 갱신 간격(ms). 0이면 aa_event_config bot_tick_min_ms~max 랜덤
-shots_per_bow,5,[레거시·미사용] 구 1활대=5발 모델. 현재 1발=1재화 + 라운드당 1~5발 선택(runRound n)
+shots_per_bow,5,활대 1개 소비 시 WebGL 연속 발사 횟수(SET5 점수표 사용)
 event_meta_version,3,aa_event_meta localStorage v (불일치 시 메타 리셋)
-starter_bow_stands,5,[레거시·미사용] 기본 발 지급은 combat_tuning.csv archery_starter_bows 사용
-kills_per_bow_host,100,[레거시·미사용] 발 수급은 event_minigame_acquire_config.csv(일반 200 보스 2) 사용
+starter_bow_stands,5,PRISM 호스트 최초·마이그레이션 지급 활대 개수
+kills_per_bow_host,100,PRISM 스퀘어 적 처치 N마리당 활대 +1
 storage_key_prism_host,prism_archery_host_v1,호스트 재화·수령대기 저장 키
 storage_key_player,aa_player_state,iframe 플레이어 점수·순위 저장 키
 storage_key_event_meta,aa_event_meta,iframe 토너먼트 라운드 종료·claimPending
@@ -518,69 +518,6 @@ reward_config_id,event_id,rank_min,rank_max,reward_grade,reward_bundle_id
 ```
 
 ### `public/event/archeryArena/aa_visual_config.csv`
-
-```csv
-visual_config_id,event_id,arrow_flight_ms,trail_fade_ms,hit_ring_pulse_ms,score_popup_total_ms,bullseye_particle_count,bullseye_particle_radius_px,bullseye_particle_duration_ms,bullseye_countup_ms,ortho_view_half_height,backdrop_sprite_url,outer_sprite_url,middle_sprite_url,center_sprite_url,bullseye_sprite_url
-1,1,300,500,200,1000,15,100,1500,800,10,,,,,
-```
-
-### `src/eventSystem/Archery Arena_game_end/aa_attempt_config.csv`
-
-```csv
-attempt_id,event_id,attempt_type,label,cost_dice,score_min,score_max,attempt_multiplier,hit_zone,has_set_bonus,sprite_url
-1,1,SINGLE,1회 단독 시도,1,1,3,1.0,OUTER,false,
-2,1,SET3,3회 세트 시도,3,5,10,1.5,MIDDLE,true,
-3,1,SET5,5회 세트 시도,5,20,50,2.5,CENTER,true,
-```
-
-### `src/eventSystem/Archery Arena_game_end/aa_bundle_reward_config.csv`
-
-```csv
-bundle_id,reward_kind,reward_amount,reward_slot_id,note
-2001,gem,120,,순위 1위 GRAND
-2002,gem,80,,순위 2~3위 HIGH
-2003,gem,50,,순위 4~10위 MIDDLE
-2004,gold,5000,,순위 11~20위 BASIC
-2005,gold,2000,,순위 21~50위 ENTRY
-```
-
-### `src/eventSystem/Archery Arena_game_end/aa_event_config.csv`
-
-```csv
-event_id,event_name,group_size,min_level,event_duration_hours,daily_free_attempts,bullseye_base_prob,bullseye_max_prob,bullseye_combo_increment,bot_tick_min_ms,bot_tick_max_ms
-1,양궁 아레나 시즌1,50,20,48,1,0.05,0.15,0.01,8000,15000
-```
-
-### `src/eventSystem/Archery Arena_game_end/aa_integration_config.csv`
-
-```csv
-config_key,config_value,description
-tournament_round_min,30,토너먼트 1라운드 길이(분). endMs = now + 이 값
-bot_tick_ms,60000,봇 점수 갱신 간격(ms). 0이면 aa_event_config bot_tick_min_ms~max 랜덤
-shots_per_bow,5,활대 1개 소비 시 WebGL 연속 발사 횟수(SET5 점수표 사용)
-event_meta_version,3,aa_event_meta localStorage v (불일치 시 메타 리셋)
-starter_bow_stands,5,PRISM 호스트 최초·마이그레이션 지급 활대 개수
-kills_per_bow_host,100,PRISM 스퀘어 적 처치 N마리당 활대 +1
-storage_key_prism_host,prism_archery_host_v1,호스트 재화·수령대기 저장 키
-storage_key_player,aa_player_state,iframe 플레이어 점수·순위 저장 키
-storage_key_event_meta,aa_event_meta,iframe 토너먼트 라운드 종료·claimPending
-iframe_deploy_base,/event/archeryArena/,Vite base URL·CSV fetch 기준 경로
-minigame_id,archery,eventMinigameRegistry 슬롯 id
-minigame_src,/event/archeryArena/index.html,iframe src
-```
-
-### `src/eventSystem/Archery Arena_game_end/aa_rank_reward_config.csv`
-
-```csv
-reward_config_id,event_id,rank_min,rank_max,reward_grade,reward_bundle_id
-1,1,1,1,GRAND,2001
-2,1,2,3,HIGH,2002
-3,1,4,10,MIDDLE,2003
-4,1,11,20,BASIC,2004
-5,1,21,50,ENTRY,2005
-```
-
-### `src/eventSystem/Archery Arena_game_end/aa_visual_config.csv`
 
 ```csv
 visual_config_id,event_id,arrow_flight_ms,trail_fade_ms,hit_ring_pulse_ms,score_popup_total_ms,bullseye_particle_count,bullseye_particle_radius_px,bullseye_particle_duration_ms,bullseye_countup_ms,ortho_view_half_height,backdrop_sprite_url,outer_sprite_url,middle_sprite_url,center_sprite_url,bullseye_sprite_url

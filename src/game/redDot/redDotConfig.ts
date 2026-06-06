@@ -1,6 +1,6 @@
 import type { RedDotCategory, RedDotConfigRow } from './types';
 
-const CSV_PATH = '/red_dot_config.csv';
+const CSV_PATH = '/tables/red_dot_config.csv';
 
 function parseCsv(text: string): Record<string, string>[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim());

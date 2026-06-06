@@ -1,6 +1,0 @@
-reward_config_id,event_id,rank_min,rank_max,reward_grade,reward_bundle_id
-1,1,1,1,GRAND,2001
-2,1,2,3,HIGH,2002
-3,1,4,10,MIDDLE,2003
-4,1,11,20,BASIC,2004
-5,1,21,50,ENTRY,2005

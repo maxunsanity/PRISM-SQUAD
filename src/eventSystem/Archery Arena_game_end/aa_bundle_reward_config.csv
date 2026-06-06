@@ -1,6 +1,0 @@
-bundle_id,reward_kind,reward_amount,reward_slot_id,note
-2001,gem,120,,순위 1위 GRAND
-2002,gem,80,,순위 2~3위 HIGH
-2003,gem,50,,순위 4~10위 MIDDLE
-2004,gold,5000,,순위 11~20위 BASIC
-2005,gold,2000,,순위 21~50위 ENTRY

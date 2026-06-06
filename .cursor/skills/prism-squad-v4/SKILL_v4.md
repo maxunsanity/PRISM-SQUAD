@@ -30,7 +30,7 @@ paths:
 ## When to Use
 
 - PRISM 코어 또는 라바/퍼즐/양궁/타이쿤/세일 모듈을 **처음부터** 맞춰 구현할 때
-- `mdv4/` · `public/*.csv` · json-render 3종 세트를 수정할 때
+- `mdv4/` · `public/tables/*.csv` · json-render 3종 세트를 수정할 때
 - 호스트 `GameCore` ↔ iframe `postMessage` 연동을 건드릴 때
 - v4 문서를 재생성할 때: `node mdv4_generator/build_mdv4_docs.mjs`
 
@@ -42,7 +42,7 @@ paths:
 ┌─────────────────────────────────────────────────────────────┐
 │  HOST: PRISM SQUAD (스퀘어 코어)                              │
 │  src/prism_squad_v4/          ← GAME·DESIGN·DEV·RECIPE·HOST_ARCHITECTURE │
-│  public/*.csv       ← 서바이벌·로비·상점·장비…                  │
+│  public/tables/*.csv       ← 서바이벌·로비·상점·장비…                  │
 │  json-render: prismHudSpec + registry.tsx                    │
 │  Three.js: GameCore + SkillSystem + EnemySystem              │
 └───────────────────────────┬─────────────────────────────────┘
@@ -56,7 +56,7 @@ paths:
 
 | 레이어 | 재현 단위 | v4 폴더 | CSV SSoT |
 |--------|-----------|---------|----------|
-| **A. 코어** | 로비·전투·상점·장비·도전·진화 | `src/prism_squad_v4/` | `public/*.csv` |
+| **A. 코어** | 로비·전투·상점·장비·도전·진화 | `src/prism_squad_v4/` | `public/tables/*.csv` |
 | **B. 인게임 이벤트** | 타이쿤·시즌·익스프레스 | `src/eventSystem/tycoonSeason/tycoon_season_event_v4/` | `public/event/tycoonSeason/` |
 | **C. iframe 미니게임** | 라바·퍼즐·양궁 | `…/Lava Quest…/lava_quest_event_v4/` 등 | `public/event/{lavaQuest,prizeDrop,archeryArena}/` |
 | **D. 세일** | 마블·드라이버 | `mallMarvels/mall_marvels_event_v4/`, `driversJoy/drivers_joy_event_v4/` | `public/event/mallMarvels/`, `driversJoy/` |
@@ -73,7 +73,7 @@ paths:
 4. `src/prism_squad_v4/DEV_prism_squad_v4.md`
 5. `src/prism_squad_v4/RECIPE_prism_squad.md` (있으면)
 6. `src/prism_squad_v4/RECIPE_CODE_prism_squad.md` (있으면)
-7. `public/*.csv` — DEV **§14·§15** 전문과 동일. **수치 임의 변경 금지**
+7. `public/tables/*.csv` — DEV **§14·§15** 전문과 동일. **수치 임의 변경 금지**
 8. **7항목 요약** (§2) → 사용자 시작 지시 후 코딩
 
 ### 1-B. 부착 모듈만 (예: 라바)

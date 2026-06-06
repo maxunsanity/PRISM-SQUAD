@@ -5,6 +5,12 @@ note: "v4는 mdv3와 별도 폴더. v5 diff용 — 절대 요약·삭제 금지.
 ui_pixel_precision: "DESIGN·외부 팀. DEV는 json-render 슬롯·$state·DOM 순서·CSV SSoT만."
 ---
 
+## 🎯 레퍼런스 (제작 기준 게임)
+
+> **퍼즐 드랍 = Monopoly GO "Peg-E Prize Drop" (플린코/펙 드롭)류.**
+>
+> ⚠️ 레퍼런스는 톤·조작감·연출 **참고용**. 모든 수치·구조·UI·플로우의 단일 진실(SSoT)은 이 문서 세트(GAME·DESIGN·DEV·CSV)다. **충돌 시 문서 우선**, 임의 추가·생략 금지.
+
 ## Design Pillars
 
 **서버 결정, 클라이언트 연출** — 결과는 bank JSON에 사전 저장된다. 플레이어가 보는 공의 움직임은 연출이다. 물리 수치를 건드리면 bank와 보드가 불일치해 공이 핀을 뚫고 지나간다.

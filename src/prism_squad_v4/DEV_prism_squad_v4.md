@@ -450,11 +450,11 @@ LLE 연동 시 해당. 코어 게임 로직은 무관.
 
 ---
 
-## 14. Host Core CSV Full Contents (public/*.csv)
+## 14. Host Core CSV Full Contents (public/tables/*.csv)
 
 > **배포 SSoT.** AI는 이 내용을 임의 변경하지 말 것. 파일이 repo에 있으면 fetch 경로 그대로 사용.
 
-### `public/adventure_config.csv`
+### `public/tables/adventure_config.csv`
 
 ```csv
 level,exp_required,reward_gem,reward_gold
@@ -475,7 +475,7 @@ level,exp_required,reward_gem,reward_gold
 15,26200,80,5000
 ```
 
-### `public/boss_config.csv`
+### `public/tables/boss_config.csv`
 
 ```csv
 boss_id,boss_name,is_mini_boss,boss_type,arena_size_w,arena_size_h,hp,speed,radius,contact_dmg,contact_dmg_interval_frames,puddle_interval_frames,puddle_radius,puddle_life_frames,puddle_dmg,puddle_dmg_interval_frames,missile_count,missile_interval_frames,missile_speed,missile_turn_rate,missile_max_range,missile_spread_angle,spawn_time_seconds,spawn_offset_y,clear_minions_on_intro,suppress_wave_spawn,geometry_type,color_hex,glow_color_hex,sprite_url
@@ -484,7 +484,7 @@ nexus,NEXUS,true,stationary_missile,360,420,150,0,42,0,0,0,0,0,0,0,3,90,3.8,1.8,
 titan,TITAN,false,moving,0,0,300,1.0,26,8,20,130,50,200,2,30,0,0,0,0,0,0,600,320,1,0,TorusGeometry,#3D2060,#6600FF,assets/boss/titan.png
 ```
 
-### `public/boss_pattern_config.csv`
+### `public/tables/boss_pattern_config.csv`
 
 ```csv
 boss_id,key,value,note
@@ -550,7 +550,7 @@ host,boss_death_phase2_ms,700,VICTORY 텍스트
 host,boss_death_phase3_ms,2200,페이드아웃 시작
 ```
 
-### `public/challenge_config.csv`
+### `public/tables/challenge_config.csv`
 
 ```csv
 challenge_id,stage,difficulty,difficulty_name,enemy_hp_mult,enemy_dmg_mult,reward_dna,reward_gold,prereq_id
@@ -586,7 +586,7 @@ challenge_id,stage,difficulty,difficulty_name,enemy_hp_mult,enemy_dmg_mult,rewar
 30,10,3,헬,11.3,4.3,60,8000,29
 ```
 
-### `public/combat_tuning.csv`
+### `public/tables/combat_tuning.csv`
 
 ```csv
 key,value,note
@@ -640,14 +640,14 @@ spawn_move_side_weight,0.30,이동 중 스폰 측면 비율
 spawn_move_speed_threshold,0.12,방향성 스폰·요격 최소 입력
 ```
 
-### `public/control_config.csv`
+### `public/tables/control_config.csv`
 
 ```csv
 joystick_ring_diameter,joystick_knob_diameter,joystick_max_dist,joystick_z_index,joystick_ring_opacity,joystick_knob_opacity,keyboard_diagonal_normalize
 100,40,40,5,0.4,0.7,false
 ```
 
-### `public/drop_config.csv`
+### `public/tables/drop_config.csv`
 
 ```csv
 drop_id,drop_type,drop_weight,effect_value,pickup_radius,geometry_type,color_hex,size_small,size_medium,size_large,sprite_url
@@ -659,7 +659,7 @@ magnet,magnet,0.06,4,28,HalfTorusGeometry,#C099FF,0,0,0,
 bomb,bomb,0.015,0,28,IcosahedronGeometry,#FF6680,0,0,0,
 ```
 
-### `public/element_config.csv`
+### `public/tables/element_config.csv`
 
 ```csv
 element,element_name,icon,color_hex,effect_type,duration_sec,magnitude,tick_interval_sec,max_stacks
@@ -670,7 +670,7 @@ beam,광선,✨,#66FFFF,pierce,0,0,0,0
 electric,전기,⚡,#CC88FF,chain,0,0,0,0
 ```
 
-### `public/enemy_config.csv`
+### `public/tables/enemy_config.csv`
 
 ```csv
 enemy_id,enemy_name,hp,damage_reduction,speed,radius,contact_dmg,contact_dmg_interval_frames,exp_drop_type,gold_drop,weight,geometry_type,color_hex,has_glow,glow_color_hex,sprite_url
@@ -680,7 +680,7 @@ bloater,블로터,30,0.24,0.50,19,4,20,medium,4,2.5,CylinderGeometry,#FFBA66,tru
 spitter,스피터,18,0.14,0.60,9,4,20,medium,3,0.9,BoxGeometry,#B899FF,true,#8833FF,
 ```
 
-### `public/equipment_config.csv`
+### `public/tables/equipment_config.csv`
 
 ```csv
 slot_id,slot_name,item_name,icon,grade,stat_type,effect_per_level,max_level,base_gold_cost,gold_cost_scale,description,skill_id
@@ -696,7 +696,7 @@ lava_blade,WEAPON,용암 검,⚔️,LEGEND,power,0.07,10,300,1.5,"화염을 휘�
 prize_crown,NECKLACE,황금 왕관,👑,LEGEND,power,0.06,10,300,1.5,"부의 상징 황금 왕관",
 ```
 
-### `public/event_minigame_acquire_config.csv`
+### `public/tables/event_minigame_acquire_config.csv`
 
 ```csv
 minigame_id,target_type,kills_required,reward_label,left_icon_key,reward_icon_key,sort_order,enabled,row_title
@@ -706,7 +706,7 @@ archery,normal,200,1발,enemy_normal,archery_bow,1,1,일반 몬스터
 archery,boss,2,1발,enemy_boss,archery_bow,2,1,보스
 ```
 
-### `public/event_minigame_host_config.csv`
+### `public/tables/event_minigame_host_config.csv`
 
 ```csv
 id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,duration_hours,enabled
@@ -715,7 +715,7 @@ prize,퍼즐,🎰,#B388FF,/event/prizeDrop/index.html,/lobby/prizeBalls,0,개,/l
 archery,양궁,🏹,#7EC8A8,/event/archeryArena/index.html,/lobby/archeryBowStands,0,발,/lobby/showArcheryArena,"aa_player_state|aa_event_meta|aa_ranking_bots|aa_ranking_dummy_schema",48,1
 ```
 
-### `public/event_minigame_kill_reward_config.csv`
+### `public/tables/event_minigame_kill_reward_config.csv`
 
 ```csv
 enemy_id,lava_base,prize_base,archery_base,is_boss
@@ -727,7 +727,7 @@ mini_boss,1,1,1,true
 final_boss,1,1,1,true
 ```
 
-### `public/evolution_config.csv`
+### `public/tables/evolution_config.csv`
 
 ```csv
 evo_id,order,branch,node_name,node_title,node_description,icon,ability_type,effect_value,cost_type,cost_amount,prereq_id
@@ -744,7 +744,7 @@ evo_id,order,branch,node_name,node_title,node_description,icon,ability_type,effe
 103,7,1,고출력 자석,고출력 자석,드롭 수집 반경을 크게 늘립니다.,🧲,magnet,0.40,dna,25,7
 ```
 
-### `public/formation_spawn_config.csv`
+### `public/tables/formation_spawn_config.csv`
 
 ```csv
 formation_id,start_time_seconds,enemy_id,count,start_offset_y,col_spacing,row_spacing,move_sec,fire_sec,march_speed_mult,enabled
@@ -759,7 +759,7 @@ formation_id,start_time_seconds,enemy_id,count,start_offset_y,col_spacing,row_sp
 9,550,spitter,20,340,34,30,1.9,1.1,0.98,1
 ```
 
-### `public/guardian_runtime_config.csv`
+### `public/tables/guardian_runtime_config.csv`
 
 ```csv
 key,value,note
@@ -784,7 +784,7 @@ eternal_orbit_per_level,4,eternal 레벨당 궤도 +
 eternal_blade_w,19,eternal 블레이드 W
 ```
 
-### `public/lava_quest_host_config.csv`
+### `public/tables/lava_quest_host_config.csv`
 
 ```csv
 level_min,level_max,boss_id,boss_spawn_sec_override,note
@@ -793,7 +793,7 @@ level_min,level_max,boss_id,boss_spawn_sec_override,note
 5,7,titan,50,
 ```
 
-### `public/level_config.csv`
+### `public/tables/level_config.csv`
 
 ```csv
 level,exp_required,exp_scale_rate
@@ -834,7 +834,7 @@ level,exp_required,exp_scale_rate
 35,3011,1.145
 ```
 
-### `public/levelup_rule_config.csv`
+### `public/tables/levelup_rule_config.csv`
 
 ```csv
 key,value,note
@@ -845,7 +845,7 @@ evo_first_in_list,1,1=진화 카드를 목록 맨 앞에 배치
 normal_shuffle,1,1=일반 스킬 후보 셔플
 ```
 
-### `public/lucky_train_config.csv`
+### `public/tables/lucky_train_config.csv`
 
 ```csv
 skill_id,gold_cost
@@ -870,14 +870,14 @@ energyCube,140
 fitnessGuide,140
 ```
 
-### `public/map_config.csv`
+### `public/tables/map_config.csv`
 
 ```csv
 map_id,map_width,map_height,camera_zoom,spawn_radius_min,spawn_radius_max,boundary_color_hex,boundary_opacity,grid_color_hex,grid_interval,floor_color_hex,ambient_light_color,ambient_light_intensity,dir_light_color,dir_light_intensity,boss_ambient_color,boss_ambient_transition_seconds,bg_sprite_url
 default,3000,3000,60,120,200,#FF4444,0.5,#D0D0D8,60,#F0EDE8,#ffffff,0.6,#ffffff,0.8,#3D0080,2.0,
 ```
 
-### `public/meta_config.csv`
+### `public/tables/meta_config.csv`
 
 ```csv
 key,value,note
@@ -895,7 +895,7 @@ cooldown_mult_min,0.2,각성 쿨감 하한
 avatar_profile_limit,16,캐릭터 선택 슬롯 수(4×4)
 ```
 
-### `public/player_config.csv`
+### `public/tables/player_config.csv`
 
 ```csv
 player_id,max_hp,base_speed,radius,invincible_frames,geometry_size,color_hex,glow_intensity,hp_bar_low_threshold,sprite_url
@@ -931,7 +931,7 @@ char_28,215,2.5,12,30,20,#E0115F,1.9,0.5,
 char_29,225,2.5,12,30,20,#0F52BA,1.9,0.5,
 ```
 
-### `public/player_visual_config.csv`
+### `public/tables/player_visual_config.csv`
 
 ```csv
 key,value,note
@@ -979,7 +979,7 @@ debuff_particle_orbit_speed_base,2.5,공전 속도 기본
 debuff_particle_orbit_speed_step,0.6,파티클마다 속도 증가
 ```
 
-### `public/projectile_config.csv`
+### `public/tables/projectile_config.csv`
 
 ```csv
 projectile_id,shape,color_hex,size_mult,speed_mult,life_seconds,pierce,bounce_enemy,bounce_screen,bounce_count,homing_turn_rate,gravity
@@ -999,7 +999,7 @@ p_auto_shotgun,sphere,#FFB347,0.8,1.1,1.4,0,0,0,0,0.0,0
 p_auto_drill,cone,#00DDFF,1.6,0.9,2.5,1,0,0,0,0.0,0
 ```
 
-### `public/red_dot_config.csv`
+### `public/tables/red_dot_config.csv`
 
 ```csv
 dot_id,category,enabled,hud_path,resolver_key,min_int,bubble_to,note
@@ -1036,7 +1036,7 @@ nav_challenge,action,1,/redDot/nav/challenge,aggregate_nav_challenge,0,,도전 �
 nav_evolution,action,1,/redDot/nav/evolution,aggregate_nav_evolution,0,,진화 탭 집계
 ```
 
-### `public/renderer_config.csv`
+### `public/tables/renderer_config.csv`
 
 ```csv
 key,value,note
@@ -1048,7 +1048,7 @@ max_frame_dt_sec,0.05,프레임 dt 상한(초)
 pixel_ratio_cap,2,devicePixelRatio 상한
 ```
 
-### `public/rush_config.csv`
+### `public/tables/rush_config.csv`
 
 ```csv
 rush_id,start_time_seconds,warning_sec,spawn_count_base,spawn_count_per_stage,spawn_count_max,ring_radius,ring_radius_jitter,rate_dog,rate_basic,rate_spitter,formation,respect_max_enemies,enabled
@@ -1060,14 +1060,14 @@ rush_id,start_time_seconds,warning_sec,spawn_count_base,spawn_count_per_stage,sp
 12,600,3,18,1,24,320,0,0.0,0.0,1.0,column,0,1
 ```
 
-### `public/rush_cycle_config.csv`
+### `public/tables/rush_cycle_config.csv`
 
 ```csv
 rush_id,warning_sec,spawn_count_base,spawn_count_per_stage,spawn_count_max,ring_radius,ring_radius_jitter,rate_dog,rate_basic,rate_spitter,formation,respect_max_enemies,enabled,note
 0,1,48,6,120,320,80,0.6,0.25,0.15,ring,0,1,주기형 러시(GameCore._buildCycleRushWave) — start_time은 런타임
 ```
 
-### `public/shop_box.csv`
+### `public/tables/shop_box.csv`
 
 ```csv
 box_id,sort_order,label,subtitle,gem_cost,key_cost,pity_max,pity_force_grade,key_bonus_chance,banner_title,banner_desc,enabled
@@ -1075,7 +1075,7 @@ resource,1,군 자원상자,일반·우수 장비,80,0,0,,0,,,1
 defense,2,지구 방위 보급품,10회 내 엘리트,80,1,10,EPIC,0.08,S급 군 지원품,10회 내 반드시 엘리트 장비 · 천장 시 EPIC,1
 ```
 
-### `public/shop_box_grade.csv`
+### `public/tables/shop_box_grade.csv`
 
 ```csv
 box_id,equipment_grade,weight,grant_fallback_gold
@@ -1086,7 +1086,7 @@ defense,EPIC,40,2500
 defense,LEGEND,25,4000
 ```
 
-### `public/shop_gem_pack.csv`
+### `public/tables/shop_gem_pack.csv`
 
 ```csv
 pack_id,sort_order,label,gems,bonus_gems,price_krw,enabled
@@ -1098,7 +1098,7 @@ gem_6500,5,보석 한 바구니,6500,6500,75000,1
 gem_14000,6,보석 한 상자,14000,14000,150000,1
 ```
 
-### `public/shop_gold_pack.csv`
+### `public/tables/shop_gold_pack.csv`
 
 ```csv
 pack_id,sort_order,label,sublabel,gold,gem_cost,is_free,enabled
@@ -1107,7 +1107,7 @@ gold_6h,2,6시간 순찰 골드,💎 90,36000,90,0,1
 gold_24h,3,24시간 순찰 골드,💎 288,144000,288,0,1
 ```
 
-### `public/shop_test_config.csv`
+### `public/tables/shop_test_config.csv`
 
 ```csv
 key,value,note
@@ -1116,7 +1116,7 @@ test_reset_gems,500,리셋 시 보석
 show_reset_button,1,상점 리셋 버튼 표시
 ```
 
-### `public/skill_config.csv`
+### `public/tables/skill_config.csv`
 
 ```csv
 skill_id,skill_name,skill_type,icon,description,base_cooldown_frames,base_dmg_mult,projectile_speed,projectile_radius,max_level,max_range,element,projectile_sprite_url,fire_pattern,target_mode,projectile_count,spread_deg,explode_radius,projectile_id,magazine_capacity,burst_interval_frames,reload_frames
@@ -1147,7 +1147,7 @@ auto_shotgun,샷건,AUTO,💥,전방 3방향 산탄 — 근거리 범위 공격,
 auto_drill,드릴건,AUTO,🌀,직진 관통 드릴 — 튕김 없이 앞으로만,65,1.0,7.5,5,1,280,,,auto,nearest,1,0,0,p_auto_drill,5,14,126
 ```
 
-### `public/skill_evolution_config.csv`
+### `public/tables/skill_evolution_config.csv`
 
 ```csv
 evolution_id,active_skill_id,passive_skill_id,result_skill_id,result_skill_name,result_description
@@ -1161,7 +1161,7 @@ evo_drill_shot,drill_shot,exoskeleton,whistling_arrow,휘파람 화살,적 사�
 evo_dimensional_blade,dimensional_blade,highFuel,void_slash,차원 참격,360도 전체 영역의 공간을 찢어 폭풍 피해를 입히는 검기
 ```
 
-### `public/skill_level_config.csv`
+### `public/tables/skill_level_config.csv`
 
 ```csv
 skill_id,level,dmg_mult_scale,cooldown_reduce_rate,passive_bonus_value
@@ -1277,7 +1277,7 @@ ammoBooster,4,0,0,0.40
 ammoBooster,5,0,0,0.50
 ```
 
-### `public/skill_runtime_config.csv`
+### `public/tables/skill_runtime_config.csv`
 
 ```csv
 key,value,note
@@ -1387,7 +1387,7 @@ whistling_arrow_spin_y,14,휘파람 화살 Y 스핀(rad/s)
 meteor_fall_rot_speed,8,메테오 낙하 메시 회전(rad/s)
 ```
 
-### `public/stage_config.csv`
+### `public/tables/stage_config.csv`
 
 ```csv
 stage,stage_name,max_enemies_scale,spawn_interval_scale,spawn_interval_min_frames,boss_hp_mult,xp_mult,initial_xp_small,enemy_hp_mult,enemy_speed_mult,enemy_dmg_mult
@@ -1403,7 +1403,7 @@ stage,stage_name,max_enemies_scale,spawn_interval_scale,spawn_interval_min_frame
 10,프리즘 코어,2.00,0.65,6,11.1,1.35,8,3.80,1.50,2.40
 ```
 
-### `public/talent_config.csv`
+### `public/tables/talent_config.csv`
 
 ```csv
 talent_id,talent_name,description,max_level,effect_per_level
@@ -1413,7 +1413,7 @@ speed,이동속도 증가,기본 이동속도 +8%,3,0.08
 exp_boost,경험치 보너스,EXP 획득량 +10%,3,0.10
 ```
 
-### `public/talent_cost_config.csv`
+### `public/tables/talent_cost_config.csv`
 
 ```csv
 talent_id,level,gold_cost
@@ -1431,7 +1431,7 @@ exp_boost,2,500
 exp_boost,3,1000
 ```
 
-### `public/ticket_config.csv`
+### `public/tables/ticket_config.csv`
 
 ```csv
 ticket_id,ticket_name,ticket_tier,multiplier,gem_cost,daily_free_count,icon,acquire_label
@@ -1441,7 +1441,7 @@ gold_ticket,골드권,3,25,200,0,🥇,상위 보상 / 구매
 diamond_ticket,다이아권,4,50,500,0,💎,💎 500 구매
 ```
 
-### `public/ticket_multiplier_step.csv`
+### `public/tables/ticket_multiplier_step.csv`
 
 ```csv
 sort_order,multiplier,note
@@ -1453,7 +1453,7 @@ sort_order,multiplier,note
 6,100,
 ```
 
-### `public/vfx_config.csv`
+### `public/tables/vfx_config.csv`
 
 ```csv
 vfx_id,particle_count,particle_size_min,particle_size_max,particle_life_frames,particle_speed,bloom_strength,bloom_radius,bloom_threshold,screen_shake_intensity,screen_shake_duration_frames,flash_duration_frames,particle_color_hex,particle_sprite_url
@@ -1467,7 +1467,7 @@ explosion,16,3,9,25,4.5,1.4,0.4,0.08,0.3,12,0,,
 red_tint_hit,0,0,0,0,0,0,0,0,0.1,5,9,,
 ```
 
-### `public/wave_config.csv`
+### `public/tables/wave_config.csv`
 
 ```csv
 stage,wave_id,start_time_seconds,spawn_interval_frames,max_enemies,rate_basic,rate_dog,rate_bloater,rate_spitter
@@ -1513,7 +1513,7 @@ stage,wave_id,start_time_seconds,spawn_interval_frames,max_enemies,rate_basic,ra
 10,4,360,5,660,0.00,0.05,0.57,0.38
 ```
 
-### `public/weapon_config.csv`
+### `public/tables/weapon_config.csv`
 
 ```csv
 weapon_id,item_name,icon,grade,skill_id,description
@@ -1522,7 +1522,7 @@ shotgun,스프레드 샷건,💥,EPIC,shotgun,"전방으로 산탄 5발을 퍼�
 drill,파워 드릴건,🌀,EPIC,drill_shot,"적을 관통하고 벽에 튕기는 드릴 발사기"
 ```
 
-### `public/weapon_visual_config.csv`
+### `public/tables/weapon_visual_config.csv`
 
 ```csv
 skill_id,weapon_kind,scale,offset_x,offset_y
@@ -2154,10 +2154,10 @@ event_id,event_name,group_size,min_level,event_duration_hours,daily_free_attempt
 config_key,config_value,description
 tournament_round_min,30,토너먼트 1라운드 길이(분). endMs = now + 이 값
 bot_tick_ms,60000,봇 점수 갱신 간격(ms). 0이면 aa_event_config bot_tick_min_ms~max 랜덤
-shots_per_bow,5,[레거시·미사용] 구 1활대=5발 모델. 현재 1발=1재화 + 라운드당 1~5발 선택(runRound n)
+shots_per_bow,5,활대 1개 소비 시 WebGL 연속 발사 횟수(SET5 점수표 사용)
 event_meta_version,3,aa_event_meta localStorage v (불일치 시 메타 리셋)
-starter_bow_stands,5,[레거시·미사용] 기본 발 지급은 combat_tuning.csv archery_starter_bows 사용
-kills_per_bow_host,100,[레거시·미사용] 발 수급은 event_minigame_acquire_config.csv(일반 200 보스 2) 사용
+starter_bow_stands,5,PRISM 호스트 최초·마이그레이션 지급 활대 개수
+kills_per_bow_host,100,PRISM 스퀘어 적 처치 N마리당 활대 +1
 storage_key_prism_host,prism_archery_host_v1,호스트 재화·수령대기 저장 키
 storage_key_player,aa_player_state,iframe 플레이어 점수·순위 저장 키
 storage_key_event_meta,aa_event_meta,iframe 토너먼트 라운드 종료·claimPending

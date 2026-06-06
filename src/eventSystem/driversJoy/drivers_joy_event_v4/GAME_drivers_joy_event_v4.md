@@ -5,6 +5,12 @@ note: "v4는 mdv3와 별도 폴더. v5 diff용 — 절대 요약·삭제 금지.
 ui_pixel_precision: "DESIGN·외부 팀. DEV는 json-render 슬롯·$state·DOM 순서·CSV SSoT만."
 ---
 
+## 🎯 레퍼런스 (제작 기준 게임)
+
+> **드라이버 = Monopoly GO 스타일 단일 한정 상점 오퍼 (단일 IAP 딜).** (이벤트 아닌 상점형)
+>
+> ⚠️ 레퍼런스는 톤·조작감·연출 **참고용**. 모든 수치·구조·UI·플로우의 단일 진실(SSoT)은 이 문서 세트(GAME·DESIGN·DEV·CSV)다. **충돌 시 문서 우선**, 임의 추가·생략 금지.
+
 # 드라이버의 기쁨 — 게임 기획서 (GAME.md)
 
 > **문서 역할:** 모듈 단독 이식용 **기획·밸런스·CSV SSoT**  

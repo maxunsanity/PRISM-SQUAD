@@ -21,7 +21,7 @@ condense_policy: forbidden
 |------|------|--------|
 | **GAME·DEV·RECIPE** | 기존 성공 md **전량 복사** + v4 배너 | 요약본 |
 | **DESIGN** | 팔레트·레이아웃 + **`style.css` 거의 전문** (있으면) | 픽셀 완성용 Figma |
-| **DEV §14** | `public/` CSV **파일 통째** | AI 임의 수치 |
+| **DEV §14** | `public/tables/` CSV **파일 통째** | AI 임의 수치 |
 | **RECIPE_CODE** | **추론 위험 구간의 샘플 소스** (연동·상태·핵심 루프) | 레포 전 파일 전부 |
 
 ---
