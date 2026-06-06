@@ -320,7 +320,7 @@ reward_energy,icon,/event/tycoonSeason/assets/reward_energy.png,⚡,36,36
 reward_gold,icon,/event/tycoonSeason/assets/reward_gold.png,💰,36,36
 reward_gem,icon,/event/tycoonSeason/assets/reward_gem.png,💎,36,36
 reward_dna,icon,/event/tycoonSeason/assets/reward_dna.png,🧬,36,36
-reward_sticker,icon,/assets/skills/kunai.png,🃏,36,36
+reward_sticker,icon,/sprites/skills/kunai.png,🃏,36,36
 tycoon_banner_bg_top,color,#FF8A2A,,0,0
 tycoon_banner_bg_bottom,color,#FFE4A8,,0,0
 tycoon_banner_border,color,#FFFFFF,,0,0
@@ -339,8 +339,8 @@ lobby_tycoon_card_bg,color,#3D2817,,0,0
 lobby_tycoon_card_border,color,#FFB347,,0,0
 lobby_season_card_bg,color,#0F2744,,0,0
 lobby_season_card_border,color,#4FC3F7,,0,0
-enemy_normal,icon,/assets/enemies/basic.png,👾,40,40
-enemy_boss,icon,/assets/boss/titan.png,👹,40,40
+enemy_normal,icon,/sprites/enemies/basic.png,👾,40,40
+enemy_boss,icon,/sprites/boss/titan.png,👹,40,40
 enemy_mini_boss,icon,,👿,40,40
 help_arrow,icon,,➜,24,24
 tournament_hero,icon,/event/assets/tournament_hero.png,🏆,120,72
