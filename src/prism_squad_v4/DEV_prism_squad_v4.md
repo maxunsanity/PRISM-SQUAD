@@ -482,7 +482,7 @@ level,exp_required,reward_gem,reward_gold
 boss_id,boss_name,is_mini_boss,boss_type,arena_size_w,arena_size_h,hp,speed,radius,contact_dmg,contact_dmg_interval_frames,puddle_interval_frames,puddle_radius,puddle_life_frames,puddle_dmg,puddle_dmg_interval_frames,missile_count,missile_interval_frames,missile_speed,missile_turn_rate,missile_max_range,missile_spread_angle,spawn_time_seconds,spawn_offset_y,clear_minions_on_intro,suppress_wave_spawn,geometry_type,color_hex,glow_color_hex,sprite_url
 crusher,CRUSHER,true,moving,0,0,225,1.6,36,8,15,0,0,0,0,0,0,0,0,0,0,0,100,200,0,0,BoxGeometry,#FF3322,#FF6644,
 nexus,NEXUS,true,stationary_missile,360,420,150,0,42,0,0,0,0,0,0,0,3,90,3.8,1.8,500,25,200,220,0,0,OctahedronGeometry,#AA22FF,#DD55FF,
-titan,TITAN,false,moving,0,0,300,1.0,26,8,20,130,50,200,2,30,0,0,0,0,0,0,600,320,1,0,TorusGeometry,#3D2060,#6600FF,/sprites/boss/titan.png
+titan,TITAN,false,moving,0,0,300,1.0,26,8,20,130,50,200,2,30,0,0,0,0,0,0,600,320,1,0,TorusGeometry,#3D2060,#6600FF,
 ```
 
 ### `public/tables/boss_pattern_config.csv`
@@ -652,9 +652,9 @@ joystick_ring_diameter,joystick_knob_diameter,joystick_max_dist,joystick_z_index
 
 ```csv
 drop_id,drop_type,drop_weight,effect_value,pickup_radius,geometry_type,color_hex,size_small,size_medium,size_large,sprite_url
-xp_small,xp,0,1,34,XpGemBillboard,#00E5FF,3.6,4.8,6.2,/sprites/drops/xp_small.png
-xp_medium,xp,0,5,34,XpGemBillboard,#9B7AFF,4.8,6.2,7.8,/sprites/drops/xp_medium.png
-xp_large,xp,0,22,34,XpGemBillboard,#FFC830,6.2,7.8,9.5,/sprites/drops/xp_large.png
+xp_small,xp,0,1,34,XpGemBillboard,#00E5FF,3.6,4.8,6.2,
+xp_medium,xp,0,5,34,XpGemBillboard,#9B7AFF,4.8,6.2,7.8,
+xp_large,xp,0,22,34,XpGemBillboard,#FFC830,6.2,7.8,9.5,
 meat,heal,0.04,30,28,CrossGeometry,#80CCFF,0,0,0,
 magnet,magnet,0.06,4,28,HalfTorusGeometry,#C099FF,0,0,0,
 bomb,bomb,0.015,0,28,IcosahedronGeometry,#FF6680,0,0,0,
@@ -1262,7 +1262,8 @@ fitnessGuide,1,0,0,80
 fitnessGuide,2,0,0,160
 fitnessGuide,3,0,0,240
 fitnessGuide,4,0,0,320
-fitnessGuide,5,0,0,400auto_basic,1,1.0,0.00,0
+fitnessGuide,5,0,0,400
+auto_basic,1,1.0,0.00,0
 auto_revolver,1,1.0,0.00,0
 auto_shotgun,1,1.0,0.00,0
 auto_drill,1,1.0,0.00,0
@@ -1558,13 +1559,13 @@ bot_cap_ratio_top_mult,1.6,상위 봇 capRatio 배율
 
 ```csv
 asset_key,asset_type,url,fallback_text,width,height
-tycoon_coin,icon,/event/tycoonSeason/assets/tycoon_coin.png,🎈,40,40
-season_coin,icon,/event/tycoonSeason/assets/season_coin.png,🏆,40,40
-reward_energy,icon,/event/tycoonSeason/assets/reward_energy.png,⚡,36,36
-reward_gold,icon,/event/tycoonSeason/assets/reward_gold.png,💰,36,36
-reward_gem,icon,/event/tycoonSeason/assets/reward_gem.png,💎,36,36
-reward_dna,icon,/event/tycoonSeason/assets/reward_dna.png,🧬,36,36
-reward_sticker,icon,/sprites/skills/kunai.png,🃏,36,36
+tycoon_coin,icon,,🎈,40,40
+season_coin,icon,,🏆,40,40
+reward_energy,icon,,⚡,36,36
+reward_gold,icon,,💰,36,36
+reward_gem,icon,,💎,36,36
+reward_dna,icon,,🧬,36,36
+reward_sticker,icon,,🃏,36,36
 tycoon_banner_bg_top,color,#FF8A2A,,0,0
 tycoon_banner_bg_bottom,color,#FFE4A8,,0,0
 tycoon_banner_border,color,#FFFFFF,,0,0
@@ -1583,16 +1584,16 @@ lobby_tycoon_card_bg,color,#3D2817,,0,0
 lobby_tycoon_card_border,color,#FFB347,,0,0
 lobby_season_card_bg,color,#0F2744,,0,0
 lobby_season_card_border,color,#4FC3F7,,0,0
-enemy_normal,icon,/sprites/enemies/basic.png,👾,40,40
-enemy_boss,icon,/sprites/boss/titan.png,👹,40,40
+enemy_normal,icon,,👾,40,40
+enemy_boss,icon,,👹,40,40
 enemy_mini_boss,icon,,👿,40,40
 help_arrow,icon,,➜,24,24
-tournament_hero,icon,/event/assets/tournament_hero.png,🏆,120,72
-tournament_tab_icon,icon,/event/assets/tournament_hero.png,🏆,48,48
+tournament_hero,icon,,🏆,120,72
+tournament_tab_icon,icon,,🏆,48,48
 modal_border_color,color,#9C7BD8,,0,0
 modal_bg_color,color,#E8D4F8,,0,0
 row_player_bg,color,#B3E5FC,,0,0
-reward_lock,icon,/event/tycoonSeason/assets/reward_lock.png,🔒,36,36
+reward_lock,icon,,🔒,36,36
 ```
 
 ### `public/event/tycoonSeason/event_board_config.csv`

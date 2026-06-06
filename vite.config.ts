@@ -3,8 +3,20 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  // localhost → 127.0.0.1(IPv4)만 쓰는 브라우저에서도 접속되도록 0.0.0.0 바인딩
-  server: { port: 5176, host: true },
+  // zip 업로드·상대 경로 배포 — index.html과 같은 폴더 기준으로 assets/tables 로드
+  base: './',
+  server: {
+    port: 5180,
+    host: '127.0.0.1',
+    strictPort: true,
+    open: true,
+  },
+  preview: {
+    port: 5180,
+    host: '127.0.0.1',
+    strictPort: true,
+    open: true,
+  },
   build: {
     chunkSizeWarningLimit: 900,
     rollupOptions: {

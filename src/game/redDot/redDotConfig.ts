@@ -1,4 +1,5 @@
 import type { RedDotCategory, RedDotConfigRow } from './types';
+import { resolvePublicPath } from '../../publicPath';
 
 const CSV_PATH = '/tables/red_dot_config.csv';
 
@@ -19,7 +20,7 @@ let cached: RedDotConfigRow[] | null = null;
 export async function loadRedDotConfig(): Promise<RedDotConfigRow[]> {
   if (cached) return cached;
   try {
-    const res = await fetch(CSV_PATH);
+    const res = await fetch(resolvePublicPath(CSV_PATH));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     cached = parseCsv(await res.text()).map(r => ({
       dot_id: r.dot_id ?? '',

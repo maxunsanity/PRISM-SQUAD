@@ -1,4 +1,5 @@
 /** 세일 이벤트 CSV — tycoonSeason/data.ts와 동일 RFC4180 파서 */
+import { resolvePublicPath } from '../../publicPath';
 
 function splitCsvLine(line: string): string[] {
   const out: string[] = [];
@@ -32,7 +33,7 @@ export function parseCSV(raw: string): Record<string, string>[] {
 }
 
 export async function loadCSV(path: string): Promise<Record<string, string>[]> {
-  const res = await fetch(path);
+  const res = await fetch(resolvePublicPath(path));
   if (!res.ok) throw new Error(`[sales] CSV load failed: ${path}`);
   return parseCSV(await res.text());
 }

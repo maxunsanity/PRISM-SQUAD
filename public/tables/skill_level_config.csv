@@ -95,7 +95,8 @@ fitnessGuide,1,0,0,80
 fitnessGuide,2,0,0,160
 fitnessGuide,3,0,0,240
 fitnessGuide,4,0,0,320
-fitnessGuide,5,0,0,400auto_basic,1,1.0,0.00,0
+fitnessGuide,5,0,0,400
+auto_basic,1,1.0,0.00,0
 auto_revolver,1,1.0,0.00,0
 auto_shotgun,1,1.0,0.00,0
 auto_drill,1,1.0,0.00,0

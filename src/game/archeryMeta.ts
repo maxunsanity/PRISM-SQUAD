@@ -3,6 +3,7 @@
  */
 import { getMinigameCurrencyService } from './minigameCurrency';
 import type { MinigameCurrencySave } from './minigameCurrency/types';
+import { resolvePublicPath } from '../publicPath';
 
 const BUNDLE_CSV = '/event/archeryArena/aa_bundle_reward_config.csv';
 
@@ -23,7 +24,7 @@ function parseCsvRows(text: string): Record<string, string>[] {
 /** PRISM 기동 시 1회 — 번들 CSV + aa_integration kills는 combat_tuning/archery_starter_bows 사용 */
 export async function preloadArcheryCsvConfig() {
   try {
-    const bunRes = await fetch(BUNDLE_CSV);
+    const bunRes = await fetch(resolvePublicPath(BUNDLE_CSV));
     if (bunRes.ok) {
       const map: typeof bundleGrantCache = {};
       for (const r of parseCsvRows(await bunRes.text())) {

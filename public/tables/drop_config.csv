@@ -1,7 +1,7 @@
 drop_id,drop_type,drop_weight,effect_value,pickup_radius,geometry_type,color_hex,size_small,size_medium,size_large,sprite_url
-xp_small,xp,0,1,34,XpGemBillboard,#00E5FF,3.6,4.8,6.2,/sprites/drops/xp_small.png
-xp_medium,xp,0,5,34,XpGemBillboard,#9B7AFF,4.8,6.2,7.8,/sprites/drops/xp_medium.png
-xp_large,xp,0,22,34,XpGemBillboard,#FFC830,6.2,7.8,9.5,/sprites/drops/xp_large.png
+xp_small,xp,0,1,34,XpGemBillboard,#00E5FF,3.6,4.8,6.2,
+xp_medium,xp,0,5,34,XpGemBillboard,#9B7AFF,4.8,6.2,7.8,
+xp_large,xp,0,22,34,XpGemBillboard,#FFC830,6.2,7.8,9.5,
 meat,heal,0.04,30,28,CrossGeometry,#80CCFF,0,0,0,
 magnet,magnet,0.06,4,28,HalfTorusGeometry,#C099FF,0,0,0,
 bomb,bomb,0.015,0,28,IcosahedronGeometry,#FF6680,0,0,0,

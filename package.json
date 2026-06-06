@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "npm run build:archery && vite",
+    "dev:game": "vite --host 127.0.0.1 --port 5180",
+    "serve": "vite preview --host 127.0.0.1 --port 5180",
     "build": "npm run build:archery && tsc -b && vite build",
     "build:archery": "npm run build --prefix \"src/eventSystem/Archery Arena_game_end\"",
     "preview": "vite preview"

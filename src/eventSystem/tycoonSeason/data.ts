@@ -1,6 +1,7 @@
 /**
  * eventSystem/data.ts — 이벤트 CSV SSoT (게임 data.ts와 분리)
  */
+import { resolvePublicPath } from '../../publicPath';
 
 export const EVENT_CSV_PATHS = {
   BOARD: '/event/tycoonSeason/event_board_config.csv',
@@ -164,7 +165,7 @@ function parseCSV(raw: string): Record<string, string>[] {
 }
 
 async function loadCSV(path: string): Promise<Record<string, string>[]> {
-  const res = await fetch(path);
+  const res = await fetch(resolvePublicPath(path));
   if (!res.ok) throw new Error(`[event] CSV load failed: ${path}`);
   return parseCSV(await res.text());
 }

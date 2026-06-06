@@ -2,6 +2,7 @@
  * data.ts — CSV 파서 + 전체 타입 정의 (SSoT)
  * 모든 게임 수치는 이 파일을 통해 로드됨. 코드 내 하드코딩 금지.
  */
+import { resolvePublicPath } from '../publicPath';
 
 /* ── CSV 경로 상수 (stubsAndMaterials.ts와 동기화 유지) ── */
 export const CSV_PATHS = {
@@ -123,7 +124,8 @@ function parseCSV(raw: string): Record<string, string>[] {
 }
 
 async function loadCSV(path: string): Promise<Record<string, string>[]> {
-  const res = await fetch(path);
+  const res = await fetch(resolvePublicPath(path));
+  if (!res.ok) throw new Error(`CSV load failed: ${path} (${res.status})`);
   const text = await res.text();
   return parseCSV(text);
 }
