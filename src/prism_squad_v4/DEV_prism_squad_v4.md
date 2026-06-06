@@ -315,7 +315,8 @@ getWallet:      () => core.getSalesWallet()               // {cashKrw,gems,gold,
 ### 9-A.1 핵심 원칙 (4개)
 1. **CSV/에셋 설정이 SSoT** — 모든 시각 설정은 CSV(또는 `event_asset_config.csv`)에. 코드는 읽어 렌더만 하고 모양/색/이미지를 직접 결정하지 않는다.
 2. **폴백 보존 (절대 손상 금지)** — `sprite_url`이 비어있으면 기존 절차적 도형/색(또는 손그림 SVG)으로 폴백. 기본 연출은 절대 깨지지 않는다.
-3. **`public/assets/` 가 리소스 루트** — 카테고리 폴더(enemies/player/boss/skills/drops/fx/bg + (UI 확장 시) ui/). Vite가 `dist/`로 복사 → `/assets/...` 직접 접근.
+3. **`public/sprites/` 가 리소스 루트** — 카테고리 폴더(enemies/player/boss/skills/drops/fx/bg + (UI 확장 시) ui/). Vite가 `dist/`로 복사 → `/sprites/...` 직접 접근.
+   - ⚠️ **`assets/`가 아니라 `sprites/`인 이유:** Vite 번들 출력 폴더가 `/assets/`(해시 파일 전용)라 일부 정적 호스트가 `/assets/` 하위 비-해시 파일을 안 내려준다(404). 충돌 회피 위해 런타임 이미지는 **반드시 `/sprites/`** 에 둔다.
 4. **마크다운/이모지 금지** — 텍스트 이모지 대신 **컨셉에 맞게 그린 그래픽(SVG / Three.js)**. 교체 기준점이 되는 **플레이스홀더 PNG**를 `scripts/gen_sprites.mjs`로 생성해 둔다.
 
 ### 9-A.2 코드 패턴 (Three.js)
@@ -346,7 +347,7 @@ if (cfg.sprite_url) {
 | VFX 파티클 | `particle_sprite_url` | VfxSystem.ts | ✅ 색상도 CSV |
 | 배경 | `bg_sprite_url` | Renderer3D.ts | ✅ 없으면 스타디움 플로어 |
 
-→ `scripts/gen_sprites.mjs`가 위 카테고리 플레이스홀더 PNG 생성(현재 `public/assets/` 7폴더·PNG 배포됨). CSV의 sprite_url은 **현재 전부 비어 있음** → 원래 연출 그대로.
+→ `scripts/gen_sprites.mjs`가 위 카테고리 플레이스홀더 PNG 생성(현재 `public/sprites/` 7폴더·PNG 배포됨). 대부분 sprite_url은 비어 있어 절차적 폴백(보스·드롭만 `/sprites/...` 지정).
 
 **이벤트 — ✅ 자체 에셋 시스템 보유:** 퍼즐/라바/양궁(iframe)은 각자 CSV `sprite_url`/`*_sprite_url` + 전용 `assets/`. 타이쿤/시즌은 `public/event/tycoonSeason/event_asset_config.csv`(`asset_key,asset_type,url,fallback_text`)로 url 있으면 `<img>`, 없으면 fallback 텍스트.
 
@@ -362,8 +363,8 @@ if (cfg.sprite_url) {
 ### 9-A.5 교체 플로우 (사용자 관점)
 ```
 1) AI로 PNG 생성 (적/투사체 64×64, 보스 128×128, 배경 512×512, PNG 투명)
-2) public/assets/[카테고리]/ 에 저장
-3) CSV의 sprite_url(또는 event_asset_config url)에 경로 입력 (예: assets/enemies/basic.png)
+2) public/sprites/[카테고리]/ 에 저장
+3) CSV의 sprite_url(또는 event_asset_config url)에 경로 입력 (예: /sprites/enemies/basic.png)
 4) 새로고침 → 즉시 반영
 ```
 
@@ -481,7 +482,7 @@ level,exp_required,reward_gem,reward_gold
 boss_id,boss_name,is_mini_boss,boss_type,arena_size_w,arena_size_h,hp,speed,radius,contact_dmg,contact_dmg_interval_frames,puddle_interval_frames,puddle_radius,puddle_life_frames,puddle_dmg,puddle_dmg_interval_frames,missile_count,missile_interval_frames,missile_speed,missile_turn_rate,missile_max_range,missile_spread_angle,spawn_time_seconds,spawn_offset_y,clear_minions_on_intro,suppress_wave_spawn,geometry_type,color_hex,glow_color_hex,sprite_url
 crusher,CRUSHER,true,moving,0,0,225,1.6,36,8,15,0,0,0,0,0,0,0,0,0,0,0,100,200,0,0,BoxGeometry,#FF3322,#FF6644,
 nexus,NEXUS,true,stationary_missile,360,420,150,0,42,0,0,0,0,0,0,0,3,90,3.8,1.8,500,25,200,220,0,0,OctahedronGeometry,#AA22FF,#DD55FF,
-titan,TITAN,false,moving,0,0,300,1.0,26,8,20,130,50,200,2,30,0,0,0,0,0,0,600,320,1,0,TorusGeometry,#3D2060,#6600FF,assets/boss/titan.png
+titan,TITAN,false,moving,0,0,300,1.0,26,8,20,130,50,200,2,30,0,0,0,0,0,0,600,320,1,0,TorusGeometry,#3D2060,#6600FF,/sprites/boss/titan.png
 ```
 
 ### `public/tables/boss_pattern_config.csv`
@@ -651,9 +652,9 @@ joystick_ring_diameter,joystick_knob_diameter,joystick_max_dist,joystick_z_index
 
 ```csv
 drop_id,drop_type,drop_weight,effect_value,pickup_radius,geometry_type,color_hex,size_small,size_medium,size_large,sprite_url
-xp_small,xp,0,1,34,XpGemBillboard,#00E5FF,3.6,4.8,6.2,/assets/drops/xp_small.png
-xp_medium,xp,0,5,34,XpGemBillboard,#9B7AFF,4.8,6.2,7.8,/assets/drops/xp_medium.png
-xp_large,xp,0,22,34,XpGemBillboard,#FFC830,6.2,7.8,9.5,/assets/drops/xp_large.png
+xp_small,xp,0,1,34,XpGemBillboard,#00E5FF,3.6,4.8,6.2,/sprites/drops/xp_small.png
+xp_medium,xp,0,5,34,XpGemBillboard,#9B7AFF,4.8,6.2,7.8,/sprites/drops/xp_medium.png
+xp_large,xp,0,22,34,XpGemBillboard,#FFC830,6.2,7.8,9.5,/sprites/drops/xp_large.png
 meat,heal,0.04,30,28,CrossGeometry,#80CCFF,0,0,0,
 magnet,magnet,0.06,4,28,HalfTorusGeometry,#C099FF,0,0,0,
 bomb,bomb,0.015,0,28,IcosahedronGeometry,#FF6680,0,0,0,

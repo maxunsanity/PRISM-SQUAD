@@ -44,7 +44,7 @@ condense_policy: forbidden
 - **레이어 B · 게임 월드**(적·플레이어·보스·스킬·드롭·VFX·3D배경): Three.js `MeshBasicMaterial`, 네온/도형, z레이어 체계(투사체 **z=1.0** 필수).
 
 ## 4. 에셋 교체 시스템 (DEV §9-A)
-- 그래픽 = CSV가 SSoT. `sprite_url` 비면 절차적 도형/색 폴백(기본 연출 무손상). `public/assets/` 루트. 이미지 교체만으로 리스킨.
+- 그래픽 = CSV가 SSoT. `sprite_url` 비면 절차적 도형/색 폴백(기본 연출 무손상). **`public/sprites/` 루트**(⚠️ vite 번들 폴더 `/assets/`와 충돌 회피 — 런타임 이미지는 `/sprites/`). 이미지 교체만으로 리스킨.
 - 게임월드는 구현 완료, **UI는 토큰화·에셋화 규칙만 정의(미구현)** — DEV §9-A.4 따라 재현.
 
 ## 5. json-render 3종 세트 (구현 SSoT)

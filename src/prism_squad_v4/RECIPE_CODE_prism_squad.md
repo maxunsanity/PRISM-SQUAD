@@ -37,7 +37,7 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     ticketUnit: '장',
     showFlag: '/lobby/showLavaQuest',
     persistKeys: ['lq_session_v1'],
-    durationHours: 0.5,
+    durationHours: 48,
     enabled: true,
   },
   prize: {
@@ -1447,7 +1447,7 @@ const FALLBACK: Record<EventMinigameId, EventMinigameConfig> = {
     ticketUnit: '장',
     showFlag: '/lobby/showLavaQuest',
     persistKeys: ['lq_session_v1'],
-    durationHours: 0.5,
+    durationHours: 48,
     enabled: true,
   },
   prize: {

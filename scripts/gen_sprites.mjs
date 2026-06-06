@@ -527,39 +527,39 @@ function makeParticleSpark() {
 const bgData = makeBg();
 
 const sprites = [
-  ['public/assets/enemies/basic.png',   makeBasic()],
-  ['public/assets/enemies/dog.png',     makeDog()],
-  ['public/assets/enemies/bloater.png', makeBloater()],
-  ['public/assets/enemies/spitter.png', makeSpitter()],
-  ['public/assets/player/default.png',  makePlayer()],
-  ['public/assets/boss/titan.png',      makeBoss()],
-  ['public/assets/skills/kunai.png',        makeKunai()],
-  ['public/assets/skills/boomerang.png',    makeBoomerang()],
-  ['public/assets/skills/rocket.png',       makeRocket()],
-  ['public/assets/skills/molotov.png',      makeMolotov()],
-  ['public/assets/skills/guardian.png',     makeGuardian()],
-  ['public/assets/skills/drone.png',        makeDrone()],
-  ['public/assets/skills/soccer_ball.png',  makeSoccerBall()],
-  ['public/assets/skills/drill_shot.png',   makeDrillShot()],
-  ['public/assets/skills/dimensional_blade.png', makeDimensionalBlade()],
-  ['public/assets/skills/debuff_aura.png',  makeDebuffAura()],
+  ['public/sprites/enemies/basic.png',   makeBasic()],
+  ['public/sprites/enemies/dog.png',     makeDog()],
+  ['public/sprites/enemies/bloater.png', makeBloater()],
+  ['public/sprites/enemies/spitter.png', makeSpitter()],
+  ['public/sprites/player/default.png',  makePlayer()],
+  ['public/sprites/boss/titan.png',      makeBoss()],
+  ['public/sprites/skills/kunai.png',        makeKunai()],
+  ['public/sprites/skills/boomerang.png',    makeBoomerang()],
+  ['public/sprites/skills/rocket.png',       makeRocket()],
+  ['public/sprites/skills/molotov.png',      makeMolotov()],
+  ['public/sprites/skills/guardian.png',     makeGuardian()],
+  ['public/sprites/skills/drone.png',        makeDrone()],
+  ['public/sprites/skills/soccer_ball.png',  makeSoccerBall()],
+  ['public/sprites/skills/drill_shot.png',   makeDrillShot()],
+  ['public/sprites/skills/dimensional_blade.png', makeDimensionalBlade()],
+  ['public/sprites/skills/debuff_aura.png',  makeDebuffAura()],
   // 드롭
-  ['public/assets/drops/xp_small.png',   makeXpSmall()],
-  ['public/assets/drops/xp_medium.png',  makeXpMedium()],
-  ['public/assets/drops/xp_large.png',   makeXpLarge()],
-  ['public/assets/drops/heal.png',       makeHeal()],
-  ['public/assets/drops/magnet.png',     makeMagnet()],
-  ['public/assets/drops/bomb.png',       makeBombDrop()],
+  ['public/sprites/drops/xp_small.png',   makeXpSmall()],
+  ['public/sprites/drops/xp_medium.png',  makeXpMedium()],
+  ['public/sprites/drops/xp_large.png',   makeXpLarge()],
+  ['public/sprites/drops/heal.png',       makeHeal()],
+  ['public/sprites/drops/magnet.png',     makeMagnet()],
+  ['public/sprites/drops/bomb.png',       makeBombDrop()],
   // VFX
-  ['public/assets/fx/particle_spark.png', makeParticleSpark()],
+  ['public/sprites/fx/particle_spark.png', makeParticleSpark()],
 ];
 
 // 배경은 512x512라 별도 처리
-mkdirSync('public/assets/bg', { recursive: true });
-mkdirSync('public/assets/drops', { recursive: true });
-mkdirSync('public/assets/fx', { recursive: true });
-writeFileSync('public/assets/bg/default.png', makePNG(bgData.pixels, bgData.size));
-console.log('✓ public/assets/bg/default.png');
+mkdirSync('public/sprites/bg', { recursive: true });
+mkdirSync('public/sprites/drops', { recursive: true });
+mkdirSync('public/sprites/fx', { recursive: true });
+writeFileSync('public/sprites/bg/default.png', makePNG(bgData.pixels, bgData.size));
+console.log('✓ public/sprites/bg/default.png');
 
 for (const [path, pixels] of sprites) {
   const png = makePNG(pixels, SIZE);
