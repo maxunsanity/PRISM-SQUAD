@@ -50,10 +50,13 @@ condense_policy: forbidden
 ## 5. json-render 3종 세트 (구현 SSoT)
 `prismHudSpec.ts`(Spec/$state) ↔ `catalog.ts`(검증) ↔ `registry.tsx`(React 구현) ↔ `hudExternalStore`(상태). **3종 동시 패치** — 하나만 고치면 컴포넌트 못 찾음. 이벤트 상태는 `/event/*`, 코어는 `/hud/*`·`/lobby/*` (혼용 금지).
 
-## 6. 이벤트 연동 + 빌드 스코프 (재현 시작 시 사용자에게 질문)
-- 코어는 6개 미니게임을 품지만 **약결합** — 코어 단독 동작 보장(`App.tsx` `eventData=null` → `attachEventBridge(null)`).
-- **재현 전 질문:** ① 통합(코어+6이벤트, 기본) ② 코어만 ③ 일부. 상세 = `GAME ## 이벤트 연동 (3계층) + 빌드 스코프` / `ATTACH_MODULES_v4.md`.
-- 이벤트를 붙이면 각 이벤트 폴더의 `SKILL_<게임>_event_v4.md`를 그 모듈 진입점으로 읽는다.
+## 6. 이벤트 연동 + 빌드 스코프 (자동 판정)
+- 코어는 6개 미니게임을 품지만 **약결합** — 코어 단독 동작 보장(`App.tsx` `eventData=null` → `attachEventBridge(null)` → 전부 no-op).
+- **★ 스코프 자동 판정 (사용자에게 묻지 말 것):**
+  - **이 폴더에 이벤트 문서(`*_event_v4/` 또는 `ATTACH_MODULES_v4.md`)가 없으면 → "코어만"으로 확정.** 이벤트(타이쿤·시즌·라바·퍼즐·양궁·쇼핑몰·드라이버) 제작·연동 코드 생성 안 함. DEV의 이벤트 연동 절(§9 등)·§15(이벤트 CSV)·`event_minigame_*`·`EventBridge`·`SalesHostBridge`는 **무시**.
+  - 이벤트 문서가 동봉돼 있으면 → 통합. 각 이벤트 폴더의 `SKILL_<게임>_event_v4.md`를 그 모듈 진입점으로 읽고 붙인다.
+  - 상세: `GAME ## 이벤트 연동 (3계층) + 빌드 스코프` / `ATTACH_MODULES_v4.md`(있을 때만).
+- **레퍼런스:** Survivor.io(탕탕특공대)류. 레퍼런스는 톤·감 참고용이고 **문서가 SSoT** — 충돌 시 문서 우선.
 
 ## 7. v4 규칙 / Anti-Patterns (코어 핵심)
 - **함축 금지**(v5 diff용) · CSV §14·15 = `public/`과 동일, **수치 임의 변경 금지** · RECIPE_CODE 임의 수정 금지(repo에서 복사).

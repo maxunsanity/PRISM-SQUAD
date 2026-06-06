@@ -710,7 +710,7 @@ archery,boss,2,1발,enemy_boss,archery_bow,2,1,보스
 
 ```csv
 id,label,emoji,tab_bg,src,ticket_path,ticket_cost,ticket_unit,show_flag_key,persist_keys,duration_hours,enabled
-lava,라바,🌋,#FFB347,/event/lavaQuest/index.html,,0,장,/lobby/showLavaQuest,lq_session_v1,0.5,1
+lava,라바,🌋,#FFB347,/event/lavaQuest/index.html,,0,장,/lobby/showLavaQuest,lq_session_v1,48,1
 prize,퍼즐,🎰,#B388FF,/event/prizeDrop/index.html,/lobby/prizeBalls,0,개,/lobby/showPrizeDrop,,24,1
 archery,양궁,🏹,#7EC8A8,/event/archeryArena/index.html,/lobby/archeryBowStands,0,발,/lobby/showArcheryArena,"aa_player_state|aa_event_meta|aa_ranking_bots|aa_ranking_dummy_schema",48,1
 ```
